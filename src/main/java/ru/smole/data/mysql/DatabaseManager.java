@@ -106,10 +106,6 @@ public class DatabaseManager {
         return null;
     }
 
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
-    }
-
     private void closeQuietly(AutoCloseable ... closeables) {
         for (AutoCloseable closeable : closeables) {
             try {
