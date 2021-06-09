@@ -57,7 +57,7 @@ public final class OpPrison extends JavaPlugin {
 
         ApiManager.registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand()
+                new BuildCommand(), new RankUpCommand()
         );
         
         loadRegionsAndMines();
