@@ -13,11 +13,17 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.smole.OpPrison;
+import ru.smole.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
+import ru.smole.utils.ItemStackUtils;
+import ru.xfenilafs.core.util.ChatUtil;
+
+import java.util.Objects;
 
 public class PlayerHandler implements Listener {
 
@@ -51,8 +57,9 @@ public class PlayerHandler implements Listener {
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
-        ItemStack item = e.getItem();
+    public void onInteract(PlayerInteractEvent event) {
+        ItemStack item = event.getItem();
+        ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
 
         if (item == null)
             return;
@@ -62,11 +69,11 @@ public class PlayerHandler implements Listener {
         if (type == Material.AIR)
             return;
 
-        Player player = e.getPlayer();
+        Player player = event.getPlayer();
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
-        Action action = e.getAction();
+        Action action = event.getAction();
 
-        if (action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
+        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
             ItemMeta itemMeta = item.getItemMeta();
             if (type == Material.MAGMA_CREAM) {
                 if (itemMeta.hasDisplayName()) {
@@ -78,6 +85,27 @@ public class PlayerHandler implements Listener {
                         playerData.setToken(playerData.getToken() + count);
                         player.getInventory().remove(item);
                     }
+                }
+            }
+        }
+
+        if (action == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+            if (event.getClickedBlock().getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && Case.getCustomCaseByLocation(event.getClickedBlock()) != null) {
+                event.setCancelled(true);
+                Case customCase = Case.getCustomCaseByLocation(event.getClickedBlock());
+                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    if (player.getInventory().getItemInMainHand() == null) {
+                        ChatUtil.sendMessage(player, "&fДля открытия этого сундука вам необходим %s", Objects.requireNonNull(customCase).getKey());
+                        return;
+                    }
+
+                    ItemStack is = player.getInventory().getItemInMainHand();
+                    if (!ItemStackUtils.hasName(is, Objects.requireNonNull(customCase).getKey())) {
+                        ChatUtil.sendMessage(player, "&fДля открытия этого сундука вам необходим %s" + customCase.getKey());
+                        return;
+                    }
+
+                    customCase.open(player, player.isSneaking());
                 }
             }
         }

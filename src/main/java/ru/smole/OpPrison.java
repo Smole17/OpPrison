@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.smole.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.mysql.DatabaseManager;
@@ -61,6 +62,7 @@ public final class OpPrison extends JavaPlugin {
         );
         
         loadRegionsAndMines();
+        loadCases();
     }
 
     @Override
@@ -137,5 +139,16 @@ public final class OpPrison extends JavaPlugin {
         log.info("Loaded {} mines!", MINES.size());
 
         Bukkit.getScheduler().runTaskTimer(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
+    }
+
+    private void loadCases() {
+        ConfigurationSection section = this.getConfig().getConfigurationSection("cases");
+        if (section != null && section.getKeys(false).size() > 0) {
+            section.getKeys(false).forEach((key) -> {
+                ConfigurationSection keySection = section.getConfigurationSection(key);
+                new Case(key, keySection);
+            });
+        }
+
     }
 }
