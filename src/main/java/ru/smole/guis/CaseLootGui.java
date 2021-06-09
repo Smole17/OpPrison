@@ -30,6 +30,15 @@ public class CaseLootGui extends BaseSimpleInventory {
             }
         }
 
+        addItem(49,
+                ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK)
+                        .setName(customCase.getId())
+                        .setLore(
+                                "§fДля открытия этого сундука",
+                                "§fвам нужен " + customCase.getKey()
+                        )
+                        .build()
+        );
         if (!customCase.getItems().isEmpty()) {
             customCase.getItems().forEach((caseItem) -> {
                 double chance = caseItem.getChance() * 100.0D;
