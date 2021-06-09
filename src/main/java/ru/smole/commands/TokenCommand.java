@@ -1,5 +1,7 @@
 package ru.smole.commands;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
@@ -7,36 +9,50 @@ import ru.smole.data.PlayerDataManager;
 import ru.smole.items.Items;
 import ru.smole.player.OpPlayer;
 import ru.smole.utils.StringUtils;
-import ru.xfenilafs.core.command.BukkitMegaCommand;
-import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.command.BukkitCommand;
 
-public class TokenCommand extends BukkitMegaCommand<Player> {
+public class TokenCommand extends BukkitCommand<Player> {
     public TokenCommand() {
         super("token");
     }
 
-    private final PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
+    private PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 
     @Override
-    protected void onUsage(Player player) {
+    protected void onExecute(Player player, String[] args) {
+        OpPlayer opPlayer = new OpPlayer(player);
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
-        ChatUtil.sendMessage(player, "&bOpPrison > ⛃%s", StringUtils._formatDouble(playerData.getToken()));
-    }
+        if (args.length == 1) {
+            Player target = Bukkit.getPlayer(player.getName());
+            if (target == null) {
+                opPlayer.sendMessage("Игрок не найден");
+                return;
+            }
+            String targetName = target.getName();
+            PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
-    @CommandArgument(aliases = {"сконвертировать"})
-    public void withdraw(Player player, String... args) {
-        int token = 0;
-        try {
-            token = Integer.parseInt(args[1]);
-        } catch (Exception e) {
-            ChatUtil.sendMessage(player, "&bOpPrison > &cВведите число!");
+            opPlayer.sendMessage(targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
         }
 
-        withdrawPlayer(player, token);
+        if (args.length == 2) {
+            if (args[0].equals("withdraw")) {
+                int token = 0;
+                try {
+                    token = Integer.parseInt(args[1]);
+                } catch (Exception e) {
+                    opPlayer.sendMessage("Введите число");
+                }
+
+                withdraw(player, token);
+                return;
+            }
+        }
+
+        opPlayer.sendMessage("⛃" + StringUtils._formatDouble(playerData.getToken()));
     }
 
-    public void withdrawPlayer(Player player, int count) {
+    public void withdraw(Player player, int count) {
         OpPlayer opPlayer = new OpPlayer(player);
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
         double token = playerData.getToken();

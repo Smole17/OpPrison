@@ -2,8 +2,6 @@ package ru.smole.utils.leaderboard;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
