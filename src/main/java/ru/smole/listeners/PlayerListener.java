@@ -8,10 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,30 +27,37 @@ public class PlayerListener implements Listener {
     private final PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
 
         dataManager.load(player);
     }
 
     @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        Player player = e.getPlayer();
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
 
         dataManager.unload(player);
     }
 
     @EventHandler
-    public void onBreak(BlockBreakEvent e) {
-        Player player = e.getPlayer();
+    public void onKick(PlayerKickEvent event) {
+        Player player = event.getPlayer();
+
+        dataManager.unload(player);
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
-        Block block = e.getBlock();
+        Block block = event.getBlock();
 
         playerData.setBlocks(playerData.getBlocks() + 1);
 
-        e.setDropItems(false);
-        e.setExpToDrop(0);
+        event.setDropItems(false);
+        event.setExpToDrop(0);
     }
 
     @EventHandler
@@ -120,12 +124,12 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onDrop(PlayerDropItemEvent e) {
+    public void onDrop(PlayerDropItemEvent event) {
 
     }
 
     @EventHandler
-    public void onFood(FoodLevelChangeEvent e) {
-        e.setFoodLevel(20);
+    public void onFood(FoodLevelChangeEvent event) {
+        event.setFoodLevel(20);
     }
 }
