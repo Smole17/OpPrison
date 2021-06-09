@@ -134,6 +134,7 @@ public final class OpPrison extends JavaPlugin {
             );
             MINES.put(mine.getLevel(), mine);
         });
+        log.info("Loaded {} mines!", MINES.size());
 
         Bukkit.getScheduler().runTaskTimer(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
     }
