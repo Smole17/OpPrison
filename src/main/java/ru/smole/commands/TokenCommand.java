@@ -26,13 +26,13 @@ public class TokenCommand extends BukkitCommand<Player> {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();
             PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
-            ChatUtil.sendMessage(player, OpPrison.prefix + targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
             return;
         }
 
@@ -42,7 +42,7 @@ public class TokenCommand extends BukkitCommand<Player> {
                 try {
                     token = Integer.parseInt(args[1]);
                 } catch (Exception e) {
-                    ChatUtil.sendMessage(player, OpPrison.prefix + "Введите число");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите число");
                 }
 
                 withdraw(player, token);
@@ -50,7 +50,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             }
         }
 
-        ChatUtil.sendMessage(player, OpPrison.prefix + "⛃" + StringUtils._formatDouble(playerData.getToken()));
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "⛃" + StringUtils._formatDouble(playerData.getToken()));
     }
 
     public void withdraw(Player player, int count) {
@@ -59,16 +59,16 @@ public class TokenCommand extends BukkitCommand<Player> {
         double token = playerData.getToken();
 
         if (count <= 0) {
-            ChatUtil.sendMessage(player, OpPrison.prefix + "Введите корректное число");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите корректное число");
             return;
         }
 
         if (token < count) {
-            ChatUtil.sendMessage(player, OpPrison.prefix + "Недостаточно токенов");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Недостаточно токенов");
             return;
         }
 
         opPlayer.add(Items.getToken(count));
-        ChatUtil.sendMessage(player, OpPrison.prefix + "Вы успешно конвертировали в предмет");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно конвертировали в предмет");
     }
 }

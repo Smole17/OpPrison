@@ -22,16 +22,16 @@ public class MoneyCommand extends BukkitCommand<Player> {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();
             PlayerData targetData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(targetName);
 
-            ChatUtil.sendMessage(player, OpPrison.prefix + targetName + ": $" + targetData.getMoney());
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": $" + targetData.getMoney());
             return;
         }
 
-        ChatUtil.sendMessage(player, OpPrison.prefix + "$" + playerData.getMoney());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "$" + playerData.getMoney());
     }
 }
