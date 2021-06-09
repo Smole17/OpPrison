@@ -38,7 +38,7 @@ public final class OpPrison extends JavaPlugin {
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
-    public static String prefix = "&bOpPrison &7>> &f";
+    public static String PREFIX = "&bOpPrison &7>> &f";
 
     @Override
     public void onEnable() {
