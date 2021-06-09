@@ -2,7 +2,6 @@ package ru.smole.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +26,7 @@ import java.util.Objects;
 
 public class PlayerListener implements Listener {
 
-    private PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
+    private final PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {

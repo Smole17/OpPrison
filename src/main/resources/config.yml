@@ -1,3 +1,19 @@
+cases:
+  §aТестовый кейс:
+    world: world
+    x: -250.0
+    y: 43.0
+    z: 439.0
+    yaw: 0.0
+    pitch: 0.0
+    key: '§aКлюч от тестового сундука'
+    items:
+      '1':
+        name: §eТест
+        material: DIRT
+        amount: 4
+        chance: 0.3
+
 leaderBoard:
   update: 1200
   format1: '&c#[top] &7| &f&o[name] &7- &6&o[count]'
@@ -12,5 +28,5 @@ prices:
 
 level:
   A: 1
-   B: 2
-   C: 3
+  B: 2
+  C: 3
