@@ -19,6 +19,7 @@ import ru.smole.OpPrison;
 import ru.smole.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
+import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -106,6 +107,14 @@ public class PlayerListener implements Listener {
 
                     customCase.open(player, player.isSneaking());
                 }
+            }
+        }
+
+        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            if (event.getClickedBlock().getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && Case.getCustomCaseByLocation(event.getClickedBlock()) != null) {
+                event.setCancelled(true);
+                Case customCase = Case.getCustomCaseByLocation(event.getClickedBlock());
+                new CaseLootGui(customCase).openInventory(player);
             }
         }
     }
