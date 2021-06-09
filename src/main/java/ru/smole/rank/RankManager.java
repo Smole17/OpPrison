@@ -20,7 +20,7 @@ public class RankManager {
         Rank rank = playerData.getRank();
 
         if (!isNextRank(rank)) {
-            opPlayer.sendMessage("У вас максимальный ранк");
+            opPlayer.sendMessage("РЈ РІР°СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°РЅРє");
             return;
         }
 
@@ -29,7 +29,7 @@ public class RankManager {
         double cost = nextRank.getCost();
 
         if (cost > money) {
-            opPlayer.sendMessage(String.format("Вам не хватает: $%s", cost - money));
+            opPlayer.sendMessage(String.format("Р’Р°Рј РЅРµ С…РІР°С‚Р°РµС‚: $%s", cost - money));
             return;
         }
 
