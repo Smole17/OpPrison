@@ -1,0 +1,9 @@
+prices:
+  DIRT: 1
+  STONE: 2
+  SAND: 3
+
+level:
+  A: 1
+  B: 2
+  C: 3
