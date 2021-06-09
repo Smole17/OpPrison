@@ -63,8 +63,8 @@ public class Case {
                 if (itemStack != null) {
                     player.getInventory().addItem(itemStack);
                 }
-                itemHand.setAmount(0);
             }
+            itemHand.setAmount(0);
             return;
         }
 
