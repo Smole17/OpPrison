@@ -7,7 +7,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import static ru.smole.OpPrison.BUILD_MODE;
 
-@CommandPermission(permission = "mlf.admin")
+@CommandPermission(permission = "opprison.admin")
 public class BuildCommand extends BukkitCommand<Player> {
 
     public BuildCommand() {
