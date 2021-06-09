@@ -2,6 +2,7 @@ package ru.smole.data;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
 import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.rank.Rank;
@@ -25,6 +26,10 @@ public class PlayerDataManager {
 
     public void load(Player player) {
         String name = player.getName();
+        HideCommand.hide.forEach(hiders -> {
+            if (!hiders.isEmpty())
+                hiders.hidePlayer(OpPrison.getInstance(), player);
+        });
 
         if (!PlayerDataSQL.playerExists(name)) {
             create(name);
@@ -59,8 +64,8 @@ public class PlayerDataManager {
         Rank rank = data.getRank();
         double prestige = data.getPrestige();
 
-        player.kickPlayer("bb");
         HideCommand.hide.remove(player);
         PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige);
+        player.kickPlayer("bb");
     }
 }

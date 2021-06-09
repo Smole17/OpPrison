@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import ru.xfenilafs.core.ApiManager;
 
-@AllArgsConstructor public enum KeyType {
+@AllArgsConstructor public enum Key {
 
     MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский").build()),
     TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен").build()),

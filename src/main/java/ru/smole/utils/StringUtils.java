@@ -31,6 +31,10 @@ public class StringUtils {
     public static Double fixDouble(int i, double d) {
         return Double.valueOf(String.format("%." + i + "f", d).replace(",", "."));
     }
+
+    public static String replaceComma(String text) {
+        return text.replaceAll(",", "");
+    }
 //
 //    public static String trim(String string) {
 //        if (string.length() > 16)

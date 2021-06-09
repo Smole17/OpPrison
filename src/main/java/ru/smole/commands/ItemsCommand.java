@@ -1,13 +1,11 @@
 package ru.smole.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
 import ru.smole.items.Items;
-import ru.smole.items.KeyType;
+import ru.smole.items.Key;
 import ru.smole.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
@@ -35,16 +33,17 @@ public class ItemsCommand extends BukkitCommand<Player> {
             }
 
             String arg = args[0].toLowerCase();
+            Items items = opPlayer.getItems();
 
             if (arg.equals("key")) {
-                KeyType type = KeyType.valueOf(args[2].toUpperCase());
-                ItemStack item = type.getStack();
+                Key type = items.getKeyFromString(args[2]);
 
-                if (item == null) {
+                if (type == null) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден");
                     return;
                 }
 
+                ItemStack item = type.getStack();
                 int amount = 1;
 
                 try {
@@ -53,7 +52,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
 
                 item.setAmount(amount);
                 opPlayer.add(item);
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b" + name + "&f был выдан &b" + type.getName() + " &fключ");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан &b%s &fключ &fx%s", name, type.getName(), amount);
                 return;
             }
 
@@ -64,8 +63,8 @@ public class ItemsCommand extends BukkitCommand<Player> {
                     amount = Integer.parseInt(args[2]);
                 } catch (Exception ignored) {}
 
-                opPlayer.add(Items.getToken(amount));
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b" + name + "&f был выдан токен &e⛃" + StringUtils._formatDouble(amount));
+                opPlayer.add(opPlayer.getItems().getToken(amount));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан токен &e⛃%s", name, StringUtils._formatDouble(amount));
                 return;
             }
         }

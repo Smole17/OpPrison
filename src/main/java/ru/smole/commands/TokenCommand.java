@@ -38,11 +38,12 @@ public class TokenCommand extends BukkitCommand<Player> {
 
         if (args.length == 2) {
             if (args[0].equals("withdraw")) {
-                int token = 0;
+                int token;
                 try {
                     token = Integer.parseInt(args[1]);
                 } catch (Exception e) {
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите число");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                    return;
                 }
 
                 withdraw(player, token);
@@ -58,17 +59,17 @@ public class TokenCommand extends BukkitCommand<Player> {
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
         double token = playerData.getToken();
 
-        if (count <= 0) {
+        if (0 >= count) {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите корректное число");
             return;
         }
 
-        if (token < count) {
+        if (count > token) {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Недостаточно токенов");
             return;
         }
 
-        opPlayer.add(Items.getToken(count));
+        opPlayer.add(opPlayer.getItems().getToken(count));
         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно конвертировали в предмет");
     }
 }

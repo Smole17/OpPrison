@@ -18,6 +18,7 @@ import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
+import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.Objects;
@@ -84,7 +85,7 @@ public class PlayerListener implements Listener {
                     String itemName = itemMeta.getDisplayName();
 
                     if (itemName.contains("⛃")) {
-                        double count = Double.parseDouble(itemName.split("⛃")[1]);
+                        double count = Double.parseDouble(StringUtils.replaceComma(itemName.split("⛃")[1]));
 
                         playerData.setToken(playerData.getToken() + count);
                         player.getInventory().remove(item);

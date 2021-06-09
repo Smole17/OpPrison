@@ -2,18 +2,17 @@ package ru.smole.rank;
 
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.commands.StatsCommand;
 import ru.smole.data.PlayerData;
 import ru.smole.player.OpPlayer;
 import ru.xfenilafs.core.util.ChatUtil;
 
 public class RankManager {
 
-    private OpPlayer opPlayer;
     private Player player;
 
-    public RankManager(OpPlayer opPlayer) {
-        this.opPlayer = opPlayer;
-        player = opPlayer.getPlayer();
+    public RankManager(Player player) {
+        this.player = player;
     }
 
     public void up() {
@@ -51,5 +50,15 @@ public class RankManager {
 
     public boolean isNextRank(Rank rank) {
         return rank != Rank.Z;
+    }
+
+    public Rank getRankFromString(String rank) {
+        for (Rank ranks : Rank.values()) {
+            if (ranks == Rank.valueOf(rank)) {
+                return ranks;
+            }
+        }
+
+        return null;
     }
 }

@@ -59,7 +59,7 @@ public final class OpPrison extends JavaPlugin {
 
         ApiManager.registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand(), new RankUpCommand()
+                new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand()
         );
         
         loadRegionsAndMines();
@@ -68,6 +68,7 @@ public final class OpPrison extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Bukkit.getOnlinePlayers().forEach(player -> playerDataManager.unload(player));
         base.close();
     }
 

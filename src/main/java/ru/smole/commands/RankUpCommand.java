@@ -12,9 +12,6 @@ public class RankUpCommand extends BukkitCommand<Player> {
 
     @Override
     protected void onExecute(Player player, String[] strings) {
-        OpPlayer opPlayer = new OpPlayer(player);
-        RankManager rankManager = new RankManager(opPlayer);
-
-        rankManager.up();
+        new OpPlayer(player).getRankManager().up();
     }
 }
