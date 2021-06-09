@@ -6,6 +6,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.player.OpPlayer;
 import ru.xfenilafs.core.command.BukkitCommand;
+import ru.xfenilafs.core.util.ChatUtil;
 
 public class MoneyCommand extends BukkitCommand<Player> {
 
@@ -21,16 +22,16 @@ public class MoneyCommand extends BukkitCommand<Player> {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                opPlayer.sendMessage("Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();
             PlayerData targetData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(targetName);
 
-            opPlayer.sendMessage(targetName + ": $" + targetData.getMoney());
+            ChatUtil.sendMessage(player, OpPrison.prefix + targetName + ": $" + targetData.getMoney());
             return;
         }
 
-        opPlayer.sendMessage("$" + playerData.getMoney());
+        ChatUtil.sendMessage(player, OpPrison.prefix + "$" + playerData.getMoney());
     }
 }

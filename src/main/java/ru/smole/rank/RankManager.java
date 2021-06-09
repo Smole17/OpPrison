@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.player.OpPlayer;
+import ru.xfenilafs.core.util.ChatUtil;
 
 public class RankManager {
 
@@ -12,7 +13,7 @@ public class RankManager {
 
     public RankManager(OpPlayer opPlayer) {
         this.opPlayer = opPlayer;
-        player = opPlayer.getPlayer();;
+        player = opPlayer.getPlayer();
     }
 
     public void up() {
@@ -20,7 +21,7 @@ public class RankManager {
         Rank rank = playerData.getRank();
 
         if (!isNextRank(rank)) {
-            opPlayer.sendMessage("У вас максимальный ранк");
+            ChatUtil.sendMessage(player, OpPrison.prefix + "У вас максимальный ранк");
             return;
         }
 
@@ -29,7 +30,7 @@ public class RankManager {
         double cost = nextRank.getCost();
 
         if (cost > money) {
-            opPlayer.sendMessage(String.format("Вам не хватает: $%s", cost - money));
+            ChatUtil.sendMessage(player, OpPrison.prefix + "Вам не хватает: $%s", cost - money);
             return;
         }
 

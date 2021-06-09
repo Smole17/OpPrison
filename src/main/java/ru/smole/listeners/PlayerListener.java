@@ -25,7 +25,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.Objects;
 
-public class PlayerHandler implements Listener {
+public class PlayerListener implements Listener {
 
     private PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 

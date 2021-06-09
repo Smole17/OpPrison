@@ -10,6 +10,7 @@ import ru.smole.items.Items;
 import ru.smole.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
+import ru.xfenilafs.core.util.ChatUtil;
 
 public class TokenCommand extends BukkitCommand<Player> {
     public TokenCommand() {
@@ -20,19 +21,18 @@ public class TokenCommand extends BukkitCommand<Player> {
 
     @Override
     protected void onExecute(Player player, String[] args) {
-        OpPlayer opPlayer = new OpPlayer(player);
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                opPlayer.sendMessage("Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();
             PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
-            opPlayer.sendMessage(targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
+            ChatUtil.sendMessage(player, OpPrison.prefix + targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
             return;
         }
 
@@ -42,7 +42,7 @@ public class TokenCommand extends BukkitCommand<Player> {
                 try {
                     token = Integer.parseInt(args[1]);
                 } catch (Exception e) {
-                    opPlayer.sendMessage("Введите число");
+                    ChatUtil.sendMessage(player, OpPrison.prefix + "Введите число");
                 }
 
                 withdraw(player, token);
@@ -50,7 +50,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             }
         }
 
-        opPlayer.sendMessage("⛃" + StringUtils._formatDouble(playerData.getToken()));
+        ChatUtil.sendMessage(player, OpPrison.prefix + "⛃" + StringUtils._formatDouble(playerData.getToken()));
     }
 
     public void withdraw(Player player, int count) {
@@ -59,16 +59,16 @@ public class TokenCommand extends BukkitCommand<Player> {
         double token = playerData.getToken();
 
         if (count <= 0) {
-            opPlayer.sendMessage("Введите корректное число");
+            ChatUtil.sendMessage(player, OpPrison.prefix + "Введите корректное число");
             return;
         }
 
         if (token < count) {
-            opPlayer.sendMessage("Недостаточно токенов");
+            ChatUtil.sendMessage(player, OpPrison.prefix + "Недостаточно токенов");
             return;
         }
 
         opPlayer.add(Items.getToken(count));
-        opPlayer.sendMessage("Вы успешно конвертировали в предмет");
+        ChatUtil.sendMessage(player, OpPrison.prefix + "Вы успешно конвертировали в предмет");
     }
 }

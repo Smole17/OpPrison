@@ -3,6 +3,7 @@ package ru.smole.player;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import ru.xfenilafs.core.util.ChatUtil;
 
 public class OpPlayer {
 
@@ -10,10 +11,6 @@ public class OpPlayer {
 
     public OpPlayer(Player player) {
         this.player = player;
-    }
-
-    public void sendMessage(String msg) {
-        player.sendMessage("§bOpPrison §7>> §f" + msg);
     }
 
     public void add(ItemStack stack) {

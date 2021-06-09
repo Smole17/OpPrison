@@ -21,7 +21,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.List;
 
-public class ChatHandler implements Listener {
+public class ChatListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
