@@ -95,13 +95,13 @@ public class PlayerListener implements Listener {
                 Case customCase = Case.getCustomCaseByLocation(event.getClickedBlock());
                 if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     if (player.getInventory().getItemInMainHand() == null) {
-                        ChatUtil.sendMessage(player, "&fДля открытия этого сундука вам необходим %s", Objects.requireNonNull(customCase).getKey());
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Для открытия этого сундука вам необходим %s", Objects.requireNonNull(customCase).getKey());
                         return;
                     }
 
                     ItemStack is = player.getInventory().getItemInMainHand();
                     if (!ItemStackUtils.hasName(is, Objects.requireNonNull(customCase).getKey())) {
-                        ChatUtil.sendMessage(player, "&fДля открытия этого сундука вам необходим %s" + customCase.getKey());
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Для открытия этого сундука вам необходим %s" + customCase.getKey());
                         return;
                     }
 

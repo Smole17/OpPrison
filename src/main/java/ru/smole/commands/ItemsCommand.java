@@ -30,7 +30,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
             Player target = Bukkit.getPlayer(args[1]);
 
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не в сети");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не в сети");
                 return;
             }
 
@@ -41,7 +41,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
                 ItemStack item = type.getStack();
 
                 if (item == null) {
-                    ChatUtil.sendMessage(player, OpPrison.prefix + "Предмет не найден");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден");
                     return;
                 }
 
@@ -53,7 +53,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
 
                 item.setAmount(amount);
                 opPlayer.add(item);
-                ChatUtil.sendMessage(player, OpPrison.prefix + "Игроку &b" + name + "&f был выдан &b" + type.getName() + " &fключ");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b" + name + "&f был выдан &b" + type.getName() + " &fключ");
                 return;
             }
 
@@ -65,11 +65,11 @@ public class ItemsCommand extends BukkitCommand<Player> {
                 } catch (Exception ignored) {}
 
                 opPlayer.add(Items.getToken(amount));
-                ChatUtil.sendMessage(player, OpPrison.prefix + "Игроку &b" + name + "&f был выдан токен &e⛃" + StringUtils._formatDouble(amount));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b" + name + "&f был выдан токен &e⛃" + StringUtils._formatDouble(amount));
                 return;
             }
         }
 
-        ChatUtil.sendMessage(player, OpPrison.prefix + "/items key/token name key_type/count amount/empty");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "/items key/token name key_type/count amount/empty");
     }
 }

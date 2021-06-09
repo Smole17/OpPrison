@@ -21,7 +21,7 @@ public class RankManager {
         Rank rank = playerData.getRank();
 
         if (!isNextRank(rank)) {
-            ChatUtil.sendMessage(player, OpPrison.prefix + "У вас максимальный ранк");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас максимальный ранк");
             return;
         }
 
@@ -30,7 +30,7 @@ public class RankManager {
         double cost = nextRank.getCost();
 
         if (cost > money) {
-            ChatUtil.sendMessage(player, OpPrison.prefix + "Вам не хватает: $%s", cost - money);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", cost - money);
             return;
         }
 
