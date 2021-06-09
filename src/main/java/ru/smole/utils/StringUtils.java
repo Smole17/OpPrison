@@ -4,24 +4,24 @@ public class StringUtils {
 
     public static String formatDouble(double d) {
         if (d < 1000.0)
-            return String.format("%f", d).replace(",", ".");
+            return String.format("%.1f", d).replace(",", ".");
         if (d < 1000000.0)
-            return String.format("%f", d / 1000.0).replace(",", ".") + "K";
+            return String.format("%.1f", d / 1000.0).replace(",", ".") + "K";
         if (d < 1.0E9)
-            return String.format("%f", d / 1000000.0).replace(",", ".") + "M";
+            return String.format("%.1f", d / 1000000.0).replace(",", ".") + "M";
         if (d < 1.0E12D)
-            return String.format("%f", d / 1.0E9D).replace(",", ".") + "B";
+            return String.format("%.1f", d / 1.0E9D).replace(",", ".") + "B";
         if (d < 1.0E15D)
-            return String.format("%f", d / 1.0E12D).replace(",", ".") + "T";
+            return String.format("%.1f", d / 1.0E12D).replace(",", ".") + "T";
         if (d < 1.0E18D)
-            return String.format("%f", d / 1.0E15D).replace(",", ".") + "Qr";
+            return String.format("%.1f", d / 1.0E15D).replace(",", ".") + "Qr";
         if (d < 1.0E21D)
-            return String.format("%f", d / 1.0E18D).replace(",", ".") + "Qn";
+            return String.format("%.1f", d / 1.0E18D).replace(",", ".") + "Qn";
         if (d < 1.0E24D)
-            return String.format("%f", d / 1.0E21D).replace(",", ".") + "Sx";
+            return String.format("%.1f", d / 1.0E21D).replace(",", ".") + "Sx";
         if (d < 1.0E27D)
-            return String.format("%f", d / 1.0E24D).replace(",", ".") + "Sp";
-        return String.format("%f", d / 1.0E27D).replace(",", ".") + "Oc";
+            return String.format("%.1f", d / 1.0E24D).replace(",", ".") + "Sp";
+        return String.format("%.1f", d / 1.0E27D).replace(",", ".") + "Oc";
     }
 
     public static String _formatDouble(double d) {
