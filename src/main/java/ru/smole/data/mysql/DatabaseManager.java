@@ -46,6 +46,20 @@ public class DatabaseManager {
         } catch (SQLException throwables) {
             throw new RuntimeException("Unable to create RowSetFactory", throwables);
         }
+
+        loadTables();
+    }
+
+    public void loadTables() {
+        update("CREATE TABLE IF NOT EXISTS " +
+                "OpPrison(" +
+                "name VARCHAR(16), " +
+                "blocks DOUBLE, " +
+                "money DOUBLE, " +
+                "token DOUBLE, " +
+                "multiplier DOUBLE, " +
+                "prestige DOUBLE, " +
+                "level VARCHAR(1))");
     }
 
     public Map<String, Double> getTopFromCriteria(String criteria, int amount) {
@@ -90,10 +104,6 @@ public class DatabaseManager {
             throwables.printStackTrace();
         }
         return null;
-    }
-
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
     }
 
     private void closeQuietly(AutoCloseable ... closeables) {
