@@ -4,11 +4,10 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import ru.smole.commands.HideCommand;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.level.Rank;
+import ru.smole.rank.Rank;
 import ru.smole.scoreboard.ScoreboardManager;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PlayerDataManager {

@@ -1,7 +1,7 @@
 package ru.smole.data;
 
 import lombok.Data;
-import ru.smole.level.Rank;
+import ru.smole.rank.Rank;
 
 @Data public class PlayerData {
 
