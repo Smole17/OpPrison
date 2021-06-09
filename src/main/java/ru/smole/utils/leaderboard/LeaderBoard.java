@@ -34,7 +34,7 @@ public class LeaderBoard {
         ResultSet resultSet = OpPrison.getInstance().getBase().getResult("SELECT * FROM OpPrison ORDER BY " + criteria + " DESC LIMIT 10");
         try {
             for (int i = 1; resultSet.next(); i++) {
-                hologram.setTextLine(i + 1, getLine(i + 1, resultSet.getString("name"), resultSet.getDouble(criteria)));
+                hologram.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
