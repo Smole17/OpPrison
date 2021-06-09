@@ -1,6 +1,7 @@
 package ru.smole.data;
 
 import lombok.Data;
+import ru.smole.level.Rank;
 
 @Data public class PlayerData {
 
@@ -9,16 +10,16 @@ import lombok.Data;
     private double money;
     private double token;
     private double multiplier;
-    private String level;
+    private Rank rank;
     private double prestige;
 
-    public PlayerData(String name, double blocks, double money, double token, double multiplier, String level, double prestige) {
+    public PlayerData(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige) {
         this.name = name;
         this.blocks = blocks;
         this.money = money;
         this.token = token;
         this.multiplier = multiplier;
-        this.level = level;
+        this.rank = rank;
         this.prestige = prestige;
     }
 }

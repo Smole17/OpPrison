@@ -32,6 +32,7 @@ public class HideCommand extends BukkitCommand<Player> {
         }
 
         Bukkit.getOnlinePlayers().forEach(players -> player.hidePlayer(main, players));
+        hide.add(player);
         opPlayer.sendMessage("Вы расскрыли игроков");
     }
 }

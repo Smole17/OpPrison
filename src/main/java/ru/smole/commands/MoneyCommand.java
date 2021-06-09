@@ -19,7 +19,7 @@ public class MoneyCommand extends BukkitCommand<Player> {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
         if (args.length == 1) {
-            Player target = Bukkit.getPlayer(player.getName());
+            Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 opPlayer.sendMessage("Игрок не найден");
                 return;
@@ -28,6 +28,7 @@ public class MoneyCommand extends BukkitCommand<Player> {
             PlayerData targetData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(targetName);
 
             opPlayer.sendMessage(targetName + ": $" + targetData.getMoney());
+            return;
         }
 
         opPlayer.sendMessage("$" + playerData.getMoney());

@@ -1,6 +1,7 @@
 package ru.smole.data.mysql;
 
 import ru.smole.OpPrison;
+import ru.smole.level.Rank;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +13,7 @@ public class PlayerDataSQL {
     public static void create(String name) {
         db.update("INSERT INTO " +
                 "OpPrison(name, blocks, money, token, multiplier, level, prestige) " +
-                "VALUES('" + name + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + "A" + "', '" + 0.0 + "')");
+                "VALUES('" + name + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + Rank.A.getName() + "', '" + 0.0 + "')");
     }
 
     public static boolean playerExists(final String name) {
@@ -43,9 +44,9 @@ public class PlayerDataSQL {
         return obj;
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, String level, double prestige) {
-        db.update(String.format("UPDATE OpPrison SET name=%s, blocks=%f, money=%f, token=%f, multiplier=%f, level=%s, prestige=%s",
-                name, blocks, money, token, multiplier, level, prestige));
+    public static void save(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige) {
+        db.update(String.format("UPDATE OpPrison SET name=%s, blocks=%f, money=%f, token=%f, multiplier=%f, rank=%s, prestige=%s",
+                name, blocks, money, token, multiplier, rank, prestige));
     }
 
     public static void set(String name, String table, String input) {

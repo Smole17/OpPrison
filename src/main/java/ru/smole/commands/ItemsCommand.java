@@ -13,7 +13,7 @@ import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 
-@CommandPermission(permission = "opprison.items")
+@CommandPermission(permission = "opprison.admin")
 public class ItemsCommand extends BukkitCommand<Player> {
 
     public ItemsCommand() {
@@ -25,7 +25,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
         OpPlayer opPlayer = new OpPlayer(player);
         String name = player.getName();
 
-        if (args.length == 4) {
+        if (args.length == 3 || args.length == 4) {
             Player target = Bukkit.getPlayer(args[1]);
 
             if (target == null) {

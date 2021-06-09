@@ -28,8 +28,6 @@ public class ChatHandler implements Listener {
         Player player = e.getPlayer();
         String msg = e.getMessage();
 
-        e.setCancelled(true);
-
         ItemStack item = player.getInventory().getItemInMainHand();
 
         if (item != null) {
@@ -40,6 +38,8 @@ public class ChatHandler implements Listener {
 
             player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(getComponent(player, getHand(msg, item))));
         }
+
+        e.setCancelled(true);
     }
 
     public BaseComponent[] getComponent(Player player, String msg) {
@@ -51,8 +51,8 @@ public class ChatHandler implements Listener {
         QueryOptions userCtx = api.getContextManager().getQueryOptions(player);
 
         String prefix = user.getCachedData().getMetaData(userCtx).getPrefix();
-        String chat = String.format("§7[§b%s§7] %s §f%s§7: §f%s",
-                StringUtils.formatDouble(playerData.getPrestige()), prefix, name, msg);
+        String chat = String.format("§7[§b%s§7] §7[%s§7] %s §f%s§7: §f%s",
+                StringUtils.formatDouble(playerData.getPrestige()), prefix, playerData.getRank().getName(), name, msg);
 
         return ChatUtil.newBuilder()
                 .setText(chat)

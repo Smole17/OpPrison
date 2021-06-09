@@ -24,7 +24,7 @@ public class TokenCommand extends BukkitCommand<Player> {
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
         if (args.length == 1) {
-            Player target = Bukkit.getPlayer(player.getName());
+            Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 opPlayer.sendMessage("Игрок не найден");
                 return;
@@ -33,6 +33,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
             opPlayer.sendMessage(targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
+            return;
         }
 
         if (args.length == 2) {
@@ -62,7 +63,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             return;
         }
 
-        if (count < token) {
+        if (token < count) {
             opPlayer.sendMessage("Недостаточно токенов");
             return;
         }

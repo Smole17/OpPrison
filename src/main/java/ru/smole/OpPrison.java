@@ -4,10 +4,7 @@ package ru.smole;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.smole.commands.HideCommand;
-import ru.smole.commands.ItemsCommand;
-import ru.smole.commands.MoneyCommand;
-import ru.smole.commands.TokenCommand;
+import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.listeners.ChatHandler;
@@ -31,7 +28,12 @@ public final class OpPrison extends JavaPlugin {
         base = new DatabaseManager("localhost", "OpPrison", "root", "vi6RcaDhRvkO0U5d", false);
 
         ApiManager.registerListeners(this, new PlayerHandler(), new ChatHandler());
-        ApiManager.registerCommands(new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand());
+        ApiManager.registerCommands(
+                new MoneyCommand(),
+                new TokenCommand(),
+                new ItemsCommand(),
+                new HideCommand(),
+                new RankUpCommand());
         createDatabase();
     }
 
@@ -49,6 +51,6 @@ public final class OpPrison extends JavaPlugin {
                 "token DOUBLE, " +
                 "multiplier DOUBLE, " +
                 "prestige DOUBLE, " +
-                "level VARCHAR(1))");
+                "rank VARCHAR(1))");
     }
 }
