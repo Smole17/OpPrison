@@ -12,7 +12,7 @@ public class CaseLootGui extends BaseSimpleInventory {
     private final Case customCase;
 
     public CaseLootGui(Case customCase) {
-        super(3, "Шансы выпадения");
+        super(6, "Шансы выпадения");
         this.customCase = customCase;
     }
 
