@@ -19,7 +19,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 
-public class PlayerHandler implements Listener {
+public class PlayerListener implements Listener {
 
     private PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 

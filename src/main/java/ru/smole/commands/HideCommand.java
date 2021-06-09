@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.player.OpPlayer;
 import ru.xfenilafs.core.command.BukkitCommand;
+import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +27,13 @@ public class HideCommand extends BukkitCommand<Player> {
         if (hide.contains(player)) {
             hide.remove(player);
             Bukkit.getOnlinePlayers().forEach(players -> player.showPlayer(main, players));
-            opPlayer.sendMessage("Вы скрыли игроков");
+            ChatUtil.sendMessage(player, OpPrison.prefix + "Вы скрыли игроков");
 
             return;
         }
 
         Bukkit.getOnlinePlayers().forEach(players -> player.hidePlayer(main, players));
         hide.add(player);
-        opPlayer.sendMessage("Вы расскрыли игроков");
+        ChatUtil.sendMessage(player, OpPrison.prefix + "Вы расскрыли игроков");
     }
 }

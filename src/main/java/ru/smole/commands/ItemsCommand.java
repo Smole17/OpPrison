@@ -12,6 +12,7 @@ import ru.smole.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
+import ru.xfenilafs.core.util.ChatUtil;
 
 @CommandPermission(permission = "opprison.admin")
 public class ItemsCommand extends BukkitCommand<Player> {
@@ -29,7 +30,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
             Player target = Bukkit.getPlayer(args[1]);
 
             if (target == null) {
-                opPlayer.sendMessage("Игрок не в сети");
+                ChatUtil.sendMessage(player, OpPrison.prefix + "Игрок не в сети");
                 return;
             }
 
@@ -40,7 +41,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
                 ItemStack item = type.getStack();
 
                 if (item == null) {
-                    opPlayer.sendMessage("Предмет не найден");
+                    ChatUtil.sendMessage(player, OpPrison.prefix + "Предмет не найден");
                     return;
                 }
 
@@ -52,7 +53,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
 
                 item.setAmount(amount);
                 opPlayer.add(item);
-                opPlayer.sendMessage("Игроку §b" + name + "§f был выдан §b" + type.getName() + " §fключ");
+                ChatUtil.sendMessage(player, OpPrison.prefix + "Игроку &b" + name + "&f был выдан &b" + type.getName() + " &fключ");
                 return;
             }
 
@@ -64,11 +65,11 @@ public class ItemsCommand extends BukkitCommand<Player> {
                 } catch (Exception ignored) {}
 
                 opPlayer.add(Items.getToken(amount));
-                opPlayer.sendMessage("Игроку §b" + name + "§f был выдан токен §e⛃" + StringUtils._formatDouble(amount));
+                ChatUtil.sendMessage(player, OpPrison.prefix + "Игроку &b" + name + "&f был выдан токен &e⛃" + StringUtils._formatDouble(amount));
                 return;
             }
         }
 
-        opPlayer.sendMessage("/items key/token name key_type/count amount/empty");
+        ChatUtil.sendMessage(player, OpPrison.prefix + "/items key/token name key_type/count amount/empty");
     }
 }

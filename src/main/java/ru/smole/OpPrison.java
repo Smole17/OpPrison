@@ -13,8 +13,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.mysql.DatabaseManager;
-import ru.smole.listeners.ChatHandler;
-import ru.smole.listeners.PlayerHandler;
+import ru.smole.listeners.ChatListener;
+import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
 import ru.smole.utils.config.ConfigManager;
@@ -37,6 +37,7 @@ public final class OpPrison extends JavaPlugin {
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
+    public static String prefix = "§bOpPrison §7>> §f";
 
     @Override
     public void onEnable() {
@@ -52,7 +53,7 @@ public final class OpPrison extends JavaPlugin {
         );
 
         ApiManager.registerListeners(this,
-                new PlayerHandler(), new ChatHandler(), new RegionListener()
+                new PlayerListener(), new ChatListener(), new RegionListener()
         );
 
         ApiManager.registerCommands(
