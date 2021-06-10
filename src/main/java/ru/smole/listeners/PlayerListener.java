@@ -1,5 +1,12 @@
 package ru.smole.listeners;
 
+import com.google.common.collect.Lists;
+import net.luckperms.api.LuckPermsProvider;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -21,6 +28,7 @@ import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PlayerListener implements Listener {
@@ -59,6 +67,48 @@ public class PlayerListener implements Listener {
 
         event.setDropItems(false);
         event.setExpToDrop(0);
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String msg = event.getMessage();
+
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
+        String prefix = Objects.requireNonNull(LuckPermsProvider.get()
+                .getUserManager().getUser(player.getName()))
+                .getCachedData().getMetaData(LuckPermsProvider.get().getContextManager().getQueryOptions(player))
+                .getPrefix();
+
+        String format = String.format("[%s] %s %s§7: §f%s",
+                msg.startsWith("!") ? "G" : "L", prefix, player.getName(), msg.startsWith("!") ? msg.substring(1) : msg
+        );
+
+        List<String> lore = Lists.newArrayList(
+                String.format("&fНик: &b%s %s", prefix, player.getName()),
+                "&fПрестиж: &b" + playerData.getPrestige(),
+                "&fРанк: &b" + playerData.getRank().getName(),
+                "&fТокенов: &b" + playerData.getToken(),
+                "&fБлоков вскопано: &b" + playerData.getBlocks()
+        );
+        BaseComponent[] comps = new BaseComponent[lore.size()];
+
+        for (int i = 0; i < lore.size(); ++i) {
+            comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
+        }
+
+        TextComponent component = new TextComponent(TextComponent.fromLegacyText(format));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
+
+        event.setCancelled(true);
+        if (msg.startsWith("!")) {
+            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(component));
+        } else {
+            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(component));
+        }
+
+        Bukkit.getConsoleSender().sendMessage(format);
     }
 
     @EventHandler

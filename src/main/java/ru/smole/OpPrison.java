@@ -14,7 +14,6 @@ import ru.smole.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.mysql.DatabaseManager;
-import ru.smole.listeners.ChatListener;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
@@ -54,12 +53,12 @@ public final class OpPrison extends JavaPlugin {
         );
 
         ApiManager.registerListeners(this,
-                new PlayerListener(), new ChatListener(), new RegionListener()
+                new PlayerListener(), new RegionListener()
         );
 
         ApiManager.registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand()
+                new BuildCommand(), new RankUpCommand(), new StatsCommand()
         );
         
         loadRegionsAndMines();
