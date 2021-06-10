@@ -58,32 +58,35 @@ public class StatsCommand extends BukkitCommand<Player> {
 
             String piece = "null";
 
-            if (type == Stat.BLOCKS) {
-                targetData.setBlocks(value);
-                piece = "было установлено блоков";
-            }
+            switch (type) {
+                case BLOCKS:
+                    targetData.setBlocks(value);
+                    piece = "было установлено блоков";
+                    break;
 
-            if (type == Stat.MONEY) {
-                targetData.setMoney(value);
-                piece = "было установлено денег";
-            }
+                case MONEY:
+                    targetData.setMoney(value);
+                    piece = "было установлено денег";
+                    break;
 
-            if (type == Stat.TOKEN) {
-                targetData.setToken(value);
-                piece = "было установлено токенов";
-            }
+                case TOKEN:
+                    targetData.setToken(value);
+                    piece = "было установлено токенов";
+                    break;
 
-            if (type == Stat.MULTIPLIER) {
-                targetData.setMultiplier(value);
-                piece = "был установлен множитель";
-            }
+                case MULTIPLIER:
+                    targetData.setMultiplier(value);
+                    piece = "был установлен множитель";
+                    break;
 
-            if (type == Stat.PRESTIGE) {
-                targetData.setPrestige(value);
-                piece = "было установлено престижей";
+                case PRESTIGE:
+                    targetData.setPrestige(value);
+                    piece = "было установлено престижей";
+                    break;
             }
 
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, value);
+            return;
         }
 
         ChatUtil.sendMessage(player, msg);
