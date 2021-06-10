@@ -33,7 +33,7 @@ public class ScoreboardManager {
                     ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(playerData.getPrestige())));
 
             baseScoreboard.updateScoreboardLine(7, boardPlayer,
-                    ChatUtil.text("  §fДобыто блоков: §b%s", StringUtils._formatDouble(playerData.getBlocks())));
+                    ChatUtil.text("  §fДобыто блоков: §b%s", StringUtils.formatDouble(playerData.getBlocks())));
 
             baseScoreboard.updateScoreboardLine(4, boardPlayer,
                     ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(playerData.getMoney())));
