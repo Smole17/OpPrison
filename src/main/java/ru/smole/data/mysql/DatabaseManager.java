@@ -59,7 +59,7 @@ public class DatabaseManager {
                 "token DOUBLE, " +
                 "multiplier DOUBLE, " +
                 "prestige DOUBLE, " +
-                "rank VARCHAR(1))");
+                "rank VARCHAR(10))");
     }
 
     public Map<String, Double> getTopFromCriteria(String criteria, int amount) {
