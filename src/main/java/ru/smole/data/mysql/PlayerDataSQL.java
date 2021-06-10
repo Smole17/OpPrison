@@ -12,7 +12,7 @@ public class PlayerDataSQL {
 
     public static void create(String name) {
         db.update("INSERT INTO " +
-                "OpPrison(name, blocks, money, token, multiplier, level, prestige) " +
+                "OpPrison(name, blocks, money, token, multiplier, rank, prestige) " +
                 "VALUES('" + name + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + Rank.A.getName() + "', '" + 0.0 + "')");
     }
 
