@@ -44,7 +44,7 @@ public class StatsCommand extends BukkitCommand<Player> {
                 }
 
                 targetData.setRank(rank);
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s был установлен ранк %s", targetName, rank.getName());
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "РРіСЂРѕРєСѓ %s Р±С‹Р» СѓСЃС‚Р°РЅРѕРІР»РµРЅ СЂР°РЅРє %s", targetName, rank.getName());
                 return;
             }
 
@@ -52,7 +52,7 @@ public class StatsCommand extends BukkitCommand<Player> {
             try {
                 value = Integer.parseInt(args[2]);
             } catch (Exception e) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Р’РІРµРґРёС‚Рµ С†РµР»РѕРµ РїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕРµ С‡РёСЃР»Рѕ");
                 return;
             }
 
@@ -61,31 +61,31 @@ public class StatsCommand extends BukkitCommand<Player> {
             switch (type) {
                 case BLOCKS:
                     targetData.setBlocks(value);
-                    piece = "было установлено блоков";
+                    piece = "Р±С‹Р»Рѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ Р±Р»РѕРєРѕРІ";
                     break;
 
                 case MONEY:
                     targetData.setMoney(value);
-                    piece = "было установлено денег";
+                    piece = "Р±С‹Р»Рѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ РґРµРЅРµРі";
                     break;
 
                 case TOKEN:
                     targetData.setToken(value);
-                    piece = "было установлено токенов";
+                    piece = "Р±С‹Р»Рѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ С‚РѕРєРµРЅРѕРІ";
                     break;
 
                 case MULTIPLIER:
                     targetData.setMultiplier(value);
-                    piece = "был установлен множитель";
+                    piece = "Р±С‹Р» СѓСЃС‚Р°РЅРѕРІР»РµРЅ РјРЅРѕР¶РёС‚РµР»СЊ";
                     break;
 
                 case PRESTIGE:
                     targetData.setPrestige(value);
-                    piece = "было установлено престижей";
+                    piece = "Р±С‹Р»Рѕ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ РїСЂРµСЃС‚РёР¶РµР№";
                     break;
             }
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, value);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "РРіСЂРѕРєСѓ %s %s: %s", targetName, piece, value);
             return;
         }
 
