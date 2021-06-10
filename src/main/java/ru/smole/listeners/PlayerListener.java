@@ -58,6 +58,9 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        if (event.isCancelled())
+            return;
+
         Player player = event.getPlayer();
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
@@ -73,6 +76,7 @@ public class PlayerListener implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         String msg = event.getMessage();
+        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
@@ -98,7 +102,7 @@ public class PlayerListener implements Listener {
             comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
         }
 
-        TextComponent component = new TextComponent(TextComponent.fromLegacyText(format));
+        TextComponent component = new TextComponent(TextComponent.fromLegacyText(getHand(format, item)));
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
 
         event.setCancelled(true);
@@ -114,7 +118,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
-        ItemStack mainHand = event.getPlayer().getInventory().getItemInMainHand();
 
         if (item == null)
             return;
@@ -182,5 +185,42 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
         event.setFoodLevel(20);
+    }
+
+
+    public String getHand(String msg, ItemStack item) {
+        if (item == null)
+            return msg;
+
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta == null)
+            return msg;
+
+        List<String> lore = meta.getLore();
+
+        if (msg.contains("#рука")) {
+            int amount = item.getAmount();
+            String text_peace = amount == 1 ? "" : " §fx" + amount;
+            String text =
+                    item.getType() == Material.AIR
+                            ? "null" : meta.getDisplayName()
+                            + text_peace;
+
+            String show = "null";
+
+            for (String s : lore) {
+                show = show + "\n" + s;
+            }
+
+            BaseComponent[] itemComponent = ChatUtil.newBuilder()
+                    .setText(item.getType() == Material.AIR ? "null" : meta.getDisplayName() + text)
+                    .setHoverEvent(HoverEvent.Action.SHOW_TEXT, show)
+                    .build();
+
+            msg = msg.replace("#рука", new TextComponent(itemComponent).toLegacyText());
+        }
+
+        return msg;
     }
 }

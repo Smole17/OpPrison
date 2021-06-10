@@ -10,13 +10,14 @@ import ru.xfenilafs.core.util.ChatUtil;
 public class RankManager {
 
     private Player player;
+    private PlayerData playerData;
 
     public RankManager(Player player) {
         this.player = player;
+        playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
     }
 
     public void up() {
-        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
         Rank rank = playerData.getRank();
 
         if (!isNextRank(rank)) {
@@ -60,5 +61,9 @@ public class RankManager {
         }
 
         return null;
+    }
+
+    public boolean isEquals(Rank rank) {
+        return playerData.getRank().getPriority() <= rank.getPriority();
     }
 }

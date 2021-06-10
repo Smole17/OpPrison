@@ -27,13 +27,13 @@ public class HideCommand extends BukkitCommand<Player> {
         if (hide.contains(player)) {
             hide.remove(player);
             Bukkit.getOnlinePlayers().forEach(players -> player.showPlayer(main, players));
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы скрыли игроков");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы расскрыли игроков");
 
             return;
         }
 
         Bukkit.getOnlinePlayers().forEach(players -> player.hidePlayer(main, players));
         hide.add(player);
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы расскрыли игроков");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы скрыли игроков");
     }
 }

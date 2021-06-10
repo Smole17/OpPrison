@@ -2,6 +2,9 @@ regions:
   1:
     name: test
     pvp: false
+    rank: A
+    inventory:
+      slot: 0
     spawnLoc: world 8 6 -7 0 0
     maxPoint: world 129 -30 97
     minPoint: world -134 111 -122

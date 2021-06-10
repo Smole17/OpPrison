@@ -65,7 +65,7 @@ public class PlayerDataManager {
         double prestige = data.getPrestige();
 
         HideCommand.hide.remove(player);
-        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige);
         player.kickPlayer("bb");
+        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige);
     }
 }

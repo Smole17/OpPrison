@@ -70,6 +70,7 @@ public class TokenCommand extends BukkitCommand<Player> {
         }
 
         opPlayer.add(opPlayer.getItems().getToken(count));
+        playerData.setToken(token - count);
         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно конвертировали в предмет");
     }
 }
