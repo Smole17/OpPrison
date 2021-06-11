@@ -207,10 +207,12 @@ public class PlayerListener implements Listener {
                             ? "null" : meta.getDisplayName()
                             + text_peace;
 
-            String show = "null";
+            String show = "Описание отстутствует";
 
-            for (String s : lore) {
-                show = show + "\n" + s;
+            if (!lore.isEmpty()) {
+                for (String s : lore) {
+                    show = show + "\n" + s;
+                }
             }
 
             BaseComponent[] itemComponent = ChatUtil.newBuilder()
