@@ -58,18 +58,15 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
-        if (event.isCancelled())
-            return;
+        if (!event.isCancelled()) {
+            Player player = event.getPlayer();
+            PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
 
-        Player player = event.getPlayer();
-        PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
+            playerData.setBlocks(playerData.getBlocks() + 1);
 
-        Block block = event.getBlock();
-
-        playerData.setBlocks(playerData.getBlocks() + 1);
-
-        event.setDropItems(false);
-        event.setExpToDrop(0);
+            event.setDropItems(false);
+            event.setExpToDrop(0);
+        }
     }
 
     @EventHandler
