@@ -88,10 +88,10 @@ public class PlayerListener implements Listener {
 
         List<String> lore = Lists.newArrayList(
                 String.format("&fНик: &b%s %s", prefix, player.getName()),
-                "&fПрестиж: &b" + playerData.getPrestige(),
+                "&fПрестиж: &b" + StringUtils.formatDouble(0, playerData.getPrestige()),
                 "&fРанк: &b" + playerData.getRank().getName(),
-                "&fТокенов: &b" + playerData.getToken(),
-                "&fБлоков вскопано: &b" + playerData.getBlocks()
+                "&fТокенов: &b" + StringUtils.formatDouble(1, playerData.getToken()),
+                "&fБлоков вскопано: &b" + StringUtils._fixDouble(0, playerData.getBlocks())
         );
         BaseComponent[] comps = new BaseComponent[lore.size()];
 
