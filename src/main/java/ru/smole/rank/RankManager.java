@@ -42,7 +42,7 @@ public class RankManager {
         for (int i = 1; i <= Rank.values().length; i++) {
             Rank ranks = Rank.values()[i];
             if (ranks == rank) {
-                rank = Rank.values()[i + 1];
+                rank = Rank.values()[i - 1];
             }
         }
 
