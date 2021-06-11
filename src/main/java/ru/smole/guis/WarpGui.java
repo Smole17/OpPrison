@@ -17,6 +17,7 @@ import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.BaseInventory;
 import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
+import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryDisplayableHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
 
@@ -50,7 +51,7 @@ public class WarpGui extends BaseSimpleInventory {
             Region region = OpPrison.REGIONS.get(name.toLowerCase());
             Material material = rankManager.isEquals(needRank) ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
 
-            addItemSelect(slot,
+            addItem(slot,
                     ApiManager.newItemBuilder(material)
                             .setName(needRank.getName())
                             .build(),
@@ -61,23 +62,23 @@ public class WarpGui extends BaseSimpleInventory {
 
         for (int i = 1; i < inventory.getSize(); i++) {
             if (i == 45 || i == 46 || i == 48 || i == 49 || i == 50 || i == 52 || i == 53)
-                inventory.setItem(i,
+                addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
                                 .setDurability(7)
                                 .build());
         }
 
-        addItemSelect(47,
+        addItem(47,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("����� ����������")
+                        .setName("xz")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().drawInventory(player));
+                        -> new DonateWarpGui().openInventory(player));
 
-        addItemSelect(51,
+        addItem(51,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("����� ���������")
+                        .setName("test")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().drawInventory(player));
+                        -> new DonateWarpGui().openInventory(player));
     }
 }

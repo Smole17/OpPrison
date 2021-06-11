@@ -15,7 +15,7 @@ import ru.xfenilafs.core.regions.Region;
 
 public class PrestigeWarpGui extends BaseSimpleInventory {
     public PrestigeWarpGui() {
-        super(6, "Точки телепортации");
+        super(6, "����� ������������");
     }
 
     @Override

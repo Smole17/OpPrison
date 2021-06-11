@@ -19,6 +19,7 @@ import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
 import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventoryListener;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
 
@@ -53,7 +54,7 @@ public final class OpPrison extends JavaPlugin {
         );
 
         ApiManager.registerListeners(this,
-                new PlayerListener(), new RegionListener()
+                new PlayerListener(), new RegionListener(), new BaseInventoryListener()
         );
 
         ApiManager.registerCommands(

@@ -8,13 +8,13 @@ import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 
 public class DonateWarpGui extends BaseSimpleInventory {
     public DonateWarpGui() {
-        super(6, "Точки телепортации");
+        super(6, "����� ������������");
     }
 
     @Override
     public void drawInventory(@NonNull Player player) {
         for (int i = 1; i < inventory.getSize(); i++) {
-            if (i == 45 || i == 46 || i == 47 || i == 48 || i == 50 || i >= 52)
+            if (i == 45 || i == 46 || i == 47 || i == 48 || i == 50 || i == 52 || i == 53)
                 inventory.setItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
