@@ -1,4 +1,4 @@
-package ru.smole.guis;
+package ru.smole.guis.warps;
 
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -73,12 +73,12 @@ public class WarpGui extends BaseSimpleInventory {
                 ApiManager.newItemBuilder(Material.DIAMOND)
                         .setName("xz")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().openInventory(player));
+                        -> new DonateWarpGui(configManager).openInventory(player));
 
         addItem(51,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
                         .setName("test")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().openInventory(player));
+                        -> new DonateWarpGui(configManager).openInventory(player));
     }
 }

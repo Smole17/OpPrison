@@ -1,44 +1,84 @@
 package ru.smole.guis.warps;
 
 import lombok.NonNull;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.data.PlayerData;
 import ru.smole.player.OpPlayer;
 import ru.smole.rank.Rank;
 import ru.smole.rank.RankManager;
+import ru.smole.utils.StringUtils;
+import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
 
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+
 public class PrestigeWarpGui extends BaseSimpleInventory {
-    public PrestigeWarpGui() {
-        super(6, "����� ������������");
+
+    private ConfigManager configManager;
+
+    public PrestigeWarpGui(ConfigManager configManager) {
+        super(6, "Точки телепортации");
+        this.configManager = configManager;
     }
 
     @Override
     public void drawInventory(@NonNull Player player) {
-        for (int i = 1; i < inventory.getSize(); i++) {
-            if (i == 45 || i == 46 || i == 48 || i >= 50)
-                inventory.setItem(i,
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
+        FileConfiguration config = configManager.getRegionConfig().getConfiguration();
+        ConfigurationSection regions = config.getConfigurationSection("regions");
+
+        regions.getKeys(false).forEach(key -> {
+            ConfigurationSection section = regions.getConfigurationSection(key);
+            String name = section.getString("name");
+            int slot = section.getInt("inventory.slot");
+
+            double needPrestige = section.getDouble("prestige");
+            if (section.getConfigurationSection("prestige") == null)
+                return;
+
+            boolean is = playerData.getPrestige() >= needPrestige;
+            Region region = OpPrison.REGIONS.get(name.toLowerCase());
+            Material material = is ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
+
+            addItem(slot,
+                    ApiManager.newItemBuilder(material)
+                            .setName("§f" + StringUtils.formatDouble(0, needPrestige) + " престижей")
+                            .build(),
+                    (baseInventory, inventoryClickEvent) -> {
+                        if (is) player.teleport(region.getSpawnLocation());
+                    });
+        });
+
+        for (int i = 1; i <= inventory.getSize(); i++) {
+            if (i == 45 || i == 46 || i == 47 || i >= 51)
+                addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
                                 .setDurability(7)
                                 .build());
         }
 
-        addItemSelect(47,
+        addItem(48,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("����� ����������")
+                        .setName("Шахты для привилегий")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().drawInventory(player));
+                        -> new DonateWarpGui(configManager).drawInventory(player));
 
-        addItemSelect(49,
+        addItem(50,
                 ApiManager.newItemBuilder(Material.IRON_INGOT)
-                        .setName("����� ������")
+                        .setName("Шахты для ранков")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui().drawInventory(player));
+                        -> new WarpGui(configManager).drawInventory(player));
+
+        addHandler(BaseInventoryClickHandler.class, (baseInventory, inventoryClickEvent) -> inventoryClickEvent.setCancelled(true));
     }
 }

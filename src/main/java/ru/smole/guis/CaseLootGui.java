@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import ru.smole.cases.Case;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 
 public class CaseLootGui extends BaseSimpleInventory {
@@ -20,8 +21,7 @@ public class CaseLootGui extends BaseSimpleInventory {
     public void drawInventory(@NonNull Player player) {
         for (int i = 0; i < inventory.getSize(); ++i) {
             if (i < 10 || i > inventory.getSize() - 9 || i == 17 || i == 18 || i == 26 || i == 27 || i == 35 || i == 36 || i == 44 || i == 45) {
-                this.inventory.setItem(
-                        i,
+                addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
                                 .setDurability(7)
@@ -39,6 +39,7 @@ public class CaseLootGui extends BaseSimpleInventory {
                         )
                         .build()
         );
+
         if (!customCase.getItems().isEmpty()) {
             customCase.getItems().forEach((caseItem) -> {
                 double chance = caseItem.getChance() * 100.0D;
@@ -54,9 +55,11 @@ public class CaseLootGui extends BaseSimpleInventory {
                                     .setAmount(caseItem.getAmount())
                                     .build()
                     );
+
                 }
             });
         }
 
+        addHandler(BaseInventoryClickHandler.class, (baseInventory, inventoryClickEvent) -> inventoryClickEvent.setCancelled(true));
     }
 }
