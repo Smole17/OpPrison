@@ -17,6 +17,7 @@ import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
 import ru.smole.utils.config.ConfigManager;
+import ru.smole.utils.hologram.HologramManager;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.BaseInventoryListener;
 import ru.xfenilafs.core.regions.Region;
@@ -32,6 +33,7 @@ public final class OpPrison extends JavaPlugin {
 
     private @Getter PlayerDataManager playerDataManager;
     private @Getter ConfigManager configManager;
+    private @Getter HologramManager hologramManager;
     private @Getter DatabaseManager base;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
@@ -42,8 +44,9 @@ public final class OpPrison extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        configManager = new ConfigManager();
         playerDataManager = new PlayerDataManager();
+        configManager = new ConfigManager();
+        hologramManager = new HologramManager();
         base = new DatabaseManager(
                 "localhost",
                 "OpPrison",
