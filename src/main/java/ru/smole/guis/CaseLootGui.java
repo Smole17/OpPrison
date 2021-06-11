@@ -49,7 +49,7 @@ public class CaseLootGui extends BaseSimpleInventory {
                                     .setName(caseItem.getName())
                                     .setLore(
                                             "",
-                                            "Шанс выпадения: " + StringUtils.formatDouble(chance)
+                                            "Шанс выпадения: " + StringUtils.formatDouble(1, chance)
                                     )
                                     .setAmount(caseItem.getAmount())
                                     .build()

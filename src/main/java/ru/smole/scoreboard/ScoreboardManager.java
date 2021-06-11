@@ -30,19 +30,19 @@ public class ScoreboardManager {
             PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
             baseScoreboard.updateScoreboardLine(8, boardPlayer,
-                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(playerData.getPrestige())));
+                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(0, playerData.getPrestige())));
 
             baseScoreboard.updateScoreboardLine(7, boardPlayer,
-                    ChatUtil.text("  §fДобыто блоков: §b%s", StringUtils.formatDouble(playerData.getBlocks())));
+                    ChatUtil.text("  §fДобыто блоков: §b%s", StringUtils._fixDouble(0, playerData.getBlocks())));
 
             baseScoreboard.updateScoreboardLine(4, boardPlayer,
-                    ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(playerData.getMoney())));
+                    ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(1, playerData.getMoney())));
 
             baseScoreboard.updateScoreboardLine(3, boardPlayer,
-                    ChatUtil.text("  §fТокен: §e⛃%s", StringUtils.formatDouble(playerData.getToken())));
+                    ChatUtil.text("  §fТокен: §e⛃%s", StringUtils.formatDouble(1, playerData.getToken())));
 
             baseScoreboard.updateScoreboardLine(2, boardPlayer,
-                    ChatUtil.text("  §fМножитель: §d%sx", StringUtils.formatDouble(playerData.getMultiplier())));
+                    ChatUtil.text("  §fМножитель: §d%sx", StringUtils._fixDouble(0, playerData.getMultiplier())));
         }), 20);
 
         scoreboardBuilder.build().setScoreboardToPlayer(player);
