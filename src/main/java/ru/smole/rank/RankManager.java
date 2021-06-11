@@ -40,9 +40,9 @@ public class RankManager {
 
     public Rank getNextRank(Rank rank) {
         for (int i = 1; i <= Rank.values().length; i++) {
-            Rank ranks = Rank.values()[i];
+            Rank ranks = Rank.values()[i -1];
             if (ranks == rank) {
-                rank = Rank.values()[i - 1];
+                return ranks;
             }
         }
 

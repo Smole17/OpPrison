@@ -209,7 +209,7 @@ public class PlayerListener implements Listener {
 
             String show = "Описание отстутствует";
 
-            if (!lore.isEmpty()) {
+            if (lore != null && !lore.isEmpty()) {
                 for (String s : lore) {
                     show = show + "\n" + s;
                 }
