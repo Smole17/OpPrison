@@ -8,7 +8,7 @@ import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 
 public class DonateWarpGui extends BaseSimpleInventory {
     public DonateWarpGui() {
-        super(6, "Точки телепортации");
+        super(6, "РўРѕС‡РєРё С‚РµР»РµРїРѕСЂС‚Р°С†РёРё");
     }
 
     @Override
@@ -24,13 +24,13 @@ public class DonateWarpGui extends BaseSimpleInventory {
 
         addItemSelect(49,
                 ApiManager.newItemBuilder(Material.IRON_INGOT)
-                        .setName("Шахты ранков")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
 
         addItemSelect(51,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("Шахты престижей")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
     }

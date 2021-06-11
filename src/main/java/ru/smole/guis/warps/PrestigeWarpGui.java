@@ -15,7 +15,7 @@ import ru.xfenilafs.core.regions.Region;
 
 public class PrestigeWarpGui extends BaseSimpleInventory {
     public PrestigeWarpGui() {
-        super(6, "Точки телепортации");
+        super(6, "РўРѕС‡РєРё С‚РµР»РµРїРѕСЂС‚Р°С†РёРё");
     }
 
     @Override
@@ -31,13 +31,13 @@ public class PrestigeWarpGui extends BaseSimpleInventory {
 
         addItemSelect(47,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("Шахты привилегий")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
 
         addItemSelect(49,
                 ApiManager.newItemBuilder(Material.IRON_INGOT)
-                        .setName("Шахты ранков")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
     }

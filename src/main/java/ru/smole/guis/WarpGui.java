@@ -25,7 +25,7 @@ public class WarpGui extends BaseSimpleInventory {
     private ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
-        super(6, "Точки телепортации");
+        super(6, "РўРѕС‡РєРё С‚РµР»РµРїРѕСЂС‚Р°С†РёРё");
         this.configManager = configManager;
     }
 
@@ -70,13 +70,13 @@ public class WarpGui extends BaseSimpleInventory {
 
         addItemSelect(47,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("Шахты привилегий")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
 
         addItemSelect(51,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("Шахты престижей")
+                        .setName("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui().drawInventory(player));
     }
