@@ -82,8 +82,12 @@ public class PlayerListener implements Listener {
                 .getCachedData().getMetaData(LuckPermsProvider.get().getContextManager().getQueryOptions(player))
                 .getPrefix();
 
-        String format = String.format("[%s] %s %s§7: §f%s",
-                msg.startsWith("!") ? "G" : "L", prefix, player.getName(), msg.startsWith("!") ? msg.substring(1) : msg
+        String _format = String.format("[%s] %s %s",
+                msg.startsWith("!") ? "G" : "L", prefix, player.getName()
+        );
+
+        String format = String.format("§7: §f%s",
+                msg.startsWith("!") ? msg.substring(1) : msg
         );
 
         List<String> lore = Lists.newArrayList(
@@ -99,14 +103,15 @@ public class PlayerListener implements Listener {
             comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
         }
 
-        TextComponent component = new TextComponent(TextComponent.fromLegacyText(getHand(format, item)));
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
+        TextComponent _component = new TextComponent(_format);
+        _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
+        _component.addExtra(getHand(format, item));
 
         event.setCancelled(true);
         if (msg.startsWith("!")) {
-            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(component));
+            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
         } else {
-            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(component));
+            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(_component));
         }
 
         Bukkit.getConsoleSender().sendMessage(format);
@@ -185,26 +190,27 @@ public class PlayerListener implements Listener {
     }
 
 
-    public String getHand(String msg, ItemStack item) {
+    public TextComponent getHand(String msg, ItemStack item) {
         if (item == null)
-            return msg;
+            return new TextComponent(msg);
+
+        if (item.getType() == Material.AIR)
+            return new TextComponent(msg);
 
         ItemMeta meta = item.getItemMeta();
 
         if (meta == null)
-            return msg;
+            return new TextComponent(msg);
 
         List<String> lore = meta.getLore();
 
         if (msg.contains("#рука")) {
             int amount = item.getAmount();
             String text_peace = amount == 1 ? "" : " §fx" + amount;
-            String text =
-                    item.getType() == Material.AIR
-                            ? "null" : meta.getDisplayName()
-                            + text_peace;
+            String text = String.format("§8[%s%s§8]",
+                    meta.getDisplayName(), text_peace);
 
-            String show = "Описание отстутствует";
+            String show = "";
 
             if (lore != null && !lore.isEmpty()) {
                 for (String s : lore) {
@@ -213,13 +219,13 @@ public class PlayerListener implements Listener {
             }
 
             BaseComponent[] itemComponent = ChatUtil.newBuilder()
-                    .setText(item.getType() == Material.AIR ? "null" : meta.getDisplayName() + text)
+                    .setText(text)
                     .setHoverEvent(HoverEvent.Action.SHOW_TEXT, show)
                     .build();
 
-            msg = msg.replace("#рука", new TextComponent(itemComponent).toLegacyText());
+            return new TextComponent(itemComponent);
         }
 
-        return msg;
+        return new TextComponent(msg);
     }
 }

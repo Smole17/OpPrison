@@ -28,7 +28,7 @@ public class StatsCommand extends BukkitCommand<Player> {
 
             RankManager rankManager = new OpPlayer(target).getRankManager();
             PlayerData targetData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(targetName);
-            Stat type = Stat.getTypeFromString(args[1]);
+            Stat type = Stat.getTypeFromString(args[1].toUpperCase());
 
             if (type == null) {
                 ChatUtil.sendMessage(player, msg);

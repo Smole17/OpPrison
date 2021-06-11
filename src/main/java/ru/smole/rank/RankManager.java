@@ -36,13 +36,14 @@ public class RankManager {
 
         playerData.setMoney(money - cost);
         playerData.setRank(nextRank);
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали свой ранк до %s", nextRank.getName());
     }
 
     public Rank getNextRank(Rank rank) {
         for (int i = 1; i <= Rank.values().length; i++) {
             Rank ranks = Rank.values()[i -1];
             if (ranks == rank) {
-                return ranks;
+                return Rank.values()[i];
             }
         }
 
