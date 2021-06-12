@@ -59,7 +59,5 @@ public class CaseLootGui extends BaseSimpleInventory {
                 }
             });
         }
-
-        addHandler(BaseInventoryClickHandler.class, (baseInventory, inventoryClickEvent) -> inventoryClickEvent.setCancelled(true));
     }
 }

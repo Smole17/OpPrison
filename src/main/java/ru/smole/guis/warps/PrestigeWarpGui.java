@@ -74,7 +74,5 @@ public class PrestigeWarpGui extends BaseSimpleInventory {
                         .setName("§fШахты для ранков")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new WarpGui(configManager).openInventory(player));
-
-        addHandler(BaseInventoryClickHandler.class, (baseInventory, inventoryClickEvent) -> inventoryClickEvent.setCancelled(true));
     }
 }
