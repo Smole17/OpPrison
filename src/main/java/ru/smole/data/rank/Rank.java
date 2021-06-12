@@ -1,4 +1,4 @@
-package ru.smole.rank;
+package ru.smole.data.rank;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package ru.smole.data.mysql;
 
 import ru.smole.OpPrison;
-import ru.smole.rank.Rank;
+import ru.smole.data.rank.Rank;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

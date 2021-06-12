@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.rank.Rank;
+import ru.smole.data.rank.Rank;
 import ru.smole.scoreboard.ScoreboardManager;
 
 import java.util.HashMap;

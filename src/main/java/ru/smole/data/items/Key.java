@@ -1,4 +1,4 @@
-package ru.smole.items;
+package ru.smole.data.items;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

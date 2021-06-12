@@ -1,4 +1,4 @@
-package ru.smole.cases;
+package ru.smole.data.cases;
 
 import lombok.Data;
 import lombok.Getter;

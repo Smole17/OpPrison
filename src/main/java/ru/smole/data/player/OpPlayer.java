@@ -1,10 +1,10 @@
-package ru.smole.player;
+package ru.smole.data.player;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import ru.smole.items.Items;
-import ru.smole.rank.RankManager;
+import ru.smole.data.items.Items;
+import ru.smole.data.rank.RankManager;
 
 public class OpPlayer {
 

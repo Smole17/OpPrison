@@ -1,10 +1,8 @@
-package ru.smole.rank;
+package ru.smole.data.rank;
 
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
-import ru.smole.commands.StatsCommand;
 import ru.smole.data.PlayerData;
-import ru.smole.player.OpPlayer;
 import ru.xfenilafs.core.util.ChatUtil;
 
 public class RankManager {

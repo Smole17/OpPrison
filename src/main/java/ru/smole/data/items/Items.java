@@ -1,4 +1,4 @@
-package ru.smole.items;
+package ru.smole.data.items;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

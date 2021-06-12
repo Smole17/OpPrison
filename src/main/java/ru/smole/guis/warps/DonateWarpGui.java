@@ -6,7 +6,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
-import ru.smole.rank.Rank;
 import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;

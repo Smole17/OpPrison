@@ -3,7 +3,7 @@ package ru.smole.guis;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import ru.smole.cases.Case;
+import ru.smole.data.cases.Case;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;

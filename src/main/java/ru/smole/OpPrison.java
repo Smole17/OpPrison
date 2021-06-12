@@ -9,7 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.smole.cases.Case;
+import ru.smole.data.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.mysql.DatabaseManager;

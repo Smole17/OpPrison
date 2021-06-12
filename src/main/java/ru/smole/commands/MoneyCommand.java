@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.player.OpPlayer;
+import ru.smole.data.player.OpPlayer;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.util.ChatUtil;
 

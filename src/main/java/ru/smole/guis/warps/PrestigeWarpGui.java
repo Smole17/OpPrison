@@ -1,24 +1,18 @@
 package ru.smole.guis.warps;
 
 import lombok.NonNull;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.player.OpPlayer;
-import ru.smole.rank.Rank;
-import ru.smole.rank.RankManager;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
-
-import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 
 public class PrestigeWarpGui extends BaseSimpleInventory {
 
