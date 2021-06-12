@@ -34,7 +34,7 @@ public class RankManager {
 
         playerData.setMoney(money - cost);
         playerData.setRank(nextRank);
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали свой ранк до %s", nextRank.getName());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "%s &7-> &f%s", rank, nextRank.getName());
     }
 
     public Rank getNextRank(Rank rank) {

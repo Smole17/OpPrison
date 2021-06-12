@@ -20,7 +20,7 @@ public class PlayerDataManager {
     }
 
     public void create(String name) {
-        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, Rank.A, 0));
+        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, Rank.A, 0, false));
         PlayerDataSQL.create(name);
     }
 
@@ -44,8 +44,9 @@ public class PlayerDataManager {
         double multiplier = (double) PlayerDataSQL.get(name, "multiplier");
         Rank rank = Rank.valueOf((String) PlayerDataSQL.get(name, "rank"));
         double prestige = (double) PlayerDataSQL.get(name, "prestige");
+        boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
 
-        playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige));
+        playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige, fly));
         ScoreboardManager.loadScoreboard(player);
     }
 
@@ -63,9 +64,10 @@ public class PlayerDataManager {
         double multiplier = data.getMultiplier();
         Rank rank = data.getRank();
         double prestige = data.getPrestige();
+        int fly = data.isFly() ? 1 : 0;
 
         HideCommand.hide.remove(player);
         player.kickPlayer("bb");
-        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige);
+        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly);
     }
 }

@@ -18,6 +18,14 @@ public class Items {
                 .build();
     }
 
+    public ItemStack getFlyVoucher() {
+        return ApiManager
+                .newItemBuilder(Material.FEATHER)
+                .setName("§fДоступ к полёту §7(/fly)")
+                .addLore("§7Нажмите для активации")
+                .build();
+    }
+
     public Key getKeyFromString(String key) {
         for (Key type : Key.values())
             if (type.equals(Key.valueOf(key.toUpperCase())))

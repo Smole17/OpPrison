@@ -12,8 +12,8 @@ public class PlayerDataSQL {
 
     public static void create(String name) {
         db.update("INSERT INTO " +
-                "OpPrison(name, blocks, money, token, multiplier, rank, prestige) " +
-                "VALUES('" + name + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + Rank.A.getClearName() + "', '" + 0.0 + "')");
+                "OpPrison(name, blocks, money, token, multiplier, rank, prestige, fly) " +
+                "VALUES('" + name + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + 0.0 + "', '" + Rank.A.getClearName() + "', '" + 0.0 + "', '" + 0 + "')");
     }
 
     public static boolean playerExists(final String name) {
@@ -44,9 +44,9 @@ public class PlayerDataSQL {
         return obj;
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige) {
-        db.update(String.format("UPDATE OpPrison SET name=%s, blocks=%f, money=%f, token=%f, multiplier=%f, rank=%s, prestige=%s",
-                name, blocks, money, token, multiplier, rank.getClearName(), prestige));
+    public static void save(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige, int fly) {
+        db.update(String.format("UPDATE OpPrison SET name=%s, blocks=%f, money=%f, token=%f, multiplier=%f, rank=%s, prestige=%s, fly=%s",
+                name, blocks, money, token, multiplier, rank.getClearName(), prestige, fly));
     }
 
     public static void set(String name, String table, String input) {

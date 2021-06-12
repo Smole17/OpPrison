@@ -12,8 +12,9 @@ import ru.smole.data.rank.Rank;
     private double multiplier;
     private Rank rank;
     private double prestige;
+    private boolean fly;
 
-    public PlayerData(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige) {
+    public PlayerData(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige, boolean fly) {
         this.name = name;
         this.blocks = blocks;
         this.money = money;
@@ -21,5 +22,6 @@ import ru.smole.data.rank.Rank;
         this.multiplier = multiplier;
         this.rank = rank;
         this.prestige = prestige;
+        this.fly = fly;
     }
 }

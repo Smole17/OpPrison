@@ -22,6 +22,8 @@ import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
+import ru.smole.data.items.Items;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
@@ -133,17 +135,29 @@ public class PlayerListener implements Listener {
         Action action = event.getAction();
 
         if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-            if (item.getType() == Material.MAGMA_CREAM) {
-                ItemMeta itemMeta = item.getItemMeta();
+            ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta.hasDisplayName()) {
+                String itemName = itemMeta.getDisplayName();
+                Items items = new OpPlayer(player).getItems();
 
-                if (itemMeta.hasDisplayName()) {
-                    String itemName = itemMeta.getDisplayName();
-
+                if (type == Material.MAGMA_CREAM) {
                     if (itemName.contains("⛃")) {
                         double count = Double.parseDouble(StringUtils.replaceComma(itemName.split("⛃")[1]));
 
                         playerData.setToken(playerData.getToken() + count);
                         item.setAmount(0);
+                        return;
+                    }
+                }
+
+                if (type == Material.FEATHER) {
+                    if (item == items.getFlyVoucher()) {
+                        if (playerData.isFly())
+                            return;
+
+                        playerData.setFly(true);
+                        item.setAmount(0);
+                        return;
                     }
                 }
             }
