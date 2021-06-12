@@ -18,7 +18,7 @@ public class DonateWarpGui extends BaseSimpleInventory {
     private ConfigManager configManager;
 
     public DonateWarpGui(ConfigManager configManager) {
-        super(6, "Точки телепортации");
+        super(6, "Точки телепортации (Привилегии)");
         this.configManager = configManager;
     }
 
@@ -50,7 +50,7 @@ public class DonateWarpGui extends BaseSimpleInventory {
         });
 
         for (int i = 1; i <= inventory.getSize(); i++) {
-            if (i == 45 || i == 46 || i == 47 || i == 48 || i == 49 || i >= 53)
+            if (i == 46 || i == 47 || i == 48 || i == 49 || i == 51 || i == 53|| i == 54)
                 addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
@@ -60,13 +60,13 @@ public class DonateWarpGui extends BaseSimpleInventory {
 
         addItem(50,
                 ApiManager.newItemBuilder(Material.IRON_INGOT)
-                        .setName("Шахты для ранков")
+                        .setName("§fШахты для ранков")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new WarpGui(configManager).drawInventory(player));
 
         addItem(52,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("Шахты для престижей")
+                        .setName("§fШахты для престижей")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new PrestigeWarpGui(configManager).drawInventory(player));
 

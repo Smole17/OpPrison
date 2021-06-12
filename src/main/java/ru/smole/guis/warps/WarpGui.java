@@ -26,7 +26,7 @@ public class WarpGui extends BaseSimpleInventory {
     private ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
-        super(6, "Точки телепортации");
+        super(6, "Точки телепортации (Ранки)");
         this.configManager = configManager;
     }
 
@@ -61,7 +61,7 @@ public class WarpGui extends BaseSimpleInventory {
         });
 
         for (int i = 1; i < inventory.getSize(); i++) {
-            if (i == 45 || i == 46 || i == 48 || i == 49 || i == 50 || i == 52 || i == 53)
+            if (i == 46 || i == 47 || i == 49 || i == 50 || i == 51 || i == 53 || i == 54)
                 addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
@@ -69,15 +69,15 @@ public class WarpGui extends BaseSimpleInventory {
                                 .build());
         }
 
-        addItem(47,
+        addItem(48,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("xz")
+                        .setName("§fШахты для привилегий")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui(configManager).openInventory(player));
 
-        addItem(51,
+        addItem(52,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("test")
+                        .setName("§fШахты для престижей")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui(configManager).openInventory(player));
     }

@@ -17,13 +17,17 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.smole.OpPrison;
 import ru.smole.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.guis.CaseLootGui;
+import ru.smole.items.Items;
+import ru.smole.player.OpPlayer;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
@@ -119,7 +123,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        ItemStack item = event.getItem();
+        Player player = event.getPlayer();
+        ItemStack item = player.getInventory().getItemInMainHand();
 
         if (item == null)
             return;
@@ -129,13 +134,13 @@ public class PlayerListener implements Listener {
         if (type == Material.AIR)
             return;
 
-        Player player = event.getPlayer();
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
         Action action = event.getAction();
 
         if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-            ItemMeta itemMeta = item.getItemMeta();
-            if (type == Material.MAGMA_CREAM) {
+            if (item.getType() == Material.MAGMA_CREAM) {
+                ItemMeta itemMeta = item.getItemMeta();
+
                 if (itemMeta.hasDisplayName()) {
                     String itemName = itemMeta.getDisplayName();
 
@@ -143,7 +148,7 @@ public class PlayerListener implements Listener {
                         double count = Double.parseDouble(StringUtils.replaceComma(itemName.split("⛃")[1]));
 
                         playerData.setToken(playerData.getToken() + count);
-                        player.getInventory().remove(item);
+                        item.setAmount(0);
                     }
                 }
             }
