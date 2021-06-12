@@ -13,6 +13,7 @@ import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
+import ru.xfenilafs.core.util.TeleportUtil;
 
 public class WarpGui extends BaseSimpleInventory {
 
@@ -42,6 +43,7 @@ public class WarpGui extends BaseSimpleInventory {
 
             Rank needRank = rankManager.getRankFromString(rankText);
             Region region = OpPrison.REGIONS.get(name.toLowerCase());
+            TeleportUtil tp = new TeleportUtil(OpPrison.getInstance());
             Material material = rankManager.isEquals(needRank) ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
 
             addItem(slot,
@@ -49,7 +51,7 @@ public class WarpGui extends BaseSimpleInventory {
                             .setName(needRank.getName())
                             .build(),
                     (baseInventory, inventoryClickEvent) -> {
-                if (rankManager.isEquals(needRank)) player.teleport(region.getSpawnLocation());
+                if (rankManager.isEquals(needRank)) tp.teleport(player, region.getSpawnLocation(), "филя на", "филя дай пожрать пожалуйста");
                     });
         });
 

@@ -13,6 +13,7 @@ import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
+import ru.xfenilafs.core.util.TeleportUtil;
 
 public class PrestigeWarpGui extends BaseSimpleInventory {
 
@@ -41,6 +42,7 @@ public class PrestigeWarpGui extends BaseSimpleInventory {
 
             boolean is = playerData.getPrestige() >= needPrestige;
             Region region = OpPrison.REGIONS.get(name.toLowerCase());
+            TeleportUtil tp = new TeleportUtil(OpPrison.getInstance());
             Material material = is ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
 
             addItem(slot,
@@ -48,7 +50,7 @@ public class PrestigeWarpGui extends BaseSimpleInventory {
                             .setName("§f" + StringUtils.formatDouble(0, needPrestige) + " престижей")
                             .build(),
                     (baseInventory, inventoryClickEvent) -> {
-                        if (is) player.teleport(region.getSpawnLocation());
+                        if (is) tp.teleport(player, region.getSpawnLocation(), "филя на", "филя дай пожрать пожалуйста");
                     });
         });
 
