@@ -67,13 +67,13 @@ public class PrestigeWarpGui extends BaseSimpleInventory {
                 ApiManager.newItemBuilder(Material.DIAMOND)
                         .setName("§fШахты для привилегий")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new DonateWarpGui(configManager).drawInventory(player));
+                        -> new DonateWarpGui(configManager).openInventory(player));
 
         addItem(50,
                 ApiManager.newItemBuilder(Material.IRON_INGOT)
                         .setName("§fШахты для ранков")
                         .build(), (baseInventory, inventoryClickEvent)
-                        -> new WarpGui(configManager).drawInventory(player));
+                        -> new WarpGui(configManager).openInventory(player));
 
         addHandler(BaseInventoryClickHandler.class, (baseInventory, inventoryClickEvent) -> inventoryClickEvent.setCancelled(true));
     }
