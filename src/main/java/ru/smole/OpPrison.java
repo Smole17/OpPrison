@@ -16,6 +16,8 @@ import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
+import ru.smole.utils.BungeeUtils;
+import ru.smole.utils.ServerUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.hologram.HologramManager;
 import ru.xfenilafs.core.ApiManager;
@@ -64,7 +66,11 @@ public final class OpPrison extends JavaPlugin {
                 new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand(),
                 new PrestigeCommand(), new FlyCommand()
         );
-        
+
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtils());
+
+        ServerUtils.load();
         loadRegionsAndMines();
         loadCases();
     }
