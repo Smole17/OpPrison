@@ -30,7 +30,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             String targetName = target.getName();
             PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": ⛃" + StringUtils.fixDouble(0, targetData.getToken()));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": ⛃" + StringUtils.replaceComma(targetData.getToken()));
             return;
         }
 
@@ -49,7 +49,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             }
         }
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "⛃" + StringUtils.fixDouble(0, playerData.getToken()));
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "⛃" + StringUtils.replaceComma(playerData.getToken()));
     }
 
     public void withdraw(Player player, double count) {
