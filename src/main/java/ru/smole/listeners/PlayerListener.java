@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +25,7 @@ import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
+import ru.smole.data.trade.Trade;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
 import ru.smole.utils.ItemStackUtils;
@@ -185,6 +187,16 @@ public class PlayerListener implements Listener {
                 new CaseLootGui(customCase).openInventory(player);
             }
         }
+    }
+
+    @EventHandler
+    public void onTradeClick(InventoryClickEvent event) {
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(event.getWhoClicked().getName());
+        Trade trade = Trade.getTrading(playerData);
+        if (trade != null) {
+            trade.handleClick(event);
+        }
+
     }
 
     @EventHandler
