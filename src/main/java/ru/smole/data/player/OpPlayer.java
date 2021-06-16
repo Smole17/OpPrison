@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.data.items.Items;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.prestige.PrestigeManager;
 import ru.smole.data.rank.RankManager;
 
@@ -13,12 +14,14 @@ public class OpPlayer {
     private @Getter Items items;
     private @Getter RankManager rankManager;
     private @Getter PrestigeManager prestigeManager;
+    private @Getter PickaxeManager pickaxeManager;
 
     public OpPlayer(Player player) {
         this.player = player;
-        items = new Items();
+        items = new Items(player);
         rankManager = new RankManager(player);
         prestigeManager = new PrestigeManager(player);
+        pickaxeManager = new PickaxeManager(player);
     }
 
     public void add(ItemStack stack) {

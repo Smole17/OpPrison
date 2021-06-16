@@ -64,11 +64,17 @@ public class ItemsCommand extends BukkitCommand<Player> {
                 } catch (Exception ignored) {}
 
                 opPlayer.add(opPlayer.getItems().getToken(amount));
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан токен &e⛃%s", name, StringUtils._formatDouble(amount));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан токен &e⛃%s", name, StringUtils.fixDouble(0, amount));
+                return;
+            }
+
+            if (arg.equals("fly")) {
+                opPlayer.add(opPlayer.getItems().getFlyVoucher());
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан флай воучер", name);
                 return;
             }
         }
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "/items key/token name key_type/count amount/empty");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "/items key/token/fly name key_type/count amount/empty");
     }
 }

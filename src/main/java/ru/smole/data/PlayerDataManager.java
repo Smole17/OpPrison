@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
 import ru.smole.data.mysql.PlayerDataSQL;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.data.rank.Rank;
 import ru.smole.scoreboard.ScoreboardManager;
 
@@ -19,9 +20,13 @@ public class PlayerDataManager {
         playerDataMap = new HashMap<>();
     }
 
-    public void create(String name) {
+    public void create(Player player) {
+        OpPlayer opPlayer = new OpPlayer(player);
+        String name = player.getName();
+
         playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, Rank.A, 0, false));
-        PlayerDataSQL.create(name);
+        opPlayer.getPickaxeManager().create();
+        PlayerDataSQL.create(name, opPlayer.getPickaxeManager().getStats());
     }
 
     public void load(Player player) {
@@ -32,7 +37,7 @@ public class PlayerDataManager {
         });
 
         if (!PlayerDataSQL.playerExists(name)) {
-            create(name);
+            create(player);
             ScoreboardManager.loadScoreboard(player);
 
             return;
@@ -65,9 +70,10 @@ public class PlayerDataManager {
         Rank rank = data.getRank();
         double prestige = data.getPrestige();
         int fly = data.isFly() ? 1 : 0;
+        String pickaxe = new OpPlayer(player).getPickaxeManager().getStats();
 
         HideCommand.hide.remove(player);
         player.kickPlayer("bb");
-        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly);
+        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe);
     }
 }

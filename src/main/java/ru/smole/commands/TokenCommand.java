@@ -30,15 +30,15 @@ public class TokenCommand extends BukkitCommand<Player> {
             String targetName = target.getName();
             PlayerData targetData = dataManager.getPlayerDataMap().get(targetName);
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": ⛃" + StringUtils._formatDouble(targetData.getToken()));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + targetName + ": ⛃" + StringUtils.fixDouble(0, targetData.getToken()));
             return;
         }
 
         if (args.length == 2) {
             if (args[0].equals("withdraw")) {
-                int token;
+                double token;
                 try {
-                    token = Integer.parseInt(args[1]);
+                    token = Double.parseDouble(args[1]);
                 } catch (Exception e) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
                     return;
@@ -49,15 +49,15 @@ public class TokenCommand extends BukkitCommand<Player> {
             }
         }
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "⛃" + StringUtils._formatDouble(playerData.getToken()));
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "⛃" + StringUtils.fixDouble(0, playerData.getToken()));
     }
 
-    public void withdraw(Player player, int count) {
+    public void withdraw(Player player, double count) {
         OpPlayer opPlayer = new OpPlayer(player);
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
         double token = playerData.getToken();
 
-        if (0 >= count) {
+        if (0D >= count) {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите корректное число");
             return;
         }

@@ -60,7 +60,8 @@ public class DatabaseManager {
                 "multiplier DOUBLE, " +
                 "prestige DOUBLE, " +
                 "rank VARCHAR(10), " +
-                "fly INT)");
+                "fly INT, " +
+                "pickaxe TEXT)");
     }
 
     public Map<String, Double> getTopFromCriteria(String criteria, int amount) {

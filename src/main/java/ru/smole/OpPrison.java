@@ -53,7 +53,7 @@ public final class OpPrison extends JavaPlugin {
                 "localhost",
                 "OpPrison",
                 "root",
-                "vi6RcaDhRvkO0U5d",
+                "Smole!7NeLoh",
                 false
         );
 

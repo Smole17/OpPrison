@@ -1,5 +1,7 @@
 package ru.smole.utils;
 
+import java.text.DecimalFormat;
+
 public class StringUtils {
 
     public static String formatDouble(int i, double d) {
@@ -24,10 +26,6 @@ public class StringUtils {
         return _fixDouble(i, d / 1.0E27D).replace(",", ".") + "Oc";
     }
 
-    public static String _formatDouble(double d) {
-        return String.format("%f", d);
-    }
-
     public static Double fixDouble(int i, double d) {
         return Double.valueOf(String.format("%." + i + "f", d).replace(",", "."));
     }
@@ -36,7 +34,11 @@ public class StringUtils {
         return String.format("%." + i + "f", d);
     }
 
-    public static String replaceComma(String text) {
+    public static String replaceComma(double d) {
+        return String.format("%,.0f", d);
+    }
+
+    public static String unReplaceComma(String text) {
         return text.replaceAll(",", "");
     }
 //

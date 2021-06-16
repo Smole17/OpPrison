@@ -10,6 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
+import ru.smole.OpPrison;
+import ru.smole.data.PlayerData;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
@@ -31,6 +33,8 @@ public class RegionListener implements Listener {
             }
             return;
         }
+
+        add(event);
         event.setExpToDrop(0);
         event.setDropItems(false);
     }
@@ -114,5 +118,12 @@ public class RegionListener implements Listener {
         if (event.getNewState().getBlock().getType() == Material.SOIL) {
             event.setCancelled(true);
         }
+    }
+
+    public void add(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
+        playerData.setBlocks(playerData.getBlocks() + 1);
     }
 }

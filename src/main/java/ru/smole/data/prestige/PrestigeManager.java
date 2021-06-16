@@ -9,10 +9,11 @@ import ru.xfenilafs.core.util.ChatUtil;
 public class PrestigeManager {
 
     private Player player;
-    private PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+    private PlayerData playerData;
 
     public PrestigeManager(Player player) {
         this.player = player;
+        playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
     }
 
     public void up(int i) {
@@ -34,7 +35,7 @@ public class PrestigeManager {
         double prestige = playerData.getPrestige();
         double money = playerData.getMoney();
 
-        double billion = 1000000000;
+        double billion = 1000000000D;
         double cost = prestige == 0 ? billion : prestige * 1.25F * billion;
 
         if (cost > money) {

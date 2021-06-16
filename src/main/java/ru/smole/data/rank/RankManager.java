@@ -34,7 +34,7 @@ public class RankManager {
 
         playerData.setMoney(money - cost);
         playerData.setRank(nextRank);
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "%s &7-> &f%s", rank, nextRank.getName());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "%s &7-> %s", rank.getName(), nextRank.getName());
     }
 
     public Rank getNextRank(Rank rank) {
@@ -63,6 +63,6 @@ public class RankManager {
     }
 
     public boolean isEquals(Rank rank) {
-        return playerData.getRank().getPriority() <= rank.getPriority();
+        return playerData.getRank().ordinal() <= rank.ordinal();
     }
 }

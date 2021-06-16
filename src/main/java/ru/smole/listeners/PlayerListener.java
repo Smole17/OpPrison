@@ -25,6 +25,7 @@ import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.guis.CaseLootGui;
+import ru.smole.guis.PickaxeGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
@@ -55,19 +56,6 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         dataManager.unload(player);
-    }
-
-    @EventHandler
-    public void onBreak(BlockBreakEvent event) {
-        if (!event.isCancelled()) {
-            Player player = event.getPlayer();
-            PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
-
-            playerData.setBlocks(playerData.getBlocks() + 1);
-
-            event.setDropItems(false);
-            event.setExpToDrop(0);
-        }
     }
 
     @EventHandler
@@ -142,7 +130,7 @@ public class PlayerListener implements Listener {
 
                 if (type == Material.MAGMA_CREAM) {
                     if (itemName.contains("⛃")) {
-                        double count = Double.parseDouble(StringUtils.replaceComma(itemName.split("⛃")[1]));
+                        double count = Double.parseDouble(StringUtils.unReplaceComma(itemName.split("⛃")[1]));
 
                         playerData.setToken(playerData.getToken() + count);
                         item.setAmount(0);
@@ -158,6 +146,12 @@ public class PlayerListener implements Listener {
                         playerData.setFly(true);
                         item.setAmount(0);
                         return;
+                    }
+                }
+
+                if (type == Material.DIAMOND_PICKAXE) {
+                    if (item.hasItemMeta()) {
+                        new PickaxeGui().openInventory(player);
                     }
                 }
             }

@@ -27,6 +27,6 @@ public class FlyCommand extends BukkitCommand<Player> {
             return;
         }
 
-        ChatUtil.sendMessage(player, "У вас нет доступа к полёту");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к полёту");
     }
 }
