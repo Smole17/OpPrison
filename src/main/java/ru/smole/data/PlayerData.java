@@ -1,6 +1,8 @@
 package ru.smole.data;
 
 import lombok.Data;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import ru.smole.data.rank.Rank;
 
 @Data public class PlayerData {
@@ -23,5 +25,9 @@ import ru.smole.data.rank.Rank;
         this.rank = rank;
         this.prestige = prestige;
         this.fly = fly;
+    }
+
+    public Player getPlayer() {
+        return Bukkit.getPlayer(name);
     }
 }
