@@ -38,9 +38,9 @@ public class ServerUtils {
             playerData.unload(player);
         });
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-            Bukkit.getOnlinePlayers().forEach((player) -> {
-                ChatUtil.sendMessage(player,"§cСервер перезагружается! Перемещаю в хаб проекта...");
-                BungeeUtils.sendToServer(player, getRandomHub());
+            Bukkit.getOnlinePlayers().forEach((p) -> {
+                ChatUtil.sendMessage(p,"§cСервер перезагружается! Перемещаю в хаб проекта...");
+                BungeeUtils.sendToServer(p, getRandomHub());
             });
         }, 200L);
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);
