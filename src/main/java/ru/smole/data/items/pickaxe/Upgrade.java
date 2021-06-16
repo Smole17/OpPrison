@@ -2,6 +2,7 @@ package ru.smole.data.items.pickaxe;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import ru.smole.data.rank.Rank;
 
 @AllArgsConstructor public enum Upgrade {
 

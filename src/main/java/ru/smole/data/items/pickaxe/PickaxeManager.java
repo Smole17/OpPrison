@@ -3,6 +3,7 @@ package ru.smole.data.items.pickaxe;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -46,17 +47,58 @@ public class PickaxeManager {
     }
 
     public void load() {
-        for (Upgrade upgrade : Upgrade.values()) {
+        String statsSQL = (String) PlayerDataSQL.get(name, "pickaxe");
+        String pickaxeName = "null";
+        double exp = 0.0;
+        double level = 0.0;
 
+        for (String stats : statsSQL.split(",")) {
+            String[] args = stats.split("=");
+
+            String arg_0 = args[0];
+            String arg_1 = args[1];
+
+            switch (arg_0) {
+                case "name":
+                    pickaxeName = arg_1;
+                    break;
+                case "exp":
+                    exp = Double.parseDouble(arg_1);
+                    break;
+                case "level":
+                    level = Double.parseDouble(arg_1);
+                    break;
+            }
+
+            Upgrade upgrade = getUpgradeFromString(arg_0);
+
+            if (upgrade == null)
+                continue;
+
+            double count = Double.parseDouble(arg_1);
+
+            upgradeMap.put(upgrade, count);
         }
+
+        upgrades.add(upgradeMap);
+
+        Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgrades);
+        pickaxes.put(name, pickaxe);
     }
 
     public void unload() {
-
+        if (!pickaxes.isEmpty())
+            pickaxes.remove(name);
     }
 
     public String getStats() {
         StringBuilder builder = new StringBuilder();
+        Pickaxe pickaxe = pickaxes.get(name);
+
+        builder.append(String.format("%s=%s", "name", pickaxe.getName()));
+        builder.append(String.format("%s=%f", "exp", StringUtils.fixDouble(0, pickaxe.getExp())));
+        builder.append(String.format("%s=%f", "level", StringUtils.fixDouble(0, pickaxe.getLevel())));
+
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Double> upgradesMap = pickaxes.get(name).getUpgrades().get(upgrade.ordinal());
 
@@ -70,5 +112,15 @@ public class PickaxeManager {
         }
 
         return builder.toString();
+    }
+
+    public Upgrade getUpgradeFromString(String upgrade) {
+        for (Upgrade upgrades : Upgrade.values()) {
+            if (upgrades == Upgrade.valueOf(upgrade)) {
+                return upgrades;
+            }
+        }
+
+        return null;
     }
 }

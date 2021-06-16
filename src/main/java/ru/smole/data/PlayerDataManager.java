@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.rank.Rank;
@@ -30,7 +31,9 @@ public class PlayerDataManager {
     }
 
     public void load(Player player) {
+        PickaxeManager pickaxeManager = new OpPlayer(player).getPickaxeManager();
         String name = player.getName();
+
         HideCommand.hide.forEach(hiders -> {
             if (!hiders.isEmpty())
                 hiders.hidePlayer(OpPrison.getInstance(), player);
@@ -38,6 +41,7 @@ public class PlayerDataManager {
 
         if (!PlayerDataSQL.playerExists(name)) {
             create(player);
+            pickaxeManager.create();
             ScoreboardManager.loadScoreboard(player);
 
             return;
@@ -52,10 +56,12 @@ public class PlayerDataManager {
         boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
 
         playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige, fly));
+        pickaxeManager.load();
         ScoreboardManager.loadScoreboard(player);
     }
 
     public void unload(Player player) {
+        OpPlayer opPlayer = new OpPlayer(player);
         String name = player.getName();
 
         if (!playerDataMap.containsKey(name))
@@ -74,6 +80,7 @@ public class PlayerDataManager {
 
         HideCommand.hide.remove(player);
         player.kickPlayer("bb");
+        opPlayer.getPickaxeManager().unload();
         PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe);
     }
 }
