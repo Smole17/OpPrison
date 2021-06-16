@@ -10,7 +10,6 @@ import ru.xfenilafs.core.util.LagUtil;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ServerUtils {
 
@@ -26,7 +25,7 @@ public class ServerUtils {
                 Bukkit.getOnlinePlayers().forEach(p -> p.setPlayerTime(trueTime, false));
                 if (LagUtil.getLastMinuteTPS() < 5.0D) {
                     Bukkit.getOnlinePlayers().forEach(player -> ChatUtil.sendMessage(player, "&4&lСожалеем, но сервер крайне перегружен. Попробуйте вернуться через несколько минут."));
-                    Bukkit.getOnlinePlayers().forEach(player -> BungeeUtils.sendToServer(player, "Hub"));
+                    Bukkit.getOnlinePlayers().forEach(player -> BungeeUtils.sendToServer(player, getRandomHub()));
                 }
             }
         }, 0L, 20L);
@@ -39,9 +38,9 @@ public class ServerUtils {
             playerData.unload(player);
         });
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-            Bukkit.getOnlinePlayers().forEach((p) -> {
-                ChatUtil.sendMessage(p,"§cСервер перезагружается! Перемещаю в хаб проекта...");
-                BungeeUtils.sendToServer(p, getRandomHub());
+            Bukkit.getOnlinePlayers().forEach((player) -> {
+                ChatUtil.sendMessage(player,"§cСервер перезагружается! Перемещаю в хаб проекта...");
+                BungeeUtils.sendToServer(player, getRandomHub());
             });
         }, 200L);
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);
