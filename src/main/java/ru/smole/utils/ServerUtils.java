@@ -1,11 +1,15 @@
 package ru.smole.utils;
 
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerDataManager;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.LagUtil;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ServerUtils {
@@ -37,9 +41,18 @@ public class ServerUtils {
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
             Bukkit.getOnlinePlayers().forEach((p) -> {
                 ChatUtil.sendMessage(p,"§cСервер перезагружается! Перемещаю в хаб проекта...");
-                BungeeUtils.sendToServer(p, "hub" + ThreadLocalRandom.current().nextInt(2));
+                BungeeUtils.sendToServer(p, getRandomHub());
             });
         }, 200L);
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);
     }
+
+    public static String getRandomHub() {
+        List<String> hubs = Lists.newArrayList("hub1", "hub2");
+        return hubs.stream()
+                .filter(Objects::nonNull)
+                .min(Comparator.comparingInt(BungeeUtils::getServerOnline))
+                .orElse(null);
+    }
+
 }
