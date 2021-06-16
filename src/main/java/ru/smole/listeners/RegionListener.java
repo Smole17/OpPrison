@@ -12,6 +12,9 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
+import ru.smole.data.items.pickaxe.Pickaxe;
+import ru.smole.data.player.OpPlayer;
+import ru.smole.data.prices.PricesManager;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
@@ -122,8 +125,11 @@ public class RegionListener implements Listener {
 
     public void add(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+        String name = player.getName();
 
-        playerData.setBlocks(playerData.getBlocks() + 1);
+        OpPlayer opPlayer = new OpPlayer(player);
+
+        Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
+        pickaxe.procUpgrades(event);
     }
 }

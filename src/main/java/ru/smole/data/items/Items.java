@@ -54,7 +54,7 @@ public class Items {
         }
         lore.add("");
         lore.add(String.format("§fУровень: §b%s", pickaxe.getLevel()));
-        lore.add(String.format("§fОпыт: §b%s/%s", pickaxe.getExp(), pickaxe.getNextExp()));
+        lore.add(String.format("§fОпыт: §b%s/%s", pickaxe.getExp(), pickaxe.getNeedExp()));
 
         double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY.ordinal()).get(Upgrade.EFFICIENCY);
 
@@ -72,6 +72,14 @@ public class Items {
     public Key getKeyFromString(String key) {
         for (Key type : Key.values())
             if (type.equals(Key.valueOf(key.toUpperCase())))
+                return type;
+
+        return null;
+    }
+
+    public Key getKeyFromInt(int i) {
+        for (Key type : Key.values())
+            if (type == Key.values()[i])
                 return type;
 
         return null;

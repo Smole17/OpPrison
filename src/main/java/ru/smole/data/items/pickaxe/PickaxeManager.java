@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.smole.data.mysql.PlayerDataSQL;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class PickaxeManager {
 
     private @Getter Map<String, Pickaxe> pickaxes;
     private Player player;
+    private OpPlayer opPlayer;
 
     private String name;
     private List<Map<Upgrade, Double>> upgrades;
@@ -23,6 +25,7 @@ public class PickaxeManager {
     public PickaxeManager(Player player) {
         pickaxes = new HashMap<>();
         this.player = player;
+        opPlayer = new OpPlayer(player);
         name = player.getName();
         upgrades = new ArrayList<>();
         upgradeMap = new HashMap<>();
@@ -44,6 +47,7 @@ public class PickaxeManager {
         );
 
         pickaxes.put(name, pickaxe);
+        opPlayer.set(opPlayer.getItems().getPickaxe(), 1);
     }
 
     public void load() {
@@ -84,6 +88,7 @@ public class PickaxeManager {
 
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgrades);
         pickaxes.put(name, pickaxe);
+        opPlayer.set(opPlayer.getItems().getPickaxe(), 1);
     }
 
     public void unload() {
