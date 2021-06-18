@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.items.Key;
@@ -74,7 +75,7 @@ import java.util.Random;
         double explosiveLevel = upgrades.get(Upgrade.EXPLOSIVE.ordinal()).get(Upgrade.EXPLOSIVE);
 
         ChatUtil.sendMessage(player, String.valueOf(blockFace.ordinal()));
-        double cost = pricesManager.getPrice(blockType.name()) * fortuneLevel;
+        double cost = pricesManager.getPrice(blockType.name()) * fortuneLevel * playerData.getMultiplier();
         double token = 750 * token_minerLevel;
 
         if (explosiveLevel > 0) {
@@ -90,9 +91,12 @@ import java.util.Random;
             Random random = new Random();
             double chance = (key_finderLevel / 5) / 100;
             if (random.nextFloat() <= chance) {
-                int type = random.nextInt(4);
+                int type = random.nextInt(3);
                 Key key = opPlayer.getItems().getKeyFromInt(type);
-                opPlayer.add(key.getStack());
+                ItemStack keyItem = key.getStack();
+
+                opPlayer.add(keyItem);
+                ChatUtil.sendMessage(player, OpPrison.getInstance() + String.format("Вы получили %s", keyItem.getI18NDisplayName()));
             }
         }
 

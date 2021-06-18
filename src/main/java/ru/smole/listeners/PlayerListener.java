@@ -8,23 +8,31 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
+import ru.smole.data.items.pickaxe.Pickaxe;
+import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.player.OpPlayer;
+import ru.smole.data.prices.PricesManager;
 import ru.smole.data.trade.Trade;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
@@ -33,6 +41,7 @@ import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class PlayerListener implements Listener {
@@ -190,23 +199,77 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onTradeClick(InventoryClickEvent event) {
-        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(event.getWhoClicked().getName());
+    public void onClick(InventoryClickEvent event) {
+        HumanEntity player = event.getWhoClicked();
+        ClickType type = event.getClick();
+        InventoryType inventoryType = event.getClickedInventory().getType();
+        ItemStack pickaxe = new OpPlayer(player.getKiller()).getItems().getPickaxe();
+
+        if (inventoryType == InventoryType.PLAYER) {
+            if (event.getCurrentItem() == pickaxe && event.getSlot() == 0) {
+                if (type == ClickType.NUMBER_KEY) {
+                    event.setCancelled(true);
+                }
+
+                event.setCancelled(true);
+            }
+
+            return;
+        }
+
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
         Trade trade = Trade.getTrading(playerData);
         if (trade != null) {
             trade.handleClick(event);
         }
-
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
+        OpPlayer opPlayer = new OpPlayer(event.getPlayer());
+        ItemStack item = event.getItemDrop().getItemStack();
 
+        if (item.getType() == Material.AIR)
+            return;
+
+        if (item == opPlayer.getItems().getPickaxe()) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
         event.setFoodLevel(20);
+    }
+
+    @EventHandler
+    public void heldItem(PlayerItemHeldEvent e) {
+        Player player = e.getPlayer();
+        ItemStack item = player.getActiveItem();
+
+        OpPlayer opPlayer = new OpPlayer(player);
+        ItemStack pickItem = opPlayer.getItems().getPickaxe();
+
+        if (item == pickItem) {
+            String name = player.getName();
+            Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
+            List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
+
+            double hasteLevel = upgrades.get(Upgrade.HASTE.ordinal()).get(Upgrade.HASTE);
+            double speedLevel = upgrades.get(Upgrade.SPEED.ordinal()).get(Upgrade.SPEED);
+            double jump_boostLevel = upgrades.get(Upgrade.JUMP_BOOST.ordinal()).get(Upgrade.JUMP_BOOST);
+            double night_visionLevel = upgrades.get(Upgrade.NIGHT_VISION.ordinal()).get(Upgrade.NIGHT_VISION);
+
+            PotionEffect haste = new PotionEffect(PotionEffectType.FAST_DIGGING, 9999, (int) hasteLevel);
+            PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 9999, (int) speedLevel);
+            PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 9999, (int) jump_boostLevel);
+            PotionEffect night = new PotionEffect(PotionEffectType.NIGHT_VISION, 9999, (int) night_visionLevel);
+
+            player.addPotionEffect(haste);
+            player.addPotionEffect(speed);
+            player.addPotionEffect(jump);
+            player.addPotionEffect(night);
+        }
     }
 
 
@@ -224,23 +287,23 @@ public class PlayerListener implements Listener {
 
         List<String> lore = meta.getLore();
 
-        if (msg.contains("#рука")) {
+        if (msg.equals("#рука")) {
             int amount = item.getAmount();
             String text_peace = amount == 1 ? "" : " §fx" + amount;
             String text = String.format("§8[%s%s§8]",
                     meta.getDisplayName(), text_peace);
 
-            String show = "";
+            StringBuilder show = new StringBuilder();
 
             if (lore != null && !lore.isEmpty()) {
                 for (String s : lore) {
-                    show = show + "\n" + s;
+                    show.append("\n").append(s);
                 }
             }
 
             BaseComponent[] itemComponent = ChatUtil.newBuilder()
                     .setText(text)
-                    .setHoverEvent(HoverEvent.Action.SHOW_TEXT, show)
+                    .setHoverEvent(HoverEvent.Action.SHOW_TEXT, show.toString())
                     .build();
 
             return new TextComponent(itemComponent);

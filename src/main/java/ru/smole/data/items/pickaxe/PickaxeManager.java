@@ -16,7 +16,6 @@ public class PickaxeManager {
 
     private @Getter Map<String, Pickaxe> pickaxes;
     private Player player;
-    private OpPlayer opPlayer;
 
     private String name;
     private List<Map<Upgrade, Double>> upgrades;
@@ -25,13 +24,13 @@ public class PickaxeManager {
     public PickaxeManager(Player player) {
         pickaxes = new HashMap<>();
         this.player = player;
-        opPlayer = new OpPlayer(player);
         name = player.getName();
         upgrades = new ArrayList<>();
         upgradeMap = new HashMap<>();
     }
 
     public void create() {
+        OpPlayer opPlayer = new OpPlayer(player);
         for (Upgrade upgrade : Upgrade.values()) {
             upgradeMap.put(upgrade, upgrade.getStart_level());
         }
@@ -51,6 +50,7 @@ public class PickaxeManager {
     }
 
     public void load() {
+        OpPlayer opPlayer = new OpPlayer(player);
         String statsSQL = (String) PlayerDataSQL.get(name, "pickaxe");
         String pickaxeName = "null";
         double exp = 0.0;
