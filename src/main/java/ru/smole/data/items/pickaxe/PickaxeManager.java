@@ -99,20 +99,20 @@ public class PickaxeManager {
         StringBuilder builder = new StringBuilder();
         Pickaxe pickaxe = pickaxes.get(name);
 
-        builder.append(String.format("%s=%s", "name", pickaxe.getName()));
-        builder.append(String.format("%s=%f", "exp", StringUtils.fixDouble(0, pickaxe.getExp())));
-        builder.append(String.format("%s=%f", "level", StringUtils.fixDouble(0, pickaxe.getLevel())));
+        builder.append(String.format("name=%s", pickaxe.getName()));
+        builder.append(String.format("exp=%s", StringUtils._fixDouble(0, pickaxe.getExp())));
+        builder.append(String.format("level=%s", StringUtils._fixDouble(0, pickaxe.getLevel())));
 
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Double> upgradesMap = pickaxes.get(name).getUpgrades().get(upgrade.ordinal());
 
-            String format = "%s=%f,";
+            String format = "%s=%s,";
 
             if (upgrade.ordinal() == Upgrade.values().length -1) {
                 format = format.replace(",", "");
             }
 
-            builder.append(String.format(format, ChatColor.stripColor(upgrade.getName()), StringUtils.fixDouble(0, upgradesMap.get(upgrade))));
+            builder.append(String.format(format, ChatColor.stripColor(upgrade.getName()), StringUtils._fixDouble(0, upgradesMap.get(upgrade))));
         }
 
         return builder.toString();
