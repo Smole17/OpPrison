@@ -46,7 +46,7 @@ public class Items {
         List<String> lore = new ArrayList<>();
         lore.add("");
         for (Upgrade upgrade : Upgrade.values()) {
-            double count = pickaxe.getUpgrades().get(upgrade.ordinal()).get(upgrade);
+            double count = pickaxe.getUpgrades().get(upgrade.ordinal() -1).get(upgrade);
             if (count == 0)
                 continue;
 
