@@ -26,7 +26,6 @@ public class PlayerDataManager {
         String name = player.getName();
 
         playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, Rank.A, 0, false));
-        opPlayer.getPickaxeManager().create();
         PlayerDataSQL.create(name, opPlayer.getPickaxeManager().getStats());
     }
 
