@@ -33,8 +33,10 @@ public class PickaxeManager {
         OpPlayer opPlayer = new OpPlayer(player);
         for (Upgrade upgrade : Upgrade.values()) {
             upgradeMap.put(upgrade, upgrade.getStart_level());
-            upgrades.add(upgradeMap);
         }
+
+        upgrades.add(upgradeMap);
+
 
         Pickaxe pickaxe = new Pickaxe(
                 player,

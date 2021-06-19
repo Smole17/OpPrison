@@ -15,7 +15,6 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.items.Key;
 import ru.smole.data.player.OpPlayer;
-import ru.smole.data.prices.PricesManager;
 import ru.smole.utils.BlockUtil;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -65,17 +64,16 @@ import java.util.Random;
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
         OpPlayer opPlayer = new OpPlayer(player);
 
-        PricesManager pricesManager = opPlayer.getPricesManager();
         Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
         List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
 
-        double fortuneLevel = upgrades.get(Upgrade.FORTUNE.ordinal()).get(Upgrade.FORTUNE);
-        double token_minerLevel = upgrades.get(Upgrade.TOKEN_MINER.ordinal()).get(Upgrade.TOKEN_MINER);
-        double key_finderLevel = upgrades.get(Upgrade.KEY_FINDER.ordinal()).get(Upgrade.KEY_FINDER);
-        double explosiveLevel = upgrades.get(Upgrade.EXPLOSIVE.ordinal()).get(Upgrade.EXPLOSIVE);
+        double fortuneLevel = upgrades.get(0).get(Upgrade.FORTUNE);
+        double token_minerLevel = upgrades.get(0).get(Upgrade.TOKEN_MINER);
+        double key_finderLevel = upgrades.get(0).get(Upgrade.KEY_FINDER);
+        double explosiveLevel = upgrades.get(0).get(Upgrade.EXPLOSIVE);
 
         ChatUtil.sendMessage(player, String.valueOf(blockFace.ordinal()));
-        double cost = pricesManager.getPrice(blockType.name()) * fortuneLevel * playerData.getMultiplier();
+        double cost = 750 * fortuneLevel * playerData.getMultiplier();
         double token = 750 * token_minerLevel;
 
         if (explosiveLevel > 0) {

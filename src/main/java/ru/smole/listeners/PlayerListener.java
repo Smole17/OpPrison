@@ -32,7 +32,6 @@ import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.player.OpPlayer;
-import ru.smole.data.prices.PricesManager;
 import ru.smole.data.trade.Trade;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
@@ -255,10 +254,10 @@ public class PlayerListener implements Listener {
             Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
             List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
 
-            double hasteLevel = upgrades.get(Upgrade.HASTE.ordinal()).get(Upgrade.HASTE);
-            double speedLevel = upgrades.get(Upgrade.SPEED.ordinal()).get(Upgrade.SPEED);
-            double jump_boostLevel = upgrades.get(Upgrade.JUMP_BOOST.ordinal()).get(Upgrade.JUMP_BOOST);
-            double night_visionLevel = upgrades.get(Upgrade.NIGHT_VISION.ordinal()).get(Upgrade.NIGHT_VISION);
+            double hasteLevel = upgrades.get(0).get(Upgrade.HASTE);
+            double speedLevel = upgrades.get(0).get(Upgrade.SPEED);
+            double jump_boostLevel = upgrades.get(0).get(Upgrade.JUMP_BOOST);
+            double night_visionLevel = upgrades.get(0).get(Upgrade.NIGHT_VISION);
 
             PotionEffect haste = new PotionEffect(PotionEffectType.FAST_DIGGING, 9999, (int) hasteLevel);
             PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 9999, (int) speedLevel);
