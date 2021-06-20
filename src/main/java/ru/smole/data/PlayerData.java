@@ -31,15 +31,21 @@ import ru.smole.data.rank.Rank;
         return Bukkit.getPlayer(name);
     }
 
-    public void addBlocks(double count) {
+    public double addBlocks(double count) {
+        double added = blocks + count;
         setBlocks(blocks + count);
+        return added;
     }
 
-    public void addMoney(double count) {
-        setMoney(money + count);
+    public double addMoney(double count) {
+        double added = money + count;
+        setMoney(added);
+        return added;
     }
 
-    public void addToken(double count) {
+    public double addToken(double count) {
+        double added = token + count;
         setToken(token + count);
+        return added;
     }
 }

@@ -16,6 +16,7 @@ import ru.smole.data.PlayerData;
 import ru.smole.data.items.Key;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.BlockUtil;
+import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.List;
@@ -53,6 +54,30 @@ import java.util.Random;
         setLevel(level + count);
     }
 
+    public String getRandomReward(Player player) {
+        OpPlayer opPlayer = new OpPlayer(player);
+        Random random = new Random();
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
+        switch (random.nextInt(4)) {
+            case 0:
+            case 1:
+                return "§a$" + StringUtils.formatDouble(1, playerData.addMoney(playerData.getMoney() / 50));
+            case 2:
+                return "§e⛃" + StringUtils.formatDouble(1, playerData.addToken(50000000000D));
+            case 3:
+                Key.MINE.getStack().setAmount(16);
+                opPlayer.add(Key.MINE.getStack());
+                return String.format("%s §fx16", Key.MINE.getStack().getItemMeta().getDisplayName());
+            case 4:
+                Key.EPIC.getStack().setAmount(4);
+                opPlayer.add(Key.EPIC.getStack());
+                return String.format("%s §fx16", Key.EPIC.getStack().getItemMeta().getDisplayName());
+        }
+
+        return "ничего";
+    }
+
     public void procUpgrades(BlockBreakEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
@@ -71,10 +96,30 @@ import java.util.Random;
         double token_minerLevel = upgrades.get(0).get(Upgrade.TOKEN_MINER);
         double key_finderLevel = upgrades.get(0).get(Upgrade.KEY_FINDER);
         double explosiveLevel = upgrades.get(0).get(Upgrade.EXPLOSIVE);
+        double jack_hammerLevel = upgrades.get(0).get(Upgrade.JACK_HAMMER);
+        double token_merchantLevel = upgrades.get(0).get(Upgrade.TOKEN_MERCHANT);
+        double luckyLevel = upgrades.get(0).get(Upgrade.LUCKY);
 
         ChatUtil.sendMessage(player, String.valueOf(blockFace.ordinal()));
         double cost = 750 * fortuneLevel * playerData.getMultiplier();
         double token = 750 * token_minerLevel;
+
+        if (token_merchantLevel > 0) {
+            double chance = (token_merchantLevel / 5) / 2500;
+            if (new Random().nextFloat() <= chance) {
+                double t_merchant = token_merchantLevel == 0 ? 1 : token_merchantLevel / 2;
+                token = token + token * t_merchant;
+                ChatUtil.sendMessage(player, "Множитель токенов принёс вам %s", token);
+            }
+        }
+
+        if (luckyLevel > 0) {
+            double chance = (luckyLevel / 2) / 40;
+            if (new Random().nextFloat() <= chance) {
+                ChatUtil.sendMessage(player, "Удача вам принесла %s", getRandomReward(player));
+            }
+        }
+
 
         if (explosiveLevel > 0) {
             double chance = (explosiveLevel / 5) / 100;
@@ -82,6 +127,15 @@ import java.util.Random;
                 cost = cost * blockFace.ordinal();
                 token = token * blockFace.ordinal();
                 new Location(player.getWorld(), blockFace.getModX(), blockFace.getModY(), blockFace.getModZ()).getBlock().setType(Material.AIR);
+            }
+        }
+
+        if (jack_hammerLevel > 0) {
+            double chance = (jack_hammerLevel / 5) / 100;
+            if (new Random().nextFloat() <= chance) {
+                int i = 1;
+                cost = cost * 1;
+                token = token * 1;
             }
         }
 
@@ -94,7 +148,7 @@ import java.util.Random;
                 ItemStack keyItem = key.getStack();
 
                 opPlayer.add(keyItem);
-                ChatUtil.sendMessage(player, OpPrison.getInstance() + String.format("Вы получили %s", keyItem.getI18NDisplayName()));
+                ChatUtil.sendMessage(player, OpPrison.getInstance() + String.format("Вы получили %s", keyItem.getItemMeta().getDisplayName()));
             }
         }
 

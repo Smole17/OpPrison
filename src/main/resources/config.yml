@@ -20,13 +20,3 @@ leaderBoard:
   format2: '&e#[top] &7| &f&o[name] &7- &6&o[count]'
   format3: '&6#[top] &7| &f&o[name] &7- &6&o[count]'
   format-default: '&7#[top] &7| &f[name] &7- &6[count]'
-
-prices:
-  DIRT: 1
-  STONE: 2
-  SAND: 3
-
-level:
-  A: 1
-  B: 2
-  C: 3

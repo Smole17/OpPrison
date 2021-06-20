@@ -15,14 +15,17 @@ import java.util.List;
 @AllArgsConstructor public enum Upgrade {
 
     EFFICIENCY("§7Эффективность", 0,10, 300,  20000, Material.ANVIL),
-    FORTUNE("§7Удача", 0,15, 500000, 680, Material.DIAMOND),
-    TOKEN_MINER("§eУдача на токены", 0, 100, 5000, 2500000, Material.DOUBLE_PLANT),
-    KEY_FINDER("§4Удача на ключи", 2, 0, 50, 1000000000, Material.TRIPWIRE_HOOK),
+    FORTUNE("§7Больше блоков", 0,15, 500000, 680, Material.DIAMOND),
+    TOKEN_MINER("§eТокен Майнер", 0, 100, 15000, 2500000, Material.DOUBLE_PLANT),
+    KEY_FINDER("§4Нахождение ключей", 2, 0, 50, 1000000000, Material.TRIPWIRE_HOOK),
     EXPLOSIVE("§4Взрыв", 5, 0, 500, 150000000, Material.TNT),
+    LUCKY("Удача", 10, 0, 20, 2000000000, Material.LAPIS_ORE),
+    TOKEN_MERCHANT("Множитель токенов", 20, 0, 5000, 50000000, Material.ENDER_PEARL),
     HASTE("§eСпешка", 1,10, 5, 25000, Material.GLOWSTONE_DUST),
     SPEED("§fСкорость", 1,10, 5, 25000, Material.SUGAR),
     JUMP_BOOST("§aПрыгучесть", 1,10, 5, 25000, Material.SLIME_BALL),
-    NIGHT_VISION("§5Ночное зрение", 1, 0, 1, 25000, Material.BROWN_MUSHROOM);
+    NIGHT_VISION("§5Ночное зрение", 1, 0, 1, 25000, Material.BROWN_MUSHROOM),
+    JACK_HAMMER("§cОтбойный молоток", 40, 0, 500, 350000000, Material.DIAMOND_PICKAXE);
 
     private @Getter String name;
     private @Getter double need_level_pickaxe;
