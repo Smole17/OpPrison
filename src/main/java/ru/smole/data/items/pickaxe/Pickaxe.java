@@ -72,7 +72,7 @@ import java.util.Random;
             case 4:
                 Key.EPIC.getStack().setAmount(4);
                 opPlayer.add(Key.EPIC.getStack());
-                return String.format("%s §fx16", Key.EPIC.getStack().getItemMeta().getDisplayName());
+                return String.format("%s §fx4", Key.EPIC.getStack().getItemMeta().getDisplayName());
         }
 
         return "ничего";
@@ -104,19 +104,23 @@ import java.util.Random;
         double cost = 750 * fortuneLevel * playerData.getMultiplier();
         double token = 750 * token_minerLevel;
 
-        if (token_merchantLevel > 0) {
-            double chance = (token_merchantLevel / 5) / 2500;
-            if (new Random().nextFloat() <= chance) {
-                double t_merchant = token_merchantLevel == 0 ? 1 : token_merchantLevel / 2;
-                token = token + token * t_merchant;
-                ChatUtil.sendMessage(player, "Множитель токенов принёс вам %s", token);
-            }
-        }
 
         if (luckyLevel > 0) {
             double chance = (luckyLevel / 2) / 40;
             if (new Random().nextFloat() <= chance) {
                 ChatUtil.sendMessage(player, "Удача вам принесла %s", getRandomReward(player));
+            }
+        }
+
+        if (token_merchantLevel > 0) {
+            double chance = (token_merchantLevel / 5) / 2500;
+            if (new Random().nextFloat() <= chance) {
+                double t_merchant = token_merchantLevel == 0 ? 1 : token_merchantLevel / 2;
+                token = token + token * t_merchant;
+                ChatUtil.sendMessage(player, "Множитель токенов принёс вам %s", StringUtils.replaceComma(token));
+                playerData.addToken(token);
+
+                token = 750 * token_minerLevel;
             }
         }
 
