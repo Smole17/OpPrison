@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -31,7 +30,7 @@ import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.data.trade.Trade;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
@@ -70,50 +69,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-        String msg = event.getMessage();
-        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
-
-        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
-
-        String prefix = Objects.requireNonNull(LuckPermsProvider.get()
-                .getUserManager().getUser(player.getName()))
-                .getCachedData().getMetaData(LuckPermsProvider.get().getContextManager().getQueryOptions(player))
-                .getPrefix();
-
-        String _format = String.format("[%s] %s %s",
-                msg.startsWith("!") ? "G" : "L", prefix, player.getName()
-        );
-
-        String format = String.format("§7: §f%s",
-                msg.startsWith("!") ? msg.substring(1) : msg
-        );
-
-        List<String> lore = Lists.newArrayList(
-                String.format("&fНик: &b%s %s", prefix, player.getName()),
-                "&fПрестиж: &b" + StringUtils.formatDouble(0, playerData.getPrestige()),
-                "&fРанк: &b" + playerData.getRank().getName(),
-                "&fТокенов: &b" + StringUtils.formatDouble(1, playerData.getToken()),
-                "&fБлоков вскопано: &b" + StringUtils._fixDouble(0, playerData.getBlocks())
-        );
-        BaseComponent[] comps = new BaseComponent[lore.size()];
-
-        for (int i = 0; i < lore.size(); ++i) {
-            comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
-        }
-
-        TextComponent _component = new TextComponent(_format);
-        _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
-        _component.addExtra(getHand(format, item));
-
-        event.setCancelled(true);
-        if (msg.startsWith("!")) {
-            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
-        } else {
-            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(_component));
-        }
-
-        Bukkit.getConsoleSender().sendMessage(format);
+        sendChat(event);
     }
 
     @EventHandler
@@ -269,6 +225,53 @@ public class PlayerListener implements Listener {
             player.addPotionEffect(jump);
             player.addPotionEffect(night);
         }
+    }
+
+    public void sendChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String msg = event.getMessage();
+        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
+        String prefix = Objects.requireNonNull(LuckPermsProvider.get()
+                .getUserManager().getUser(player.getName()))
+                .getCachedData().getMetaData(LuckPermsProvider.get().getContextManager().getQueryOptions(player))
+                .getPrefix();
+
+        String _format = String.format("[%s] %s %s",
+                msg.startsWith("!") ? "G" : "L", prefix, player.getName()
+        );
+
+        String format = String.format("§7: §f%s",
+                msg.startsWith("!") ? msg.substring(1) : msg
+        );
+
+        List<String> lore = Lists.newArrayList(
+                String.format("&fНик: &b%s %s", prefix, player.getName()),
+                "&fПрестиж: &b" + StringUtils.formatDouble(0, playerData.getPrestige()),
+                "&fРанк: &b" + playerData.getRank().getName(),
+                "&fТокенов: &b" + StringUtils.formatDouble(1, playerData.getToken()),
+                "&fБлоков вскопано: &b" + StringUtils._fixDouble(0, playerData.getBlocks())
+        );
+        BaseComponent[] comps = new BaseComponent[lore.size()];
+
+        for (int i = 0; i < lore.size(); ++i) {
+            comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
+        }
+
+        TextComponent _component = new TextComponent(_format);
+        _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
+        _component.addExtra(getHand(format, item));
+
+        event.setCancelled(true);
+        if (msg.startsWith("!")) {
+            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
+        } else {
+            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(_component));
+        }
+
+        Bukkit.getConsoleSender().sendMessage(format);
     }
 
 

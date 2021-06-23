@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 
 import java.util.ArrayList;

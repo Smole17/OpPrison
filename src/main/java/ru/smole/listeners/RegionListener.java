@@ -10,10 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
-import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
 import ru.smole.data.items.pickaxe.Pickaxe;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 

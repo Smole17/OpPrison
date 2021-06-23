@@ -5,8 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.data.player.OpPlayer;
-import ru.smole.data.rank.Rank;
+import ru.smole.data.OpPlayer;
 import ru.smole.data.rank.RankManager;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
@@ -36,7 +35,7 @@ public class StatsCommand extends BukkitCommand<Player> {
             }
 
             if (type == Stat.RANK) {
-                Rank rank = rankManager.getRankFromString(args[2].toUpperCase());
+                RankManager.Rank rank = rankManager.getRankFromString(args[2].toUpperCase());
 
                 if (rank == null) {
                     ChatUtil.sendMessage(player, msg);

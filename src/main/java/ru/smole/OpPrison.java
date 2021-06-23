@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -16,8 +19,6 @@ import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
-import ru.smole.utils.BungeeUtils;
-import ru.smole.utils.ServerUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.hologram.HologramManager;
 import ru.xfenilafs.core.ApiManager;
@@ -42,6 +43,7 @@ public final class OpPrison extends JavaPlugin {
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static String PREFIX = "&bOpPrison &7>> &f";
+    public static BossBar BAR;
 
     @Override
     public void onEnable() {
@@ -50,12 +52,13 @@ public final class OpPrison extends JavaPlugin {
         configManager = new ConfigManager();
         hologramManager = new HologramManager();
         base = new DatabaseManager(
-                "localhost",
-                "OpPrison",
+                "46.105.122.17",
+                "azerusdms",
                 "root",
-                "vi6RcaDhRvkO0U5d",
+                "ASosX2YXV4YB7VyaTw72kZ5KWwZTXfajyo",
                 false
         );
+        BAR = Bukkit.createBossBar("1", BarColor.RED, BarStyle.SOLID);
 
         ApiManager.registerListeners(this,
                 new PlayerListener(), new RegionListener(), new BaseInventoryListener()
@@ -67,10 +70,6 @@ public final class OpPrison extends JavaPlugin {
                 new PrestigeCommand(), new FlyCommand(), new TradeCommand()
         );
 
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtils());
-
-        ServerUtils.load();
         loadRegionsAndMines();
         loadCases();
     }
@@ -79,6 +78,7 @@ public final class OpPrison extends JavaPlugin {
     public void onDisable() {
         Bukkit.getOnlinePlayers().forEach(player -> playerDataManager.unload(player));
         base.close();
+        BAR.removeAll();
     }
 
     private void loadRegionsAndMines() {

@@ -3,7 +3,7 @@ package ru.smole.data;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import ru.smole.data.rank.Rank;
+import ru.smole.data.rank.RankManager;
 
 @Data public class PlayerData {
 
@@ -12,11 +12,11 @@ import ru.smole.data.rank.Rank;
     private double money;
     private double token;
     private double multiplier;
-    private Rank rank;
+    private RankManager.Rank rank;
     private double prestige;
     private boolean fly;
 
-    public PlayerData(String name, double blocks, double money, double token, double multiplier, Rank rank, double prestige, boolean fly) {
+    public PlayerData(String name, double blocks, double money, double token, double multiplier, RankManager.Rank rank, double prestige, boolean fly) {
         this.name = name;
         this.blocks = blocks;
         this.money = money;
@@ -46,6 +46,18 @@ import ru.smole.data.rank.Rank;
     public double addToken(double count) {
         double added = token + count;
         setToken(token + count);
+        return added;
+    }
+
+    public double addMultiplier(double count) {
+        double added = multiplier + count;
+        setMultiplier(multiplier + count);
+        return added;
+    }
+
+    public double addPrestige(double count) {
+        double added = prestige + count;
+        setPrestige(added);
         return added;
     }
 }

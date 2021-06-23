@@ -9,7 +9,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;

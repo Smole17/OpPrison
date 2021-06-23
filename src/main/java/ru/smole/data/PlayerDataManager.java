@@ -6,8 +6,7 @@ import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.player.OpPlayer;
-import ru.smole.data.rank.Rank;
+import ru.smole.data.rank.RankManager;
 import ru.smole.scoreboard.ScoreboardManager;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ public class PlayerDataManager {
         OpPlayer opPlayer = new OpPlayer(player);
         String name = player.getName();
 
-        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, Rank.A, 0, false));
+        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, RankManager.Rank.A, 0, false));
         PlayerDataSQL.create(name, opPlayer.getPickaxeManager().getStats());
     }
 
@@ -42,6 +41,7 @@ public class PlayerDataManager {
             create(player);
             pickaxeManager.create();
             ScoreboardManager.loadScoreboard(player);
+            OpPrison.BAR.addPlayer(player);
 
             return;
         }
@@ -50,13 +50,14 @@ public class PlayerDataManager {
         double money = (double) PlayerDataSQL.get(name, "money");
         double token = (double) PlayerDataSQL.get(name, "token");
         double multiplier = (double) PlayerDataSQL.get(name, "multiplier");
-        Rank rank = Rank.valueOf((String) PlayerDataSQL.get(name, "rank"));
+        RankManager.Rank rank = RankManager.Rank.valueOf((String) PlayerDataSQL.get(name, "rank"));
         double prestige = (double) PlayerDataSQL.get(name, "prestige");
         boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
 
         playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige, fly));
         pickaxeManager.load();
         ScoreboardManager.loadScoreboard(player);
+        OpPrison.BAR.addPlayer(player);
     }
 
     public void unload(Player player) {
@@ -72,7 +73,7 @@ public class PlayerDataManager {
         double money = data.getMoney();
         double token = data.getToken();
         double multiplier = data.getMultiplier();
-        Rank rank = data.getRank();
+        RankManager.Rank rank = data.getRank();
         double prestige = data.getPrestige();
         int fly = data.isFly() ? 1 : 0;
         String pickaxe = new OpPlayer(player).getPickaxeManager().getStats();

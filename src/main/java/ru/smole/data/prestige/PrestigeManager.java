@@ -4,8 +4,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.data.player.OpPlayer;
-import ru.smole.data.rank.Rank;
+import ru.smole.data.OpPlayer;
+import ru.smole.data.rank.RankManager;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -22,7 +22,7 @@ public class PrestigeManager {
     public void up(int i) {
         OpPlayer opPlayer = new OpPlayer(player);
         if (!opPlayer.getRankManager().isNextRank(playerData.getRank())) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы должны достичь ранка %s", ChatColor.translateAlternateColorCodes('&', Rank.Z.getName()));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы должны достичь ранка %s", ChatColor.translateAlternateColorCodes('&', RankManager.Rank.Z.getName()));
         }
 
         switch (i) {

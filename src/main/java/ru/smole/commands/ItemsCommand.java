@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.Key;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;

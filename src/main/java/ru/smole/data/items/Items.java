@@ -7,12 +7,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.player.OpPlayer;
+import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Items {
@@ -79,7 +78,7 @@ public class Items {
 
     public Key getKeyFromInt(int i) {
         for (Key type : Key.values())
-            if (type == Key.values()[i])
+            if (type == Key.values()[i - 1])
                 return type;
 
         return null;
