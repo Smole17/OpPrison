@@ -2,5 +2,3 @@ name: OpPrison
 version: @version@
 main: ru.smole.OpPrison
 authors: [ NeSmole ]
-depend:
-  - LuckPerms

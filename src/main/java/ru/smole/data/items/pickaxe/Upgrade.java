@@ -19,9 +19,9 @@ import java.util.List;
     EFFICIENCY("§7Эффективность", 0,10, 300,  20000, Material.ANVIL, false),
     FORTUNE("§7Шахтёр", 0,15, 500000, 680, Material.DIAMOND, false),
     TOKEN_MINER("§eДобыча токенов", 0, 100, 15000, 2500000, Material.DOUBLE_PLANT, false),
-    HASTE("§eСпешка", 1,10, 5, 25000, Material.GLOWSTONE_DUST, false),
-    SPEED("§fСкорость", 1,10, 5, 25000, Material.SUGAR, false),
-    JUMP_BOOST("§aПрыгучесть", 1,10, 5, 25000, Material.SLIME_BALL, false),
+    HASTE("§eСпешка", 1,0, 5, 25000, Material.GLOWSTONE_DUST, false),
+    SPEED("§fСкорость", 1,0, 5, 25000, Material.SUGAR, false),
+    JUMP_BOOST("§aПрыгучесть", 1,0, 5, 25000, Material.SLIME_BALL, false),
     NIGHT_VISION("§5Ночное зрение", 1, 0, 1, 25000, Material.BROWN_MUSHROOM, false),
     KEY_FINDER("§4Добыча ключей", 2, 0, 50, 1000000000, Material.TRIPWIRE_HOOK, true),
     EXPLOSIVE("§4Взрыв", 5, 0, 500, 150000000, Material.TNT, false),
@@ -43,7 +43,7 @@ import java.util.List;
 
     public Object[] getMaxUpgrades(PlayerData playerData, double level, int limit) {
         boolean is = false;
-        Object[] obj = {0, 0, 0};
+        Object[] obj = {0.0D, 0.0D, 0.0D};
         double upgrades = (double) obj[0];
         double tokens = (double) obj[1];
         List<Double> token = new ArrayList<>();

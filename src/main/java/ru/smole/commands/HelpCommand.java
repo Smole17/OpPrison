@@ -26,9 +26,10 @@ public class HelpCommand extends BukkitCommand<Player> {
 
         description = "Руководство не найдено. Используйте данный список: " + Arrays.toString(Guide.values());
 
+        if (args.length > 0)
         Arrays
                 .stream(Guide.values())
-                .filter(guide -> Guide.getGuideFromString(args[0]) == guide)
+                .filter(guide -> Guide.getGuideFromString(args[0]) != null && Guide.getGuideFromString(args[0]) == guide)
                 .forEachOrdered(guide -> description = guide.getDesc()
                 );
 
@@ -88,8 +89,9 @@ public class HelpCommand extends BukkitCommand<Player> {
 
         public static Guide getGuideFromString(String guide) {
             for (Guide type : Guide.values())
-                if (type.equals(Guide.valueOf(guide.toUpperCase())))
+                if (type.equals(Guide.valueOf(guide.toUpperCase()))) {
                     return type;
+                }
 
             return null;
         }

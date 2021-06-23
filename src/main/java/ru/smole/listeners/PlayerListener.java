@@ -1,7 +1,6 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
-import net.luckperms.api.LuckPermsProvider;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -23,12 +22,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import ru.luvas.rmcs.player.RPlayer;
+import ru.luvas.rmcs.utils.UtilChat;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.OpPlayer;
 import ru.smole.data.trade.Trade;
@@ -158,7 +160,7 @@ public class PlayerListener implements Listener {
         HumanEntity player = event.getWhoClicked();
         ClickType type = event.getClick();
         InventoryType inventoryType = event.getClickedInventory().getType();
-        ItemStack pickaxe = new OpPlayer(player.getKiller()).getItems().getPickaxe();
+        ItemStack pickaxe = new OpPlayer(Bukkit.getPlayer(player.getName())).getItems().getPickaxe();
 
         if (inventoryType == InventoryType.PLAYER) {
             if (event.getCurrentItem() == pickaxe && event.getSlot() == 0) {
@@ -207,13 +209,13 @@ public class PlayerListener implements Listener {
 
         if (item == pickItem) {
             String name = player.getName();
-            Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
-            List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
+            Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
+            Map<Upgrade, Double> upgrades = pickaxe.getUpgrades();
 
-            double hasteLevel = upgrades.get(0).get(Upgrade.HASTE);
-            double speedLevel = upgrades.get(0).get(Upgrade.SPEED);
-            double jump_boostLevel = upgrades.get(0).get(Upgrade.JUMP_BOOST);
-            double night_visionLevel = upgrades.get(0).get(Upgrade.NIGHT_VISION);
+            double hasteLevel = upgrades.get(Upgrade.HASTE);
+            double speedLevel = upgrades.get(Upgrade.SPEED);
+            double jump_boostLevel = upgrades.get(Upgrade.JUMP_BOOST);
+            double night_visionLevel = upgrades.get(Upgrade.NIGHT_VISION);
 
             PotionEffect haste = new PotionEffect(PotionEffectType.FAST_DIGGING, 9999, (int) hasteLevel);
             PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 9999, (int) speedLevel);
@@ -229,15 +231,13 @@ public class PlayerListener implements Listener {
 
     public void sendChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        String name = player.getName();
         String msg = event.getMessage();
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
 
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
-        String prefix = Objects.requireNonNull(LuckPermsProvider.get()
-                .getUserManager().getUser(player.getName()))
-                .getCachedData().getMetaData(LuckPermsProvider.get().getContextManager().getQueryOptions(player))
-                .getPrefix();
+        String prefix = RPlayer.checkAndGet(name).getLongPrefix();
 
         String _format = String.format("[%s] %s %s",
                 msg.startsWith("!") ? "G" : "L", prefix, player.getName()
@@ -248,16 +248,16 @@ public class PlayerListener implements Listener {
         );
 
         List<String> lore = Lists.newArrayList(
-                String.format("&fНик: &b%s %s", prefix, player.getName()),
+                String.format("&fНик: &b%s %s", prefix, name),
                 "&fПрестиж: &b" + StringUtils.formatDouble(0, playerData.getPrestige()),
-                "&fРанк: &b" + playerData.getRank().getName(),
+                "&fРанг: &b" + playerData.getRank().getName(),
                 "&fТокенов: &b" + StringUtils.formatDouble(1, playerData.getToken()),
                 "&fБлоков вскопано: &b" + StringUtils._fixDouble(0, playerData.getBlocks())
         );
         BaseComponent[] comps = new BaseComponent[lore.size()];
 
         for (int i = 0; i < lore.size(); ++i) {
-            comps[i] = new TextComponent(ChatColor.translateAlternateColorCodes('&', String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
+            comps[i] = new TextComponent(ChatUtil.color(String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
         }
 
         TextComponent _component = new TextComponent(_format);

@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.items.pickaxe.Pickaxe;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
@@ -28,13 +29,13 @@ public class PickaxeGui extends BaseSimpleInventory {
     @Override
     public void drawInventory(@NonNull Player player) {
         OpPlayer opPlayer = new OpPlayer(player);
-        Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(player.getName());
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
         List<String> lore = new ArrayList<>();
         for (Upgrade upgrade : Upgrade.values()) {
-            List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
-            double count = upgrades.get(upgrade.ordinal()).get(upgrade);
+            Map<Upgrade, Double> upgrades = pickaxe.getUpgrades();
+            double count = upgrades.get(upgrade);
             Material type = upgrade.getMaterial();
 
             double needToken = upgrade.getNeedTokens(count);
@@ -75,12 +76,11 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                         ClickType clickType = inventoryClickEvent.getClick();
                         double playerToken = playerData.getToken();
-                        
-                        Map<Upgrade, Double> upgradeMap = upgrades.get(upgrade.ordinal());
+
                         if (clickType.isLeftClick()) {
                             if (playerToken >= needToken) {
-                                upgradeMap.remove(upgrade);
-                                upgradeMap.put(upgrade, count +1);
+                                upgrades.remove(upgrade);
+                                upgrades.put(upgrade, count +1);
                             }
 
                             return;
@@ -92,8 +92,8 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                             tokens.forEach((token) -> {
                                 if (playerToken >= token) {
-                                    upgradeMap.remove(upgrade);
-                                    upgradeMap.put(upgrade, count + maxUpgrades10);
+                                    upgrades.remove(upgrade);
+                                    upgrades.put(upgrade, count + maxUpgrades10);
                                 }
                             });
 
@@ -102,8 +102,8 @@ public class PickaxeGui extends BaseSimpleInventory {
                         
                         if (clickType.isKeyboardClick()) {
                             if (playerToken >= maxTokens) {
-                                upgradeMap.remove(upgrade);
-                                upgradeMap.put(upgrade, maxUpgrades);
+                                upgrades.remove(upgrade);
+                                upgrades.put(upgrade, maxUpgrades);
                             }
                         }
                     });

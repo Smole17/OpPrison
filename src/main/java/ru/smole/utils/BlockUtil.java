@@ -14,7 +14,7 @@ import java.util.Collection;
 public class BlockUtil {
 
     public boolean isEmpty(@NonNull Block block) {
-        return block.getTypeId() == 0;
+        return block.getType().ordinal() == 0;
     }
 
     public BlockFace getEmptyRelative(@NonNull Block block, boolean checkObliquely) {

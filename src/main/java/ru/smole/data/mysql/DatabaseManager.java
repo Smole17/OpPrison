@@ -2,7 +2,6 @@ package ru.smole.data.mysql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
 import lombok.Getter;
 
 import javax.sql.rowset.CachedRowSet;
@@ -64,7 +63,7 @@ public class DatabaseManager {
     }
 
     public Map<String, Double> getTopFromCriteria(String criteria, int amount) {
-        Map<String, Double> top = new LinkedHashMap<String, Double>();
+        Map<String, Double> top = new LinkedHashMap<>();
         ResultSet resultSet = getResult("SELECT * FROM `" + dbname + "` ORDER BY " + criteria + " DESC LIMIT " + amount);
         try {
             while (resultSet.next()) {

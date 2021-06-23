@@ -22,14 +22,17 @@ public class PlayerDataManager {
 
     public void create(Player player) {
         OpPlayer opPlayer = new OpPlayer(player);
+        PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
 
         playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, RankManager.Rank.A, 0, false));
-        PlayerDataSQL.create(name, opPlayer.getPickaxeManager().getStats());
+        pickaxeManager.create();
+        PlayerDataSQL.create(name, pickaxeManager.getStats());
     }
 
     public void load(Player player) {
-        PickaxeManager pickaxeManager = new OpPlayer(player).getPickaxeManager();
+        OpPlayer opPlayer = new OpPlayer(player);
+        PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
 
         HideCommand.hide.forEach(hiders -> {
@@ -39,7 +42,7 @@ public class PlayerDataManager {
 
         if (!PlayerDataSQL.playerExists(name)) {
             create(player);
-            pickaxeManager.create();
+            opPlayer.set(opPlayer.getItems().getPickaxe(), 1);
             ScoreboardManager.loadScoreboard(player);
             OpPrison.BAR.addPlayer(player);
 
@@ -56,6 +59,7 @@ public class PlayerDataManager {
 
         playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige, fly));
         pickaxeManager.load();
+        opPlayer.getBoosterManager().load();
         ScoreboardManager.loadScoreboard(player);
         OpPrison.BAR.addPlayer(player);
     }
@@ -80,8 +84,7 @@ public class PlayerDataManager {
 
         HideCommand.hide.remove(player);
         player.kickPlayer("bb");
-        opPlayer.getPickaxeManager().unload();
-        opPlayer.getBoosterManager().load();
         PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe);
+        opPlayer.getPickaxeManager().unload();
     }
 }

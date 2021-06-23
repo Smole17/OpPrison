@@ -15,7 +15,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.smole.data.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.DatabaseManager;
+import ru.smole.data.prestige.PrestigeManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
@@ -55,13 +57,12 @@ public final class OpPrison extends JavaPlugin {
         playerDataManager = new PlayerDataManager();
         configManager = new ConfigManager();
         hologramManager = new HologramManager();
-        base = new DatabaseManager(
-                "46.105.122.17",
-                "azerusdms",
-                "root",
-                "ASosX2YXV4YB7VyaTw72kZ5KWwZTXfajyo",
-                false
-        );
+        base = new DatabaseManager("46.105.122.17",
+		"azerusdms",
+		"azerusdms",
+		"AGHKSF8123AIYWT1862t3iJKGHFASDqqqq",
+		false);
+
         BAR = Bukkit.createBossBar(String.format("§fБустер сервера: §b+%s §8(/help booster)",
                 StringUtils._fixDouble(1, BOOSTER) + "%"), BarColor.BLUE, BarStyle.SOLID);
 
@@ -72,13 +73,15 @@ public final class OpPrison extends JavaPlugin {
         ApiManager.registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
                 new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand(),
-                new PrestigeCommand(), new FlyCommand(), new TradeCommand(), new RestartCommand()
+                new PrestigeCommand(), new FlyCommand(), new TradeCommand(), new RestartCommand(),
+                new HelpCommand()
         );
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
 
         ServerUtil.load();
+        PickaxeManager.pickaxes = new HashMap<>();
 
         loadRegionsAndMines();
         loadCases();

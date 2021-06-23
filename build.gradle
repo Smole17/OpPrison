@@ -7,40 +7,27 @@ plugins {
 group = 'ru.smole'
 version = '1.0'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
 repositories {
     mavenCentral()
     maven {
         name = 'papermc-repo'
         url = 'https://papermc.io/repo/repository/maven-public/'
     }
+
     maven {
-        name = 'sonatype'
-        url = 'https://oss.sonatype.org/content/groups/public/'
+        url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
+
     maven {
-        name = 'luckperms'
-        url = 'https://repo1.maven.org/maven2/net/luckperms/api/'
+        url = 'https://jitpack.io'
     }
 }
 
 dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
-
-    compileOnly 'net.luckperms:api:5.3'
-
-    compileOnly group: 'com.zaxxer', name: 'HikariCP-java7', version: '2.4.13'
-
-
     compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
-
     compileOnly 'org.projectlombok:lombok:1.18.20'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }
 
@@ -49,3 +36,5 @@ processResources {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
+
+tasks.withType(JavaCompile)*.options*.encoding = 'UTF-8'

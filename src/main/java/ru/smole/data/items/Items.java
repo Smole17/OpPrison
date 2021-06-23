@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.data.items.pickaxe.Pickaxe;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
@@ -39,23 +40,25 @@ public class Items {
     }
 
     public ItemStack getPickaxe() {
-        OpPlayer opPlayer = new OpPlayer(player);
-        Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(player.getName());
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
 
         List<String> lore = new ArrayList<>();
         lore.add("");
         for (Upgrade upgrade : Upgrade.values()) {
-            double count = pickaxe.getUpgrades().get(upgrade.ordinal()).get(upgrade);
+            double count = pickaxe
+                    .getUpgrades()
+                    .get(upgrade);
+
             if (count == 0)
                 continue;
 
-            lore.add(String.format("%s %s", upgrade.getName(), count));
+            lore.add(String.format("%s %s", upgrade.getName(), StringUtils._fixDouble(0, count)));
         }
         lore.add("");
         lore.add(String.format("§fУровень: §b%s", pickaxe.getLevel()));
         lore.add(String.format("§fОпыт: §b%s/%s", pickaxe.getExp(), pickaxe.getNeedExp()));
 
-        double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY.ordinal()).get(Upgrade.EFFICIENCY);
+        double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY);
 
         return ApiManager.newItemBuilder(Material.DIAMOND_PICKAXE)
                 .setUnbreakable(true)

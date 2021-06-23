@@ -2,6 +2,7 @@ package ru.smole.data.items.pickaxe;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -17,6 +18,7 @@ import ru.smole.utils.BlockUtil;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -28,7 +30,7 @@ import java.util.Random;
     private String name;
     private double exp;
     private double level;
-    private List<Map<Upgrade, Double>> upgrades;
+    private Map<Upgrade, Double> upgrades;
 
     public double getNeedExp() {
         double needXp = 1000D;
@@ -102,20 +104,19 @@ import java.util.Random;
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
         OpPlayer opPlayer = new OpPlayer(player);
 
-        Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
-        List<Map<Upgrade, Double>> upgrades = pickaxe.getUpgrades();
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
 
-        double fortuneLevel = upgrades.get(0).get(Upgrade.FORTUNE);
-        double token_minerLevel = upgrades.get(0).get(Upgrade.TOKEN_MINER);
-        double key_finderLevel = upgrades.get(0).get(Upgrade.KEY_FINDER);
-        double explosiveLevel = upgrades.get(0).get(Upgrade.EXPLOSIVE);
-        double jack_hammerLevel = upgrades.get(0).get(Upgrade.JACK_HAMMER);
-        double token_merchantLevel = upgrades.get(0).get(Upgrade.TOKEN_MERCHANT);
-        double luckyLevel = upgrades.get(0).get(Upgrade.LUCKY);
-        double multi_finderLevel = upgrades.get(0).get(Upgrade.MULTI_FINDER);
-        double prestige_finderLevel = upgrades.get(0).get(Upgrade.PRESTIGE_FINDER);
-        double prestige_merchantLevel = upgrades.get(0).get(Upgrade.PRESTIGE_MERCHANT);
-        double blessingsLevel = upgrades.get(0).get(Upgrade.BLESSINGS);
+        double fortuneLevel = upgrades.get(Upgrade.FORTUNE);
+        double token_minerLevel = upgrades.get(Upgrade.TOKEN_MINER);
+        double key_finderLevel = upgrades.get(Upgrade.KEY_FINDER);
+        double explosiveLevel = upgrades.get(Upgrade.EXPLOSIVE);
+        double jack_hammerLevel = upgrades.get(Upgrade.JACK_HAMMER);
+        double token_merchantLevel = upgrades.get(Upgrade.TOKEN_MERCHANT);
+        double luckyLevel = upgrades.get(Upgrade.LUCKY);
+        double multi_finderLevel = upgrades.get(Upgrade.MULTI_FINDER);
+        double prestige_finderLevel = upgrades.get(Upgrade.PRESTIGE_FINDER);
+        double prestige_merchantLevel = upgrades.get(Upgrade.PRESTIGE_MERCHANT);
+        double blessingsLevel = upgrades.get(Upgrade.BLESSINGS);
 
         ChatUtil.sendMessage(player, String.valueOf(blockFace.ordinal()));
         double cost = 750 * fortuneLevel * playerData.getMultiplier();

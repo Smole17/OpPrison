@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
+import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
 public class RankManager {
@@ -30,7 +31,7 @@ public class RankManager {
         double cost = nextRank.getCost();
 
         if (cost > money) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", cost - money);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
             return;
         }
 
