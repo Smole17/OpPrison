@@ -74,8 +74,8 @@ import java.util.Random;
 
         switch (random.nextInt(4)) {
             case 0:
-            case 1:
                 return "§a$" + StringUtils.formatDouble(1, playerData.addMoney(playerData.getMoney() / 50));
+            case 1:
             case 2:
                 return "§e⛃" + StringUtils.formatDouble(1, playerData.addToken(50000000000D));
             case 3:
@@ -120,6 +120,10 @@ import java.util.Random;
         ChatUtil.sendMessage(player, String.valueOf(blockFace.ordinal()));
         double cost = 750 * fortuneLevel * playerData.getMultiplier();
         double token = 750 * token_minerLevel;
+
+        if (OpPrison.BOOSTER > 0) {
+            token = token + (token * OpPrison.BOOSTER / 100);
+        }
 
         if (prestige_finderLevel > 0) {
             double chance = prestige_finderLevel / 10000;

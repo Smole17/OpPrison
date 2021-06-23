@@ -8,6 +8,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.prestige.PrestigeManager;
@@ -20,12 +21,15 @@ public class OpPlayer {
     private @Getter RankManager rankManager;
     private @Getter PrestigeManager prestigeManager;
     private @Getter PickaxeManager pickaxeManager;
+    private @Getter BoosterManager boosterManager;
+
     public OpPlayer(Player player) {
         this.player = player;
         items = new Items(player);
         rankManager = new RankManager(player);
         prestigeManager = new PrestigeManager(player);
         pickaxeManager = new PickaxeManager(player);
+        boosterManager = new BoosterManager(player);
     }
 
     public void add(ItemStack stack) {

@@ -61,13 +61,13 @@ public class PlayerDataManager {
     }
 
     public void unload(Player player) {
-        OpPlayer opPlayer = new OpPlayer(player);
         String name = player.getName();
 
         if (!playerDataMap.containsKey(name))
             return;
 
         PlayerData data = playerDataMap.get(name);
+        OpPlayer opPlayer = new OpPlayer(player);
 
         double blocks = data.getBlocks();
         double money = data.getMoney();
@@ -81,6 +81,7 @@ public class PlayerDataManager {
         HideCommand.hide.remove(player);
         player.kickPlayer("bb");
         opPlayer.getPickaxeManager().unload();
+        opPlayer.getBoosterManager().load();
         PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe);
     }
 }

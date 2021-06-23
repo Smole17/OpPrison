@@ -19,6 +19,9 @@ import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
+import ru.smole.utils.BungeeUtil;
+import ru.smole.utils.ServerUtil;
+import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.hologram.HologramManager;
 import ru.xfenilafs.core.ApiManager;
@@ -44,6 +47,7 @@ public final class OpPrison extends JavaPlugin {
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static String PREFIX = "&bOpPrison &7>> &f";
     public static BossBar BAR;
+    public static double BOOSTER = 0.0;
 
     @Override
     public void onEnable() {
@@ -58,7 +62,8 @@ public final class OpPrison extends JavaPlugin {
                 "ASosX2YXV4YB7VyaTw72kZ5KWwZTXfajyo",
                 false
         );
-        BAR = Bukkit.createBossBar("1", BarColor.RED, BarStyle.SOLID);
+        BAR = Bukkit.createBossBar(String.format("§fБустер сервера: §b+%s §8(/help booster)",
+                StringUtils._fixDouble(1, BOOSTER) + "%"), BarColor.BLUE, BarStyle.SOLID);
 
         ApiManager.registerListeners(this,
                 new PlayerListener(), new RegionListener(), new BaseInventoryListener()
@@ -67,8 +72,13 @@ public final class OpPrison extends JavaPlugin {
         ApiManager.registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
                 new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand(),
-                new PrestigeCommand(), new FlyCommand(), new TradeCommand()
+                new PrestigeCommand(), new FlyCommand(), new TradeCommand(), new RestartCommand()
         );
+
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
+
+        ServerUtil.load();
 
         loadRegionsAndMines();
         loadCases();
@@ -160,6 +170,5 @@ public final class OpPrison extends JavaPlugin {
                 new Case(key, keySection);
             });
         }
-
     }
 }
