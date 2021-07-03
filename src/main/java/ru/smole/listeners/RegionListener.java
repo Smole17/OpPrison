@@ -12,6 +12,7 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.OpPlayer;
+import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
@@ -31,10 +32,11 @@ public class RegionListener implements Listener {
             if (!BUILD_MODE.contains(event.getPlayer())) {
                 event.setCancelled(true);
             }
+
+            add(event);
             return;
         }
 
-        add(event);
         event.setExpToDrop(0);
         event.setDropItems(false);
     }
@@ -126,7 +128,7 @@ public class RegionListener implements Listener {
 
         OpPlayer opPlayer = new OpPlayer(player);
 
-        Pickaxe pickaxe = opPlayer.getPickaxeManager().getPickaxes().get(name);
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event);
     }
 }

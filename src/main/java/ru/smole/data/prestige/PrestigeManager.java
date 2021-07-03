@@ -42,21 +42,43 @@ public class PrestigeManager {
 
     protected boolean upgradePrestige(int i) {
         double prestige = playerData.getPrestige();
+        double upped = 0;
         double money = playerData.getMoney();
 
         double billion = 1000000000D;
-        double cost = prestige == 0 ? billion : prestige * 1.25F * billion;
+        double cost = prestige == 0 ? billion : prestige * 1.05F * billion;
 
-        if (cost > money) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
-            return false;
+        switch (i) {
+            case 1:
+                if (cost > money) {
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
+                    return false;
+                }
+
+                playerData.setMoney(money - cost);
+                playerData.setPrestige(prestige + upped);
+
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: %s", StringUtils._fixDouble(0, prestige));
+                return true;
+            case 2:
+                do {
+                    upped = upped +1;
+
+                    cost = upped * cost;
+                } while (cost > money);
+
+                if (cost > money) {
+                    if (upped == 0) {
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
+                        return false;
+                    }
+
+                    playerData.setMoney(money - cost);
+                    playerData.setPrestige(prestige + upped);
+                }
+                return true;
         }
 
-        playerData.setMoney(money - cost);
-        playerData.setPrestige(prestige + 1);
-
-        if (i == 1)
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: %s", StringUtils._fixDouble(0, prestige));
         return true;
     }
 }

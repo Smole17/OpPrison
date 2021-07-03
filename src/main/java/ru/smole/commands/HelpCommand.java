@@ -3,15 +3,11 @@ package ru.smole.commands;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
-import ru.smole.data.items.Key;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.util.ChatUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 
 public class HelpCommand extends BukkitCommand<Player> {
 
@@ -46,7 +42,7 @@ public class HelpCommand extends BukkitCommand<Player> {
         GROUP(
                 "\n   Группы - это некие привилегии данного режима, " +
                 "\n   которые Вы можете получить из ящиков." +
-                "\n   §c§nОбнуляются после конца сезона!" +
+                "\n   §cОбнуляются после конца сезона!" +
                 "\n\n   §8(привилегии режима не связаны со всеми режимами сервера)"
         ),
 

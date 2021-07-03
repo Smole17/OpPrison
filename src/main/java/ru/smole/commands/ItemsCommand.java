@@ -1,11 +1,11 @@
 package ru.smole.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.items.Items;
-import ru.smole.data.items.Key;
 import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
@@ -13,14 +13,15 @@ import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
 @CommandPermission(permission = "opprison.admin")
-public class ItemsCommand extends BukkitCommand<Player> {
+public class ItemsCommand extends BukkitCommand<CommandSender> {
 
     public ItemsCommand() {
         super("items");
     }
 
     @Override
-    protected void onExecute(Player player, String[] args) {
+    protected void onExecute(CommandSender sender, String[] args) {
+        Player player = (Player) sender;
         OpPlayer opPlayer = new OpPlayer(player);
         String name = player.getName();
 
@@ -36,7 +37,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
             Items items = opPlayer.getItems();
 
             if (arg.equals("key")) {
-                Key type = items.getKeyFromString(args[2]);
+                Items.Key type = items.getKeyFromString(args[2]);
 
                 if (type == null) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден");
@@ -69,7 +70,7 @@ public class ItemsCommand extends BukkitCommand<Player> {
             }
 
             if (arg.equals("fly")) {
-                opPlayer.add(opPlayer.getItems().getFlyVoucher());
+                opPlayer.add(opPlayer.getItems().getItem("fly"));
                 ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан флай воучер", name);
                 return;
             }

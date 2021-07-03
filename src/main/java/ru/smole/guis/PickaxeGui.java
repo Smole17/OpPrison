@@ -28,7 +28,6 @@ public class PickaxeGui extends BaseSimpleInventory {
     @SuppressWarnings("uncheked")
     @Override
     public void drawInventory(@NonNull Player player) {
-        OpPlayer opPlayer = new OpPlayer(player);
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
@@ -50,10 +49,12 @@ public class PickaxeGui extends BaseSimpleInventory {
             double maxUpgrades = (double) upgrade.getMaxUpgrades(playerData, count, -1)[0];
             double maxTokens = (double) upgrade.getMaxUpgrades(playerData, count, -1)[1];
 
-            if (upgrade.isMaxLevel(count)) {
+            if (!upgrade.isMaxLevel(count)) {
                 lore.add(String.format("+ §f1 уровень: §e%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
-                lore.add(String.format("+ §f10 уровень: §e%s §8(( ПКМ ))", StringUtils.formatDouble(2, needToken10)));
-                lore.add(String.format("+ §f%s уровень: §e%s §8(( Q ))", StringUtils.formatDouble(2, maxUpgrades), StringUtils.formatDouble(2, maxTokens)));
+                lore.add(String.format("+ §f10 уровней: §e%s §8(( ПКМ ))", StringUtils.formatDouble(2, needToken10)));
+                lore.add(String.format("+ §f%s уровней: §e%s §8(( Q ))",
+                        StringUtils.formatDouble(2, maxUpgrades > upgrade.getMax_level() ? upgrade.getMax_level() : maxUpgrades),
+                        StringUtils.formatDouble(2, maxTokens)));
             }
 
             ItemUtil.ItemBuilder itemBuilder =
@@ -107,6 +108,8 @@ public class PickaxeGui extends BaseSimpleInventory {
                             }
                         }
                     });
+
+            lore.clear();
         }
     }
 }

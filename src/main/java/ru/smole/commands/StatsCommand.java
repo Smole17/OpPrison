@@ -7,6 +7,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.OpPlayer;
 import ru.smole.data.rank.RankManager;
+import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
@@ -47,9 +48,9 @@ public class StatsCommand extends BukkitCommand<Player> {
                 return;
             }
 
-            int value;
+            double value;
             try {
-                value = Integer.parseInt(args[2]);
+                value = Double.parseDouble(args[2]);
             } catch (Exception e) {
                 ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
                 return;
@@ -84,7 +85,7 @@ public class StatsCommand extends BukkitCommand<Player> {
                     break;
             }
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, value);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, StringUtils.replaceComma(value));
             return;
         }
 

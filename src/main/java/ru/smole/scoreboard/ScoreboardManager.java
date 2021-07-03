@@ -39,7 +39,7 @@ public class ScoreboardManager {
                     ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(1, playerData.getMoney())));
 
             baseScoreboard.updateScoreboardLine(3, boardPlayer,
-                    ChatUtil.text("  §fТокен: §e⛃%s", StringUtils.formatDouble(1, playerData.getToken())));
+                    ChatUtil.text("  §fТокены: §e⛃%s", StringUtils.formatDouble(1, playerData.getToken())));
 
             baseScoreboard.updateScoreboardLine(2, boardPlayer,
                     ChatUtil.text("  §fМножитель: §d%sx", StringUtils._fixDouble(0, playerData.getMultiplier())));

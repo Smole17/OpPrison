@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.smole.data.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
+import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.data.prestige.PrestigeManager;
@@ -27,6 +28,7 @@ import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.hologram.HologramManager;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.CorePlugin;
 import ru.xfenilafs.core.inventory.BaseInventoryListener;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
@@ -35,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public final class OpPrison extends JavaPlugin {
+public final class OpPrison extends CorePlugin {
 
     public @Getter static OpPrison instance;
 
@@ -51,8 +53,7 @@ public final class OpPrison extends JavaPlugin {
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
-    @Override
-    public void onEnable() {
+    public void onPluginEnable() {
         instance = this;
         playerDataManager = new PlayerDataManager();
         configManager = new ConfigManager();
@@ -82,13 +83,13 @@ public final class OpPrison extends JavaPlugin {
 
         ServerUtil.load();
         PickaxeManager.pickaxes = new HashMap<>();
+        Items.init();
 
         loadRegionsAndMines();
         loadCases();
     }
 
-    @Override
-    public void onDisable() {
+    public void onPluginDisable() {
         Bukkit.getOnlinePlayers().forEach(player -> playerDataManager.unload(player));
         base.close();
         BAR.removeAll();

@@ -2,7 +2,6 @@ package ru.smole.data.items.pickaxe;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,14 +11,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.data.items.Key;
+import ru.smole.data.items.Items;
 import ru.smole.data.OpPlayer;
 import ru.smole.utils.BlockUtil;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -81,13 +78,13 @@ import java.util.Random;
             case 2:
                 return "§e⛃" + StringUtils.formatDouble(1, playerData.addToken(50000000000D));
             case 3:
-                Key.MINE.getStack().setAmount(16);
-                opPlayer.add(Key.MINE.getStack());
-                return String.format("%s §fx16", Key.MINE.getStack().getItemMeta().getDisplayName());
+                Items.Key.MINE.getStack().setAmount(16);
+                opPlayer.add(Items.Key.MINE.getStack());
+                return String.format("%s §fx16", Items.Key.MINE.getStack().getItemMeta().getDisplayName());
             case 4:
-                Key.EPIC.getStack().setAmount(4);
-                opPlayer.add(Key.EPIC.getStack());
-                return String.format("%s §fx4", Key.EPIC.getStack().getItemMeta().getDisplayName());
+                Items.Key.EPIC.getStack().setAmount(4);
+                opPlayer.add(Items.Key.EPIC.getStack());
+                return String.format("%s §fx4", Items.Key.EPIC.getStack().getItemMeta().getDisplayName());
         }
 
         return "ничего";
@@ -193,7 +190,7 @@ import java.util.Random;
             double chance = (key_finderLevel / 5) / 100;
             if (random.nextFloat() <= chance) {
                 int type = random.nextInt(3);
-                Key key = opPlayer.getItems().getKeyFromInt(type == 2 ? 0 : type);
+                Items.Key key = opPlayer.getItems().getKeyFromInt(type == 2 ? 0 : type);
                 ItemStack keyItem = key.getStack();
 
                 opPlayer.add(keyItem);
