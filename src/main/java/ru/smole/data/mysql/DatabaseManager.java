@@ -57,7 +57,7 @@ public class DatabaseManager {
                 "token DOUBLE, " +
                 "multiplier DOUBLE, " +
                 "prestige DOUBLE, " +
-                "rank VARCHAR(10), " +
+                "rank TEXT, " +
                 "fly INT, " +
                 "pickaxe TEXT)");
     }

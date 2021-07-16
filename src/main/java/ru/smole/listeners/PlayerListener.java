@@ -1,23 +1,26 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
+import lombok.val;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -29,6 +32,7 @@ import ru.smole.data.cases.Case;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
+import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
@@ -38,8 +42,14 @@ import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
+import ru.smole.utils.hologram.Hologram;
+import ru.smole.utils.hologram.HologramManager;
+import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.ItemUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,108 +80,120 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        event.setKeepInventory(true);
+        event.setDroppedExp(0);
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        ChatUtil.sendMessage(player, "yep");
+
+        LeaderBoard.holograms.forEach(s -> {
+            Hologram hologram = OpPrison.getInstance().getHologramManager().getCachedHologram(s);
+
+            hologram.removeReceiver(player);
+            hologram.addReceiver(player);
+            hologram.refreshHologram();
+        });
+    }
+
+    @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         sendChat(event);
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        Items.interact(event);
+
         Player player = event.getPlayer();
-        ItemStack item = player.getInventory().getItemInMainHand();
-
-        if (item == null)
-            return;
-
-        Material type = item.getType();
-
-        if (type == Material.AIR)
-            return;
-
-        PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
+        Block block = event.getClickedBlock();
         Action action = event.getAction();
 
-        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-            ItemMeta itemMeta = item.getItemMeta();
-            if (itemMeta.hasDisplayName()) {
-                String itemName = itemMeta.getDisplayName();
-                Items items = new OpPlayer(player).getItems();
+        if (event.hasBlock()) {
+            Case customCase = Case.getCustomCaseByLocation(block);
 
-                if (type == Material.MAGMA_CREAM) {
-                    if (itemName.contains("⛃")) {
-                        double count = Double.parseDouble(StringUtils.unReplaceComma(itemName.split("⛃")[1]));
+            if (block.getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && customCase != null)
+                switch (action) {
+                    case LEFT_CLICK_BLOCK:
+                        new CaseLootGui(customCase).openInventory(player);
+                        event.setCancelled(true);
 
-                        playerData.setToken(playerData.getToken() + count);
-                        item.setAmount(0);
-                        return;
-                    }
+                        break;
+                    case RIGHT_CLICK_BLOCK:
+                        event.setCancelled(true);
+
+                        break;
                 }
-
-                if (type == Material.FEATHER) {
-                    if (item == items.getFlyVoucher()) {
-                        if (playerData.isFly())
-                            return;
-
-                        playerData.setFly(true);
-                        item.setAmount(0);
-                        return;
-                    }
-                }
-
-                if (type == Material.DIAMOND_PICKAXE) {
-                    if (item.hasItemMeta()) {
-                        new PickaxeGui().openInventory(player);
-                    }
-                }
-            }
-        }
-
-        if (action == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
-            if (event.getClickedBlock().getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && Case.getCustomCaseByLocation(event.getClickedBlock()) != null) {
-                event.setCancelled(true);
-                Case customCase = Case.getCustomCaseByLocation(event.getClickedBlock());
-                if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                    if (player.getInventory().getItemInMainHand() == null) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Для открытия этого сундука вам необходим %s", Objects.requireNonNull(customCase).getKey());
-                        return;
-                    }
-
-                    ItemStack is = player.getInventory().getItemInMainHand();
-                    if (!ItemStackUtils.hasName(is, Objects.requireNonNull(customCase).getKey())) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Для открытия этого сундука вам необходим %s" + customCase.getKey());
-                        return;
-                    }
-
-                    customCase.open(player, player.isSneaking());
-                }
-            }
-        }
-
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            if (event.getClickedBlock().getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && Case.getCustomCaseByLocation(event.getClickedBlock()) != null) {
-                event.setCancelled(true);
-                Case customCase = Case.getCustomCaseByLocation(event.getClickedBlock());
-                new CaseLootGui(customCase).openInventory(player);
-            }
         }
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        HumanEntity player = event.getWhoClicked();
-        ClickType type = event.getClick();
-        InventoryType inventoryType = event.getClickedInventory().getType();
-        ItemStack pickaxe = new OpPlayer(Bukkit.getPlayer(player.getName())).getItems().getPickaxe();
+    public void onSwitch(PlayerSwapHandItemsEvent event) {
+        event.setCancelled(true);
+    }
 
-        if (inventoryType == InventoryType.PLAYER) {
-            if (event.getCurrentItem() == pickaxe && event.getSlot() == 0) {
-                if (type == ClickType.NUMBER_KEY) {
-                    event.setCancelled(true);
+    @EventHandler
+    public void onCraft(CraftItemEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onOpen(InventoryOpenEvent event) {
+        Player player = Bukkit.getPlayer(event.getPlayer().getName());
+        OpPlayer opPlayer = new OpPlayer(player);
+        ChatUtil.sendMessage(player, event.getInventory().getType().name());
+
+        if (event.getInventory().getType() == InventoryType.PLAYER) {
+            ChatUtil.sendMessage(player, event.getInventory().getName());
+            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+        }
+
+        opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+    }
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent event) {
+        Inventory inv = event.getInventory();
+        val crates = Crate.crates;
+
+        if (!crates.isEmpty())
+            crates.forEach((s, crate) -> {
+                if (inv.getName().equals(crate.getType().getName())) {
+                    List<ItemStack> items = crate.getItems();
+
+                    if (!items.isEmpty()) {
+                        items.forEach(itemStack -> {
+                            Player player = Bukkit.getPlayer(event.getPlayer().getName());
+
+                            new OpPlayer(player).add(itemStack);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили недостающий предмет %s", itemStack.getItemMeta().getDisplayName());
+                        });
+
+                        items.clear();
+                    }
                 }
+            });
+    }
 
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        Player player = Bukkit.getPlayer(event.getWhoClicked().getName());
+        ItemStack curItem = event.getCurrentItem();
+
+        if(event.getHotbarButton() != -1) {
+            ItemStack item = player.getInventory().getContents()[event.getHotbarButton()];
+            if(item != null)
+                if (Items.isSomePickaxe(item, player.getName()))
+                    event.setCancelled(true);
+        }
+
+        if (curItem != null) {
+            if (Items.isSomePickaxe(curItem, player.getName())) {
                 event.setCancelled(true);
             }
-
-            return;
         }
 
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
@@ -183,13 +205,12 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        OpPlayer opPlayer = new OpPlayer(event.getPlayer());
         ItemStack item = event.getItemDrop().getItemStack();
 
         if (item.getType() == Material.AIR)
             return;
 
-        if (item == opPlayer.getItems().getPickaxe()) {
+        if (Items.isSomePickaxe(item, event.getPlayer().getName())) {
             event.setCancelled(true);
         }
     }
@@ -197,36 +218,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onFood(FoodLevelChangeEvent event) {
         event.setFoodLevel(20);
-    }
-
-    @EventHandler
-    public void heldItem(PlayerItemHeldEvent e) {
-        Player player = e.getPlayer();
-        ItemStack item = player.getActiveItem();
-
-        OpPlayer opPlayer = new OpPlayer(player);
-        ItemStack pickItem = opPlayer.getItems().getPickaxe();
-
-        if (item == pickItem) {
-            String name = player.getName();
-            Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
-            Map<Upgrade, Double> upgrades = pickaxe.getUpgrades();
-
-            double hasteLevel = upgrades.get(Upgrade.HASTE);
-            double speedLevel = upgrades.get(Upgrade.SPEED);
-            double jump_boostLevel = upgrades.get(Upgrade.JUMP_BOOST);
-            double night_visionLevel = upgrades.get(Upgrade.NIGHT_VISION);
-
-            PotionEffect haste = new PotionEffect(PotionEffectType.FAST_DIGGING, 9999, (int) hasteLevel);
-            PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 9999, (int) speedLevel);
-            PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 9999, (int) jump_boostLevel);
-            PotionEffect night = new PotionEffect(PotionEffectType.NIGHT_VISION, 9999, (int) night_visionLevel);
-
-            player.addPotionEffect(haste);
-            player.addPotionEffect(speed);
-            player.addPotionEffect(jump);
-            player.addPotionEffect(night);
-        }
     }
 
     public void sendChat(AsyncPlayerChatEvent event) {
@@ -239,20 +230,20 @@ public class PlayerListener implements Listener {
 
         String prefix = RPlayer.checkAndGet(name).getLongPrefix();
 
-        String _format = String.format("[%s] %s %s",
-                msg.startsWith("!") ? "G" : "L", prefix, player.getName()
-        );
-
-        String format = String.format("§7: §f%s",
-                msg.startsWith("!") ? msg.substring(1) : msg
+        String format = String.format("§8[§a%s§8] %s%s§7: §f",
+                StringUtils.formatDouble(String.valueOf(playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
+                prefix.replace('&', '§'), player.getName()
         );
 
         List<String> lore = Lists.newArrayList(
                 String.format("&fНик: &b%s %s", prefix, name),
-                "&fПрестиж: &b" + StringUtils.formatDouble(0, playerData.getPrestige()),
-                "&fРанг: &b" + playerData.getRank().getName(),
-                "&fТокенов: &b" + StringUtils.formatDouble(1, playerData.getToken()),
-                "&fБлоков вскопано: &b" + StringUtils._fixDouble(0, playerData.getBlocks())
+                "&fПрестижи: &b" + StringUtils.formatDouble(2, playerData.getPrestige()),
+                "&fДобыто блоков: &e" + StringUtils._fixDouble(0, playerData.getBlocks()),
+                "&fГруппа: &b" + playerData.getGroup().getName(),
+                "",
+                "&fДеньги: &a" + StringUtils.formatDouble(2, playerData.getMoney()),
+                "&fТокенов: &e" + StringUtils.formatDouble(2, playerData.getToken()),
+                "&fМножитель: &d" + StringUtils._fixDouble(0, playerData.getMultiplier())
         );
         BaseComponent[] comps = new BaseComponent[lore.size()];
 
@@ -260,18 +251,14 @@ public class PlayerListener implements Listener {
             comps[i] = new TextComponent(ChatUtil.color(String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
         }
 
-        TextComponent _component = new TextComponent(_format);
+        TextComponent _component = new TextComponent(format.replaceFirst("!", ""));
         _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
-        _component.addExtra(getHand(format, item));
+        _component.addExtra(getHand(msg, item));
 
         event.setCancelled(true);
-        if (msg.startsWith("!")) {
-            Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
-        } else {
-            player.getLocation().getNearbyPlayers(200).forEach(players -> players.spigot().sendMessage(_component));
-        }
+        Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
 
-        Bukkit.getConsoleSender().sendMessage(format);
+        Bukkit.getConsoleSender().sendMessage(format + msg);
     }
 
 
@@ -282,30 +269,31 @@ public class PlayerListener implements Listener {
         if (item.getType() == Material.AIR)
             return new TextComponent(msg);
 
-        ItemMeta meta = item.getItemMeta();
-
-        if (meta == null)
-            return new TextComponent(msg);
-
-        List<String> lore = meta.getLore();
-
-        if (msg.equals("#рука")) {
+        if (msg.equals("#рука") || msg.equals("#hand") || msg.equals("[item]")) {
             int amount = item.getAmount();
             String text_peace = amount == 1 ? "" : " §fx" + amount;
-            String text = String.format("§8[%s%s§8]",
-                    meta.getDisplayName(), text_peace);
+            String text = String.format("§8[§f%s%s§8]",
+                    item.hasItemMeta() ? item.getItemMeta().getDisplayName()
+                            : Bukkit.getServer().getItemFactory().getItemMeta(item.getType()).getDisplayName(), text_peace);
 
-            StringBuilder show = new StringBuilder();
-
-            if (lore != null && !lore.isEmpty()) {
-                for (String s : lore) {
-                    show.append("\n").append(s);
-                }
-            }
+//            msg = text;
+//
+//            ItemMeta meta = item.getItemMeta();
+//            if (meta == null)
+//                return new TextComponent(msg);
+//
+//            StringBuilder show = new StringBuilder();
+//            List<String> lore = meta.getLore();
+//
+//            if (lore != null && !lore.isEmpty()) {
+//                for (String s : lore) {
+//                    show.append("\n").append(s);
+//                }
+//            }
 
             BaseComponent[] itemComponent = ChatUtil.newBuilder()
                     .setText(text)
-                    .setHoverEvent(HoverEvent.Action.SHOW_TEXT, show.toString())
+                    .setHoverEvent(HoverEvent.Action.SHOW_ITEM, ItemStackUtils.convertItemStackToJsonRegular(item))
                     .build();
 
             return new TextComponent(itemComponent);

@@ -1,16 +1,20 @@
 package ru.smole.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
+import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
+
+import java.util.Arrays;
 
 @CommandPermission(permission = "opprison.admin")
 public class ItemsCommand extends BukkitCommand<CommandSender> {
@@ -22,60 +26,35 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
     @Override
     protected void onExecute(CommandSender sender, String[] args) {
         Player player = (Player) sender;
-        OpPlayer opPlayer = new OpPlayer(player);
-        String name = player.getName();
 
-        if (args.length == 3 || args.length == 4) {
-            Player target = Bukkit.getPlayer(args[1]);
-
-            if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не в сети");
-                return;
-            }
-
-            String arg = args[0].toLowerCase();
-            Items items = opPlayer.getItems();
-
-            if (arg.equals("key")) {
-                Items.Key type = items.getKeyFromString(args[2]);
-
-                if (type == null) {
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден");
-                    return;
-                }
-
-                ItemStack item = type.getStack();
-                int amount = 1;
-
-                try {
-                    amount = Integer.parseInt(args[3]);
-                } catch (Exception ignored) {}
-
-                item.setAmount(amount);
-                opPlayer.add(item);
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан &b%s &fключ &fx%s", name, type.getName(), amount);
-                return;
-            }
-
-            if (arg.equals("token")) {
-                int amount = 1;
-
-                try {
-                    amount = Integer.parseInt(args[2]);
-                } catch (Exception ignored) {}
-
-                opPlayer.add(opPlayer.getItems().getToken(amount));
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан токен &e⛃%s", name, StringUtils.fixDouble(0, amount));
-                return;
-            }
-
-            if (arg.equals("fly")) {
-                opPlayer.add(opPlayer.getItems().getItem("fly"));
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f был выдан флай воучер", name);
-                return;
-            }
+        if (args.length < 1) {
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "/items name type amount");
+            return;
         }
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "/items key/token/fly name key_type/count amount/empty");
+        Player target = Bukkit.getPlayer(args[0]);
+
+        if (target == null) {
+            ChatUtil.sendMessage(player, OpPrison.PREFIX +  "Игрок не найден");
+            return;
+        }
+
+        OpPlayer opPlayer = new OpPlayer(target);
+
+        double amount = 1;
+
+        try {
+            amount = Double.parseDouble(args[2]);
+        } catch (Exception ignored) {}
+
+        ItemStack itemStack = Items.getItem(args[1], amount);
+
+        if (itemStack == null) {
+            ChatUtil.sendMessage(player, "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
+            return;
+        }
+
+        opPlayer.add(itemStack);
+        ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
     }
 }

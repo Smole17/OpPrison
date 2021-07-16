@@ -6,6 +6,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.OpPlayer;
+import ru.smole.data.items.Items;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.util.ChatUtil;
@@ -38,6 +39,11 @@ public class TokenCommand extends BukkitCommand<Player> {
             if (args[0].equals("withdraw")) {
                 double token;
                 try {
+                    if (args[1].contains(".")) {
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                        return;
+                    }
+
                     token = Double.parseDouble(args[1]);
                 } catch (Exception e) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
@@ -57,7 +63,7 @@ public class TokenCommand extends BukkitCommand<Player> {
         PlayerData playerData = dataManager.getPlayerDataMap().get(player.getName());
         double token = playerData.getToken();
 
-        if (0D >= count) {
+        if (1D >= count) {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите корректное число");
             return;
         }
@@ -67,7 +73,7 @@ public class TokenCommand extends BukkitCommand<Player> {
             return;
         }
 
-        opPlayer.add(opPlayer.getItems().getToken(count));
+        opPlayer.add(Items.getItem("token", count));
         playerData.setToken(token - count);
         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно конвертировали в предмет");
     }

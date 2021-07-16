@@ -5,12 +5,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.rank.RankManager;
+import ru.smole.data.group.GroupsManager;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
+
+import java.util.Arrays;
 
 @CommandPermission(permission = "opprison.admin")
 public class StatsCommand extends BukkitCommand<Player> {
@@ -20,13 +21,11 @@ public class StatsCommand extends BukkitCommand<Player> {
 
     @Override
     protected void onExecute(Player player, String[] args) {
-        String msg = OpPrison.PREFIX + "/stats name BLOCKS/MONEY/TOKEN/MULTIPLIER/PRESTIGE/RANK value";
+        String msg = OpPrison.PREFIX + "/stats name BLOCKS/MONEY/TOKEN/MULTIPLIER/PRESTIGE/GROUP value";
 
         if (args.length == 3) {
             Player target = Bukkit.getPlayer(args[0]);
             String targetName = target.getName();
-
-            RankManager rankManager = new OpPlayer(target).getRankManager();
             PlayerData targetData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(targetName);
             Stat type = Stat.getTypeFromString(args[1].toUpperCase());
 
@@ -35,58 +34,62 @@ public class StatsCommand extends BukkitCommand<Player> {
                 return;
             }
 
-            if (type == Stat.RANK) {
-                RankManager.Rank rank = rankManager.getRankFromString(args[2].toUpperCase());
+            Object value;
 
-                if (rank == null) {
-                    ChatUtil.sendMessage(player, msg);
+            if (type != Stat.GROUP) {
+                try {
+                    value = Double.valueOf(args[2]);
+                } catch (Exception e) {
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
                     return;
                 }
-
-                targetData.setRank(rank);
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s был установлен ранк %s", targetName, rank.getName());
-                return;
-            }
-
-            double value;
-            try {
-                value = Double.parseDouble(args[2]);
-            } catch (Exception e) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
-                return;
+            } else {
+                try {
+                    value = GroupsManager.Group.getGroupFromString(args[2]);
+                } catch (Exception e) {
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Группа не найдена. Используйте данный список: %s", Arrays.toString(GroupsManager.Group.values()));
+                    return;
+                }
             }
 
             String piece = "null";
 
             switch (type) {
                 case BLOCKS:
-                    targetData.setBlocks(value);
+                    targetData.setBlocks((double) value);
                     piece = "было установлено блоков";
                     break;
 
                 case MONEY:
-                    targetData.setMoney(value);
+                    targetData.setMoney((double) value);
                     piece = "было установлено денег";
                     break;
 
                 case TOKEN:
-                    targetData.setToken(value);
+                    targetData.setToken((double) value);
                     piece = "было установлено токенов";
                     break;
 
                 case MULTIPLIER:
-                    targetData.setMultiplier(value);
+                    targetData.setMultiplier((double) value);
                     piece = "был установлен множитель";
                     break;
 
                 case PRESTIGE:
-                    targetData.setPrestige(value);
+                    targetData.setPrestige((double) value);
                     piece = "было установлено престижей";
+                    break;
+
+                case GROUP:
+                    targetData.setGroup(GroupsManager.Group.getGroupFromString(String.valueOf(value)));
+                    piece = "была установлена группа";
                     break;
             }
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, StringUtils.replaceComma(value));
-            return;
+            if (value != null) {
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, value);
+                return;
+            }
         }
 
         ChatUtil.sendMessage(player, msg);
@@ -99,7 +102,7 @@ public class StatsCommand extends BukkitCommand<Player> {
         TOKEN(),
         MULTIPLIER(),
         PRESTIGE(),
-        RANK();
+        GROUP();
 
         public static Stat getTypeFromString(String stat) {
             for (Stat type : Stat.values())

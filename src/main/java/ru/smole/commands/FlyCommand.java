@@ -11,7 +11,7 @@ public class FlyCommand extends BukkitCommand<Player> {
     protected boolean is;
 
     public FlyCommand() {
-        super("fly");
+        super("flying");
         is = false;
     }
 
@@ -24,6 +24,7 @@ public class FlyCommand extends BukkitCommand<Player> {
             player.setAllowFlight(is);
             player.setFlying(is);
 
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + String.format("Вы %s полёт", is ? "включили" : "выключили"));
             return;
         }
 

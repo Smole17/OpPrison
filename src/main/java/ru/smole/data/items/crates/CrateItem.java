@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
+import ru.smole.data.OpPlayer;
 import ru.smole.data.items.Items;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -13,16 +14,17 @@ import ru.xfenilafs.core.util.ChatUtil;
 @AllArgsConstructor
 public class CrateItem {
 
-    private String name;
     private Rare rare;
     private ItemStack itemStack;
 
-    public void sendMessage(Player player, String crateName) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX +
-                    String.format("%s открыл %s &fи получил %s",
+    public void sendMessage(Player sender, Player player, String crateName) {
+            ChatUtil.sendMessage(sender, OpPrison.PREFIX +
+                    String.format("%s открыл %s &fи получил %s %s &fx%s",
                             player.getName(),
                             crateName,
-                            name
+                            rare.getName(),
+                            itemStack.getItemMeta().getDisplayName(),
+                            itemStack.getAmount()
                     ));
     }
 
@@ -30,10 +32,10 @@ public class CrateItem {
     @AllArgsConstructor
     public enum Rare {
 
-        COMMON("§7ОБЫЧНЫЙ", 1.0),
-        RARE("§9РЕДКИЙ", 0.4),
-        EPIC("§5ЭПИЧЕСКИЙ", 0.15),
-        LEGENDARY("§6ЛЕГЕНДАРНЫЙ", 0.05),
+        COMMON("§7ОБЫЧНЫЙ", 0.85),
+        RARE("§9РЕДКИЙ", 0.45),
+        EPIC("§5ЭПИЧЕСКИЙ", 0.25),
+        LEGENDARY("§6ЛЕГЕНДАРНЫЙ", 0.020),
         MYTHICAL("§cМИФИЧЕСКИЙ", 0.01);
 
         private String name;

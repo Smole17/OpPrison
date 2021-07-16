@@ -2,6 +2,8 @@ package ru.smole.utils.leaderboard;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,29 +13,35 @@ import ru.smole.utils.hologram.Hologram;
 import ru.xfenilafs.core.util.ChatUtil;
 
 public class LeaderBoard {
-    private final Hologram hologram;
-    private final String topName;
+    public static List<String> holograms = new ArrayList<>();
+
     private final String criteria;
 
     public LeaderBoard(String topName, Location location, String criteria) {
-        this.topName = topName;
         this.criteria = criteria;
-        hologram = OpPrison.getInstance().getHologramManager().createHologram(location);
-        createLeaderBoard();
-        OpPrison.getInstance().getServer().getScheduler().runTaskTimer(OpPrison.getInstance(), this::update, 0L, OpPrison.getInstance().getConfig().getInt("leaderBoard.update") * 20L);
-    }
+        OpPrison.getInstance().getHologramManager().createHologram(
+                criteria,
+                location,
+                hologram -> {
+                    hologram.addLine(ChatUtil.color(topName));
+                    hologram.addLine(ChatUtil.color(topName));
+                    for (int i = 0; i < 10; i++)
+                        hologram.addLine(ChatUtil.text("§fЗагрузка..."));
+                    hologram.addLine(ChatUtil.color("&8(обновление раз в 5 минут)"));
+                }
+        );
 
-    private void createLeaderBoard() {
-        hologram.addLine(ChatUtil.color(topName));
-        for (int i = 0; i < 10; i++)
-            hologram.addLine(ChatUtil.text("#%s §fЗагрузка", i));
+        OpPrison.getInstance().getServer().getScheduler().runTaskTimer(OpPrison.getInstance(), this::update, 0L, OpPrison.getInstance().getConfig().getInt("leaderBoard.update") * 20L);
+
+        holograms.add(criteria);
     }
 
     public void update() {
+        Hologram hologram = OpPrison.getInstance().getHologramManager().getCachedHologram(criteria);
         ResultSet resultSet = OpPrison.getInstance().getBase().getResult("SELECT * FROM OpPrison ORDER BY " + criteria + " DESC LIMIT 10");
         try {
             for (int i = 1; resultSet.next(); i++) {
-                hologram.modifyLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
+                hologram.modifyLine(i, getLine(i, resultSet.getString("name"), StringUtils.fixDouble(0, resultSet.getDouble(criteria))));
             }
         } catch (SQLException exception) {
             exception.printStackTrace();

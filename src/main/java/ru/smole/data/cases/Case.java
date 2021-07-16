@@ -3,28 +3,53 @@ package ru.smole.data.cases;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import ru.smole.OpPrison;
+import ru.smole.commands.StatsCommand;
+import ru.smole.data.PlayerData;
 import ru.smole.utils.config.ConfigUtils;
+import ru.smole.utils.hologram.Hologram;
+import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Getter
 public class Case {
 
-    public static Map<String, Case> cases = new LinkedHashMap();
+    public static Map<String, Case> cases = new HashMap<>();
     private String id;
+    private String name;
     private String key;
     private Location location;
     private List<CaseItem> items;
 
     public Case(String id, ConfigurationSection section) {
         this.id = id;
-        this.key = section.getString("key");
+        this.name = section.getString("name");
+        this.key = section.getString("key").toUpperCase();
         this.location = ConfigUtils.loadLocationFromConfigurationSection(section);
+
+        String holoId = "case_" + id;
+        OpPrison.getInstance().getHologramManager().createHologram(
+                holoId,
+                new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY() - 0.3, location.getBlockZ() + 0.5),
+                hologram -> {
+                    hologram.addLine(name);
+                    hologram.addLine("§fЛКМ - Просмотр выпадаемых вещей");
+                    hologram.addLine("§fПКМ - Открыть кейс на ВСЕ ключи");
+                }
+        );
+
+        LeaderBoard.holograms.add(holoId);
+        this.items = new ArrayList<>();
+
         ConfigurationSection itemsSection = section.getConfigurationSection("items");
         if (itemsSection != null && itemsSection.getKeys(false).size() > 0) {
             itemsSection.getKeys(false).forEach((item) -> {
@@ -40,55 +65,44 @@ public class Case {
         cases.put(id, this);
     }
 
-    public static Case getCase(String id) {
-        return cases.get(id);
-    }
-
     public static Case getCustomCaseByLocation(Block block) {
-        for (Case customCase : cases.values()) {
-            if (block.getLocation().equals(customCase.getLocation())) {
+        for (Case customCase : cases.values())
+            if (block.equals(customCase.getLocation().getBlock()))
                 return customCase;
-            }
-        }
 
         return null;
     }
 
-    public void open(Player player, boolean fastOpen) {
+    public void open(Player player) {
         ItemStack itemHand = player.getInventory().getItemInMainHand();
+        String playerName = player.getName();
 
-        if (fastOpen) {
+        CaseItem caseItem = getRandomItem();
+        CaseItem.CaseItemType caseItemType = caseItem.getType();
+
             for (int i = 0; i < itemHand.getAmount(); i++) {
-                ItemStack itemStack = getRandomItem();
-                if (itemStack != null) {
-                    player.getInventory().addItem(itemStack);
+                if (caseItemType != CaseItem.CaseItemType.VAULT) {
+                    player.getInventory().addItem((ItemStack) caseItem.get(playerName));
+                    return;
                 }
+
+                caseItem.get(playerName);
             }
+
             itemHand.setAmount(0);
-            return;
-        }
-
-        ItemStack itemStack = getRandomItem();
-        if (itemStack != null) {
-            player.getInventory().addItem(itemStack);
-        }
-        itemHand.setAmount(itemHand.getAmount() - 1);
-
     }
 
-    public ItemStack getRandomItem() {
-        ItemStack itemStack = null;
+    public CaseItem getRandomItem() {
         Random random = new Random();
+        CaseItem returnedCaseItem = null;
 
-        while (itemStack == null) {
+        while (returnedCaseItem == null) {
             CaseItem caseItem = items.get(random.nextInt(items.size()));
-            double chance = caseItem.getChance();
-            if (random.nextFloat() <= chance) {
-                itemStack = caseItem.getStack();
-                itemStack.setAmount(caseItem.getStack().getAmount());
-            }
+
+            if (random.nextFloat() <= caseItem.getChance())
+                returnedCaseItem = caseItem;
         }
 
-        return itemStack;
+        return returnedCaseItem;
     }
 }

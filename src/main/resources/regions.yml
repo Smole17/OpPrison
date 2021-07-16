@@ -2,7 +2,6 @@ regions:
   1:
     name: test
     pvp: false
-    rank: A
     inventory:
       slot: 0
     spawnLoc: world 8 6 -7 0 0
@@ -17,5 +16,4 @@ mines:
     minPoint: 18 111 -1197
     resetTime: 3m
     blocks:
-      - DIRT 50
-      - SAND 50
+      - STONE 100

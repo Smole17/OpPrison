@@ -2,6 +2,7 @@ package ru.smole;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,12 +12,21 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
+import ru.smole.data.OpPlayer;
 import ru.smole.data.cases.Case;
 import ru.smole.commands.*;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
+import ru.smole.data.items.crates.Crate;
+import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.data.prestige.PrestigeManager;
 import ru.smole.listeners.PlayerListener;
@@ -27,17 +37,21 @@ import ru.smole.utils.ServerUtil;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.hologram.HologramManager;
+import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.CorePlugin;
 import ru.xfenilafs.core.inventory.BaseInventoryListener;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
+import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.smole.data.items.Items.registerItem;
+
 @Slf4j
-public final class OpPrison extends CorePlugin {
+public class OpPrison extends CorePlugin {
 
     public @Getter static OpPrison instance;
 
@@ -45,11 +59,13 @@ public final class OpPrison extends CorePlugin {
     private @Getter ConfigManager configManager;
     private @Getter HologramManager hologramManager;
     private @Getter DatabaseManager base;
+    private @Getter BukkitTask pickaxeTask;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static String PREFIX = "&bOpPrison &7>> &f";
+    public static String BAR_FORMAT;
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
@@ -64,22 +80,10 @@ public final class OpPrison extends CorePlugin {
 		"AGHKSF8123AIYWT1862t3iJKGHFASDqqqq",
 		false);
 
-        BAR = Bukkit.createBossBar(String.format("§fБустер сервера: §b+%s §8(/help booster)",
-                StringUtils._fixDouble(1, BOOSTER) + "%"), BarColor.BLUE, BarStyle.SOLID);
+        BAR_FORMAT = String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
+                StringUtils._fixDouble(1, BOOSTER) + "%");
 
-        ApiManager.registerListeners(this,
-                new PlayerListener(), new RegionListener(), new BaseInventoryListener()
-        );
-
-        ApiManager.registerCommands(
-                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand(), new RankUpCommand(), new StatsCommand(), new WarpCommand(),
-                new PrestigeCommand(), new FlyCommand(), new TradeCommand(), new RestartCommand(),
-                new HelpCommand()
-        );
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
+        BAR = Bukkit.createBossBar(BAR_FORMAT, BarColor.BLUE, BarStyle.SOLID);
 
         ServerUtil.load();
         PickaxeManager.pickaxes = new HashMap<>();
@@ -87,10 +91,26 @@ public final class OpPrison extends CorePlugin {
 
         loadRegionsAndMines();
         loadCases();
+        loadLeaderBoard();
+        loadEffects();
+        loadCrates();
+
+        registerListeners(
+                new PlayerListener(), new RegionListener()
+        );
+
+        registerCommands(
+                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
+                new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
+                new FlyCommand(), new TradeCommand(), new RestartCommand(), new HelpCommand()
+        );
+
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
     }
 
     public void onPluginDisable() {
-        Bukkit.getOnlinePlayers().forEach(player -> playerDataManager.unload(player));
+        Bukkit.getOnlinePlayers().forEach(playerDataManager::unload);
         base.close();
         BAR.removeAll();
     }
@@ -160,6 +180,7 @@ public final class OpPrison extends CorePlugin {
                             .collect(Collectors.toList())
             );
             MINES.put(mine.getLevel(), mine);
+
         });
         log.info("Loaded {} mines!", MINES.size());
 
@@ -168,11 +189,120 @@ public final class OpPrison extends CorePlugin {
 
     private void loadCases() {
         ConfigurationSection section = this.getConfig().getConfigurationSection("cases");
+
         if (section != null && section.getKeys(false).size() > 0) {
             section.getKeys(false).forEach((key) -> {
                 ConfigurationSection keySection = section.getConfigurationSection(key);
                 new Case(key, keySection);
             });
         }
+    }
+
+    public void loadCrates() {
+        ConfigurationSection section = this.getConfig().getConfigurationSection("crates");
+
+        if (section != null && section.getKeys(false).size() > 0) {
+            section.getKeys(false).forEach((key) -> {
+                ConfigurationSection keySection = section.getConfigurationSection(key);
+                new Crate(key, keySection);
+            });
+        }
+
+        Arrays.stream(Crate.crates.keySet().toArray())
+                .forEach(crateName ->
+                        registerItem(
+                                crateName + "_crate",
+                                ApiManager
+                                        .newItemBuilder(Crate.crates.get((String) crateName).getType().getStack())
+                                        .build(),
+                                (playerInteractEvent, itemStack) -> {
+                                    Action action = playerInteractEvent.getAction();
+
+                                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                                        ItemStack item = playerInteractEvent.getItem();
+
+                                        item.setAmount(item.getAmount() - 1);
+                                        Crate.crates.get((String) crateName).open(playerInteractEvent.getPlayer());
+                                    }
+                                })
+                );
+    }
+
+    private void loadLeaderBoard() {
+        LeaderBoard blocks = new LeaderBoard(
+                "&fТоп по блокам",
+                new Location(Bukkit.getWorld("world"), 34, 122, 2),
+                "blocks"
+        );
+
+        LeaderBoard prestige = new LeaderBoard(
+                        "&fТоп по престижам",
+                new Location(Bukkit.getWorld("world"), 23, 122, 2),
+                "prestige"
+        );
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            if (Bukkit.getOnlinePlayers().size() == 0)
+                return;
+
+            Bukkit.getOnlinePlayers().forEach(getPlayerDataManager()::updateTop);
+
+            blocks.update();
+            prestige.update();
+        }, 20 * 300, 20 * 300);
+    }
+
+    private void loadEffects() {
+        pickaxeTask = Bukkit.getScheduler().runTaskTimer(this, () ->
+                Bukkit.getOnlinePlayers().forEach(player -> {
+            String item = Items.getItemName(player.getInventory().getItemInMainHand());
+
+            if (item.length() < 1 || !item.equals("pickaxe"))
+                return;
+
+            Pickaxe pickaxe = PickaxeManager.pickaxes.get(player.getName());
+            val upgrades = pickaxe.getUpgrades();
+
+            int hasteLevel = (int) upgrades.get(Upgrade.HASTE).getCount();
+            int speedLevel = (int) upgrades.get(Upgrade.SPEED).getCount();
+            int jump_boostLevel = (int) upgrades.get(Upgrade.JUMP_BOOST).getCount();
+            int night_visionLevel = (int) upgrades.get(Upgrade.NIGHT_VISION).getCount();
+
+            if (hasteLevel != 0) {
+                if (upgrades.get(Upgrade.HASTE).isIs()) {
+                    if (player.hasPotionEffect(PotionEffectType.FAST_DIGGING))
+                        player.removePotionEffect(PotionEffectType.FAST_DIGGING);
+
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 80, hasteLevel));
+                }
+            }
+
+            if (speedLevel != 0) {
+                if (upgrades.get(Upgrade.SPEED).isIs()) {
+                    if (player.hasPotionEffect(PotionEffectType.SPEED))
+                        player.removePotionEffect(PotionEffectType.SPEED);
+
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 80, speedLevel));
+                }
+            }
+
+            if (jump_boostLevel != 0) {
+                if (upgrades.get(Upgrade.JUMP_BOOST).isIs()) {
+                    if (player.hasPotionEffect(PotionEffectType.JUMP))
+                        player.removePotionEffect(PotionEffectType.JUMP);
+
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 80, jump_boostLevel));
+                }
+            }
+
+            if (night_visionLevel != 0) {
+                if (upgrades.get(Upgrade.NIGHT_VISION).isIs()) {
+                    if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
+                        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 400, night_visionLevel));
+                }
+            }
+        }), 20, 20);
     }
 }

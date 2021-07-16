@@ -6,8 +6,10 @@ import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
 import ru.smole.data.trade.Trade;
 import ru.xfenilafs.core.command.BukkitCommand;
+import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
+@CommandPermission(permission = "opprison.admin")
 public class TradeCommand extends BukkitCommand<Player> {
     public TradeCommand() {
         super("trade");

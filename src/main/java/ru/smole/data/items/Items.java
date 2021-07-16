@@ -2,70 +2,100 @@ package ru.smole.data.items;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.server.v1_12_R1.NBTTagString;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import ru.smole.OpPrison;
+import ru.smole.data.OpPlayer;
+import ru.smole.data.PlayerData;
+import ru.smole.data.cases.Case;
+import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
+import ru.smole.guis.PickaxeGui;
+import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.player.CorePlayer;
+import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.ItemUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Items {
 
     private Player player;
-    public static @Getter Map<String, ItemStack> items;
+    private static @Getter
+    Map<String, Function<Object[], ItemStack>> creators;
+    private static @Getter
+    Map<String, BiConsumer<PlayerInteractEvent, ItemStack>> interacts;
 
     public Items(Player player) {
         this.player = player;
     }
 
-    public static void init() {
-        items = new HashMap<>();
-
-        items.put("fly",
-                ApiManager
-                        .newItemBuilder(Material.FEATHER)
-                        .setName("§fДоступ к полёту §7(/fly)")
-                        .addLore("§7Нажмите для активации")
-                        .build());
+    public static ItemStack getItem(String name, Object... params) {
+        Function<Object[], ItemStack> creator = creators.get(name.toLowerCase());
+        if (creator == null)
+            return null;
+        return setTagName(creator.apply(params), name.toLowerCase());
     }
 
-    public ItemStack getItem(String name) {
-        return items
-                .getOrDefault
-                        (name, ApiManager
-                                .newItemBuilder(Material.BARRIER)
-                                .setName("§cНеверный предмет")
-                                .build());
+    public static String getItemName(ItemStack item) {
+        if (item != null) {
+            NBTTagString nbt = ItemStackUtils.getTag(ApiManager.newItemBuilder(item), "op_item");
+            String name;
+            if (nbt != null && (name = nbt.c_()) != null) {
+                if (creators.containsKey(name.toLowerCase()))
+                    return name;
+            }
+        }
+        return "";
     }
 
-    public ItemStack getToken(double count) {
-        return ApiManager
-                .newItemBuilder(Material.MAGMA_CREAM)
-                .setName(String.format("§e⛃%s", StringUtils.formatDouble(0, count)))
-                .addLore(String.format("§fСодержит - §e%s токенов", StringUtils.replaceComma(count)), "§7Нажмите для активации")
-                .build();
-    }
 
-    public ItemStack getPickaxe() {
-        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
+//    public ItemStack getToken(double count) {
+//        ItemStack itemStack = getItem("token");
+//        ItemMeta itemMeta = itemStack.getItemMeta();
+//        List<String> lore = new ArrayList<>();
+//
+//        itemMeta.setDisplayName(String.format("§e⛃%s", StringUtils.fixDouble(2, count)));
+//        lore.add(String.format("§fСодержит - §e⛃%s", StringUtils._fixDouble(0, count)));
+//        lore.add("§7Нажмите для активации");
+//
+//        itemMeta.setLore(lore);
+//        itemStack.setItemMeta(itemMeta);
+//        return itemStack;
+//    }
+
+    protected static ItemStack getPickaxe(String name) {
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
 
         List<String> lore = new ArrayList<>();
+
         lore.add("");
         for (Upgrade upgrade : Upgrade.values()) {
             double count = pickaxe
                     .getUpgrades()
-                    .get(upgrade);
+                    .get(upgrade)
+                    .getCount();
 
             if (count == 0)
                 continue;
@@ -76,47 +106,219 @@ public class Items {
         lore.add(String.format("§fУровень: §b%s", (int) pickaxe.getLevel()));
         lore.add(String.format("§fОпыт: §b%s/%s", (int) pickaxe.getExp(), (int) pickaxe.getNeedExp()));
 
-        double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY);
+        double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY).getCount();
 
-        return ApiManager.newItemBuilder(Material.DIAMOND_PICKAXE)
+        ItemUtil.ItemBuilder itemPick = ApiManager.newItemBuilder(Material.DIAMOND_PICKAXE)
                 .setUnbreakable(true)
                 .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
                 .addItemFlag(ItemFlag.HIDE_DESTROYS)
                 .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-                .setName(pickaxe.getName())
-                .addEnchantment(Enchantment.DIG_SPEED, (int) efficiency)
-                .setLore(lore)
-                .build();
+                .setName("§fКирка " + pickaxe.getName())
+                .setLore(lore);
+
+        return pickaxe.getUpgrades()
+                .get(Upgrade.EFFICIENCY)
+                .isIs()
+                ? itemPick.addEnchantment(Enchantment.DIG_SPEED, (int) efficiency).build()
+                : itemPick.build();
     }
 
+    public static boolean isSomePickaxe(ItemStack itemStack, String playerName) {
+        if (itemStack != null)
+            if (itemStack.hasItemMeta()) {
+                ItemMeta itemMeta = itemStack.getItemMeta();
 
-    public Key getKeyFromString(String key) {
-        for (Key type : Key.values())
-            if (type.equals(Key.valueOf(key.toUpperCase())))
-                return type;
+                if (itemMeta.hasDisplayName())
+                    if (itemMeta.getDisplayName().contains(playerName))
+                        return itemStack.getType() == Material.DIAMOND_PICKAXE;
+            }
 
-        return null;
+        return false;
     }
 
-    public Key getKeyFromInt(int i) {
-        for (Key type : Key.values())
-            if (type == Key.values()[i - 1])
-                return type;
+    // register items
 
-        return null;
+    public static void init() {
+        creators = new HashMap<>();
+        interacts = new HashMap<>();
+        Map<String, PlayerData> playerDataMap = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap();
+
+        registerItem("pickaxe",
+                objects -> getPickaxe(objects[0].toString()),
+                (playerInteractEvent, itemStack) -> {
+                    Action action = playerInteractEvent.getAction();
+                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
+                        new PickaxeGui().openInventory(playerInteractEvent.getPlayer());
+                 }
+        );
+
+        registerItem("fly",
+                ApiManager
+                        .newItemBuilder(Material.FEATHER)
+                        .setName("§fДоступ к полёту §7(/flying)")
+                        .addLore("§7Нажмите для активации")
+                        .build(),
+                (playerInteractEvent, itemStack) -> {
+                    Player player = playerInteractEvent.getPlayer();
+                    ItemStack item = playerInteractEvent.getItem();
+
+                    item.setAmount(item.getAmount() - 1);
+
+                    if (playerDataMap.get(player.getName()).isFly())
+                        return;
+
+                    playerDataMap.get(player.getName()).setFly(true);
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили доступ к полёту &8(/flying)");
+                });
+
+        registerItem("token", objects ->
+                        ApiManager
+                                .newItemBuilder(Material.MAGMA_CREAM)
+                                .setName("§e⛃" + StringUtils.formatDouble(2, (double) objects[0]))
+                                .addLore(String.format("§fСодержит - §e⛃%s", StringUtils.replaceComma((double) objects[0])), "§7Нажмите для активации")
+                                .build(),
+                (playerInteractEvent, itemStack) -> {
+                    Player player = playerInteractEvent.getPlayer();
+                    double value = Double.parseDouble(StringUtils.unReplaceComma(itemStack.getItemMeta().getLore().get(0).split("⛃")[1]));
+                    ItemStack item = playerInteractEvent.getItem();
+
+                    item.setAmount(item.getAmount() - 1);
+
+                    playerDataMap.get(player.getName()).addToken(value);
+                    ChatUtil.sendMessage(player,
+                            OpPrison.PREFIX + "Вы получили §e⛃%s §8(%s)",
+                            StringUtils.formatDouble(2, value),
+                            StringUtils.replaceComma(value));
+                });
+
+        registerItem("ign",
+                ApiManager
+                        .newItemBuilder(Material.PAPER)
+                        .setName("Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)")
+                        .setLore("§7Нажмите для активации")
+                        .build(),
+                (playerInteractEvent, itemStack) -> {
+                    Action action = playerInteractEvent.getAction();
+
+                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                        ItemStack item = playerInteractEvent.getItem();
+
+                        item.setAmount(item.getAmount() - 1);
+
+                        CorePlayer.getCorePlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
+                    }
+                });
+
+        Arrays.stream(Key.values())
+                .forEach(key ->
+                        registerItem(
+                                String.format("%s_key", key.name().toLowerCase()),
+                                objects -> ApiManager.newItemBuilder(key.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
+                                (event, itemStack) -> {
+                                    Player player = event.getPlayer();
+                                    Action action = event.getAction();
+                                    Block block = event.getClickedBlock();
+
+                                    if (action == Action.RIGHT_CLICK_BLOCK && event.hasBlock()) {
+                                        Case customCase = Case.getCustomCaseByLocation(block);
+
+                                        if (event.getHand() == EquipmentSlot.HAND && customCase != null) {
+                                            Key needKey = Key.getKeyFromString(customCase.getKey());
+
+                                            if (needKey == null) {
+                                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Ключ не установлен");
+                                                return;
+                                            }
+
+                                            ItemStack itemKey = needKey.getStack();
+
+                                            if (!key.name().equals(needKey.name())) {
+                                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Для открытия этого кейса вам необходим %s", itemKey.getItemMeta().getDisplayName());
+                                                return;
+                                            }
+
+                                            customCase.open(player);
+                                            event.setCancelled(true);
+                                        }
+                                    }
+                                })
+                );
+
+        Arrays.stream(GroupsManager.Group.values())
+                .forEach(group ->
+                        registerItem(
+                                String.format("%s_group", group.name().toLowerCase()),
+                                objects -> ApiManager.newItemBuilder(group.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
+                                (playerInteractEvent, itemStack) -> {
+                                    Player player = playerInteractEvent.getPlayer();
+                                    ItemStack item = playerInteractEvent.getItem();
+
+                                    item.setAmount(item.getAmount() - 1);
+
+                                    if (new OpPlayer(player).getGroupsManager().isCan(group)) {
+                                        return;
+                                    }
+
+                                    playerDataMap.get(player.getName()).setGroup(group);
+                                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новую группу %s", group.getName());
+                                })
+                );
+    }
+
+    protected static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
+        creators.put(name.toLowerCase(), creator);
+        if (interact != null)
+            interacts.put(name.toLowerCase(), interact);
+    }
+
+    public static void registerItem(String name, ItemStack item, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
+        registerItem(name, (o) -> item.clone(), interact);
+    }
+
+    protected static void registerItem(String name, ItemStack item) {
+        registerItem(name, item, null);
+    }
+
+    protected static ItemStack setTagName(ItemStack item, String name) {
+        return ItemStackUtils.setTag(ApiManager.newItemBuilder(item), "op_item", new NBTTagString(name.toLowerCase())).build();
+    }
+
+    public static void interact(PlayerInteractEvent event) {
+        if (event.getItem() != null && event.getItem().getType() != Material.AIR) {
+            String name;
+
+            if ((name = getItemName(event.getItem())).length() > 1) {
+                BiConsumer<PlayerInteractEvent, ItemStack> interact = interacts.getOrDefault(name.toLowerCase(), null);
+                if (interact == null)
+                    return;
+
+                interact.accept(event, event.getItem());
+            }
+        }
     }
 
     @AllArgsConstructor
+    @Getter
     public enum Key {
 
-        TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен").build()),
-        MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский").build()),
-        EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический").build()),
-        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Легендарный").build()),
-        MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический").build()),
-        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный").build());
+        TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен §fключ").build()),
+        MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский §fключ").build()),
+        EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический §fключ").build()),
+        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Легендарный §fключ").build()),
+        MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический §fключ").build()),
+        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build());
 
-        private @Getter String name;
-        private @Getter ItemStack stack;
+        private String name;
+        private ItemStack stack;
+
+        public static Key getKeyFromString(String key) {
+            for (Key type : Key.values()) {
+                if (type == Key.valueOf(key)) {
+                    return type;
+                }
+            }
+
+            return null;
+        }
     }
 }

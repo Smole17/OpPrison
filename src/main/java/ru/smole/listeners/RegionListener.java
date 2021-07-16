@@ -33,10 +33,10 @@ public class RegionListener implements Listener {
                 event.setCancelled(true);
             }
 
-            add(event);
             return;
         }
 
+        add(event);
         event.setExpToDrop(0);
         event.setDropItems(false);
     }
@@ -125,8 +125,6 @@ public class RegionListener implements Listener {
     public void add(BlockBreakEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
-
-        OpPlayer opPlayer = new OpPlayer(player);
 
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event);

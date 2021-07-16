@@ -4,96 +4,118 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.OpPlayer;
+import ru.smole.data.cases.Case;
+import ru.smole.data.items.Items;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.ItemUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Data
-@AllArgsConstructor
 public class Crate {
+
+    public static Map<String, Crate> crates = new HashMap<>();
+    public static Map<UUID, List<ItemStack>> playerItems = new HashMap<>();
+    public static List<CrateItem> crateItems = new ArrayList<>();
 
     public String name;
     public Type type;
-    public List<CrateItem> crateItems;
+    public List<ItemStack> items;
+
+    public Crate(String name, ConfigurationSection section) {
+        items = new ArrayList<>();
+        type = Type.valueOf(section.getString("type").toUpperCase());
+        this.name = type.getName();
+        ConfigurationSection items = section.getConfigurationSection("items");
+
+        for (String item : items.getKeys(false)) {
+            CrateItem.Rare itemRare = CrateItem.Rare.valueOf(items.getString(item + ".rare"));
+            ConfigurationSection op_item = items.getConfigurationSection(item + ".op-item");
+
+            String itemName = op_item.getString("name");
+            ItemStack itemStack;
+
+            if (op_item.getDouble("amount") != 0) {
+                double amount = op_item.getDouble("amount");
+
+                itemStack = Items.getItem(itemName, amount);
+            } else itemStack = Items.getItem(itemName);
+
+
+            CrateItem crateItem = new CrateItem(itemRare, itemStack);
+            crateItems.add(crateItem);
+        }
+
+        crates.put(name, this);
+    }
 
     public void open(Player player) {
-        switch (type) {
-            case LOOTBOX:
-                new CrateGui(type.getName());
-            case MONTHLY:
-                ChatUtil.sendMessage(player, OpPrison.getInstance() +
-                        String.format("%s открывает %s",
-                                player.getName(), Type.MONTHLY.getName()));
-                new CrateGui(type.getName());
-        }
+        Bukkit.getOnlinePlayers().forEach(onPlayer ->
+                ChatUtil.sendMessage(onPlayer, OpPrison.PREFIX +
+                        String.format("%s открывает %s&f...",
+                                player.getName(), type.getName())));
+
+        new CrateGui(type.getName()).openInventory(player);
     }
 
     public CrateItem getRandomItem(boolean def) {
         Random random = new Random();
+        CrateItem returnCrateItem = null;
 
         if (def) {
-            Stream<CrateItem> crateItemDef = crateItems
-                    .stream()
-                    .filter(crateItem
-                            -> crateItem.getRare() == CrateItem.Rare.EPIC ||
-                            crateItem.getRare() == CrateItem.Rare.LEGENDARY ||
-                            crateItem.getRare() == CrateItem.Rare.MYTHICAL);
+            List<CrateItem> defList = crateItems.stream().filter(
+                    crateItem ->
+                            crateItem.getRare() == CrateItem.Rare.EPIC ||
+                                    crateItem.getRare() == CrateItem.Rare.LEGENDARY ||
+                                    crateItem.getRare() == CrateItem.Rare.MYTHICAL
+            ).collect(Collectors.toList());
 
-            CrateItem crateItem = crateItemDef
-                    .collect(Collectors.toList())
-                    .get(random.nextInt((int) crateItemDef.count()));
-
-            if (random.nextFloat() <= crateItem.getRare().getChance()) {
-                return crateItem;
+            while (returnCrateItem == null) {
+                for (CrateItem crateItem : defList) {
+                    if (random.nextFloat() <= crateItem.getRare().getChance())
+                        returnCrateItem = crateItem;
+                }
             }
 
-            List<CrateItem> epics = crateItems
-                    .stream()
-                    .filter(crateItem1 -> crateItem1.getRare() == CrateItem.Rare.EPIC)
-                    .collect(Collectors.toList());
-
-            return epics.get(random.nextInt(epics.size()));
+          return returnCrateItem;
         }
 
-        Stream<CrateItem> crateItemDef = crateItems
-                .stream()
-                .filter(crateItem
-                        -> crateItem.getRare() == CrateItem.Rare.COMMON ||
-                        crateItem.getRare() == CrateItem.Rare.RARE);
+        List<CrateItem> unDefList = crateItems.stream().filter(
+                crateItem ->
+                        crateItem.getRare() == CrateItem.Rare.COMMON ||
+                                crateItem.getRare() == CrateItem.Rare.RARE
+        ).collect(Collectors.toList());
 
-        CrateItem crateItem = crateItemDef
-                .collect(Collectors.toList())
-                .get(random.nextInt((int) crateItemDef.count()));
-
-        if (random.nextFloat() <= crateItem.getRare().getChance()) {
-            return crateItem;
+        while (returnCrateItem == null) {
+            for (CrateItem crateItem : unDefList) {
+                if (random.nextFloat() <= crateItem.getRare().getChance())
+                    returnCrateItem = crateItem;
+            }
         }
 
-        List<CrateItem> commons = crateItemDef
-                .filter(crateItem1 -> crateItem1.getRare() == CrateItem.Rare.COMMON)
-                .collect(Collectors.toList());
-
-        return commons.get(random.nextInt(commons.size()));
+        return returnCrateItem;
     }
 
     @AllArgsConstructor
     public enum Type {
 
-        LOOTBOX("§6ЛУТБОКС"),
+        LOOT_BOX("§6ЛУТБОКС"),
         MONTHLY("§fКЕЙС МЕСЯЦА");
 
         private @Getter String name;
@@ -104,6 +126,11 @@ public class Crate {
             lore.add("§7Нажмите для активации");
             lore.add("");
 
+            crateItems.forEach(
+                    crateItem ->
+                            lore.add(
+                                    crateItem.getRare().getName() + " " + crateItem.getItemStack().getItemMeta().getDisplayName() + " §fx" + crateItem.getItemStack().getAmount())
+            );
 
             return ApiManager
                     .newItemBuilder(Material.ENDER_CHEST)
@@ -125,13 +152,12 @@ public class Crate {
             OpPlayer opPlayer = new OpPlayer(player);
 
             switch (type) {
-                case LOOTBOX:
+                case LOOT_BOX:
                     for (int i = 0; i < 2; i++) {
                         setDefaultReward(opPlayer, i);
                     }
 
-
-                    setFinalReward(player, opPlayer);
+                    setFinalReward(opPlayer);
                     setGlassPanel();
 
                     break;
@@ -140,15 +166,22 @@ public class Crate {
                         setDefaultReward(opPlayer, i);
                     }
 
-                    setFinalReward(player, opPlayer);
+                    setFinalReward(opPlayer);
                     setGlassPanel();
 
                     break;
             }
+
+            playerItems.put(opPlayer.getPlayer().getUniqueId(), items);
         }
 
         private void setDefaultReward(OpPlayer opPlayer, int i) {
             int slot = 12 + i;
+
+            CrateItem crateItem = getRandomItem(false);
+            ItemStack itemStack = crateItem.getItemStack();
+
+            items.add(itemStack);
 
             addItem(
                     slot,
@@ -158,15 +191,25 @@ public class Crate {
                             .setLore("§7Нажмите, чтобы забрать награду")
                             .build(),
                     (baseInventory, inventoryClickEvent) -> {
-                        CrateItem crateItem = getRandomItem(false);
-                        ItemStack itemStack = crateItem.getItemStack();
+                        Inventory inv = inventoryClickEvent.getClickedInventory();
+                        int clickedSlot = inventoryClickEvent.getSlot();
+                        ItemStack clickItem = inv.getItem(clickedSlot);
 
-                        inventoryClickEvent.setCurrentItem(itemStack);
+                        if (clickItem.getType() != Material.LADDER)
+                            return;
+
+                        inv.setItem(clickedSlot, itemStack);
                         opPlayer.add(itemStack);
+                        items.remove(itemStack);
                     });
         }
 
-        private void setFinalReward(@NonNull Player player, OpPlayer opPlayer) {
+        private void setFinalReward(OpPlayer opPlayer) {
+            CrateItem crateItem = getRandomItem(true);
+            ItemStack itemStack = crateItem.getItemStack();
+
+            items.add(itemStack);
+
             addItem(
                     15,
                     ApiManager
@@ -175,20 +218,27 @@ public class Crate {
                             .setLore("§7Нажмите, чтобы забрать финальную награду")
                             .build(),
                     (baseInventory, inventoryClickEvent) -> {
-                        CrateItem crateItem = getRandomItem(true);
-                        ItemStack itemStack = crateItem.getItemStack();
+                        Inventory inv = inventoryClickEvent.getClickedInventory();
+                        int clickedSlot = inventoryClickEvent.getSlot();
+                        ItemStack clickItem = inv.getItem(clickedSlot);
 
-                        inventoryClickEvent.setCurrentItem(itemStack);
+                        if (clickItem.getType() != Material.IRON_FENCE)
+                            return;
+
+                        inv.remove(clickItem);
+                        inv.setItem(clickedSlot, itemStack);
                         opPlayer.add(itemStack);
-                        crateItem.sendMessage(player, name);
+                        items.remove(itemStack);
+
+                        Bukkit.getOnlinePlayers().forEach(onPlayer -> crateItem.sendMessage(onPlayer, opPlayer.getPlayer(), name));
                     });
         }
 
         private void setGlassPanel() {
-            for (int i = 1; i < inventoryRows * 9; i++) {
-                Material type = getInventory().getItem(i).getType();
+            for (int i = 1; i <= getInventoryRows() * 9; i++) {
+                BaseInventoryItem item = getInventoryInfo().getItem(i - 2);
 
-                if (type == Material.AIR)
+                if (item == null)
                     addItem(
                             i,
                             ApiManager

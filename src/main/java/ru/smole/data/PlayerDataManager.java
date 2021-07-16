@@ -4,10 +4,11 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
+import ru.smole.data.group.GroupsManager;
+import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.rank.RankManager;
 import ru.smole.scoreboard.ScoreboardManager;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class PlayerDataManager {
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
 
-        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, RankManager.Rank.A, 0, false));
+        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false));
         pickaxeManager.create();
         PlayerDataSQL.create(name, pickaxeManager.getStats());
     }
@@ -43,7 +44,7 @@ public class PlayerDataManager {
 
         if (!PlayerDataSQL.playerExists(name)) {
             create(player);
-            opPlayer.set(opPlayer.getItems().getPickaxe(), 1);
+            opPlayer.set(Items.getItem("pickaxe", name), 1);
             ScoreboardManager.loadScoreboard(player);
             OpPrison.BAR.addPlayer(player);
 
@@ -54,13 +55,13 @@ public class PlayerDataManager {
         double money = (double) PlayerDataSQL.get(name, "money");
         double token = (double) PlayerDataSQL.get(name, "token");
         double multiplier = (double) PlayerDataSQL.get(name, "multiplier");
-        RankManager.Rank rank = RankManager.Rank.valueOf((String) PlayerDataSQL.get(name, "rank"));
+        GroupsManager.Group group = GroupsManager.Group.valueOf((String) PlayerDataSQL.get(name, "rank"));
         double prestige = (double) PlayerDataSQL.get(name, "prestige");
         boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
-        Pickaxe pickaxe = PickaxeManager.pickaxes.get(name);
+        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
 
-        playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, rank, prestige, fly));
-        PickaxeManager.pickaxes.put(name, pickaxe);
+        playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, group, prestige, fly));
+        PickaxeManager.getPickaxes().put(name, pickaxe);
 
         pickaxeManager.load();
         opPlayer.getBoosterManager().load();
@@ -76,19 +77,29 @@ public class PlayerDataManager {
 
         PlayerData data = playerDataMap.get(name);
         OpPlayer opPlayer = new OpPlayer(player);
+        PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
 
         double blocks = data.getBlocks();
         double money = data.getMoney();
         double token = data.getToken();
         double multiplier = data.getMultiplier();
-        RankManager.Rank rank = data.getRank();
+        GroupsManager.Group group = data.getGroup();
         double prestige = data.getPrestige();
         int fly = data.isFly() ? 1 : 0;
-        String pickaxe = new OpPlayer(player).getPickaxeManager().getStats();
+        String pickaxe = pickaxeManager.getStats();
 
         HideCommand.hide.remove(player);
-        PlayerDataSQL.save(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe);
+        PlayerDataSQL.save(name, blocks, money, token, multiplier, group, prestige, fly, pickaxe);
         opPlayer.getBoosterManager().unload();
-        opPlayer.getPickaxeManager().unload();
+        pickaxeManager.unload();
+        playerDataMap.remove(name);
+    }
+
+    public void updateTop(Player player) {
+        String name = player.getName();
+        PlayerData data = playerDataMap.get(name);
+
+        PlayerDataSQL.set(name, "blocks", String.valueOf(data.getBlocks()));
+        PlayerDataSQL.set(name, "prestige", String.valueOf(data.getPrestige()));
     }
 }

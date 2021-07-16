@@ -22,12 +22,18 @@ public class HelpCommand extends BukkitCommand<Player> {
 
         description = "Руководство не найдено. Используйте данный список: " + Arrays.toString(Guide.values());
 
-        if (args.length > 0)
-        Arrays
-                .stream(Guide.values())
-                .filter(guide -> Guide.getGuideFromString(args[0]) != null && Guide.getGuideFromString(args[0]) == guide)
-                .forEachOrdered(guide -> description = guide.getDesc()
-                );
+        if (args.length >= 1) {
+            try {
+                Arrays
+                        .stream(Guide.values())
+                        .filter(guide -> Guide.getGuideFromString(args[0]) == guide)
+                        .forEach(guide ->
+                                description = guide.getDesc()
+                        );
+            } catch (Exception e) {
+                description = "Руководство не найдено. Используйте данный список: " + Arrays.toString(Guide.values());
+            }
+        }
 
         ChatUtil.sendMessage(player, OpPrison.PREFIX + String.format("Найденная информация: %s", description));
     }
@@ -42,7 +48,6 @@ public class HelpCommand extends BukkitCommand<Player> {
         GROUP(
                 "\n   Группы - это некие привилегии данного режима, " +
                 "\n   которые Вы можете получить из ящиков." +
-                "\n   §cОбнуляются после конца сезона!" +
                 "\n\n   §8(привилегии режима не связаны со всеми режимами сервера)"
         ),
 
@@ -54,7 +59,7 @@ public class HelpCommand extends BukkitCommand<Player> {
         MONEY(
                 "\n   Деньги - это одна из валют режима," +
                 "\n   которая требуется на данный момент для прокачки" +
-                "\n   ранка и престижей. Добываемые деньги умножаются на кол-во" +
+                "\n    престижей. Добываемые деньги умножаются на кол-во" +
                         "\n   множителя, который указан в скорборде."
         ),
 
@@ -78,16 +83,17 @@ public class HelpCommand extends BukkitCommand<Player> {
         GAME(
                 "\n   OpPrison - идея была взята с запада. " +
                         "\n   Тут основное внимание сконцентрированно на копание, прокачку престижей" +
-                        "\n   и прокачку кирки в 100x100x100 (XYZ) шахтах."
+                        "\n   и прокачку кирки в 100x100x100 шахтах."
         );
 
         private @Getter String desc;
 
         public static Guide getGuideFromString(String guide) {
-            for (Guide type : Guide.values())
-                if (type.equals(Guide.valueOf(guide.toUpperCase()))) {
+            for (Guide type : Guide.values()) {
+                if (type == Guide.valueOf(guide.toUpperCase())) {
                     return type;
                 }
+            }
 
             return null;
         }

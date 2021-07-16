@@ -16,9 +16,7 @@ public class ConfigUtils {
         double x = section.getDouble("x");
         double y = section.getDouble("y");
         double z = section.getDouble("z");
-        float yaw = (float) section.getDouble("yaw");
-        float pitch = (float) section.getDouble("pitch");
-        return new Location(world, x, y, z, yaw, pitch);
+        return new Location(world, x, y, z);
     }
 
     public static void saveLocationToConfigurationSection(Location location, Config config, String sectionName) {

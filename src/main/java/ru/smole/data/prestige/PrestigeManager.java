@@ -1,11 +1,8 @@
 package ru.smole.data.prestige;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.PlayerData;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.rank.RankManager;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -20,65 +17,57 @@ public class PrestigeManager {
     }
 
     public void up(int i) {
-        OpPlayer opPlayer = new OpPlayer(player);
-        if (!opPlayer.getRankManager().isNextRank(playerData.getRank())) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы должны достичь ранка %s", ChatColor.translateAlternateColorCodes('&', RankManager.Rank.Z.getName()));
-        }
-
         switch (i) {
             case 1:
                 upgradePrestige(1);
                 break;
             case 2:
-                while (upgradePrestige(2)) {
-                    upgradePrestige(2);
-                }
-
-                if (upgradePrestige(2))
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
+                upgradePrestige(2);
                 break;
         }
     }
 
-    protected boolean upgradePrestige(int i) {
+    protected void upgradePrestige(int i) {
         double prestige = playerData.getPrestige();
-        double upped = 0;
+        double upped = prestige + 1;
         double money = playerData.getMoney();
 
         double billion = 1000000000D;
-        double cost = prestige == 0 ? billion : prestige * 1.05F * billion;
+        double cost = prestige == 0 ? billion : upped * 1.05F * billion;
+
+        if (cost > money) {
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: &a$%s", StringUtils.replaceComma(cost - money));
+            return;
+        }
 
         switch (i) {
             case 1:
-                if (cost > money) {
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
-                    return false;
-                }
-
                 playerData.setMoney(money - cost);
-                playerData.setPrestige(prestige + upped);
+                playerData.setPrestige(upped);
 
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: %s", StringUtils._fixDouble(0, prestige));
-                return true;
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: &b%s", StringUtils._fixDouble(0, upped));
+                return;
             case 2:
-                do {
-                    upped = upped +1;
+                double cost2 = 0;
+                double need = 0;
 
-                    cost = upped * cost;
-                } while (cost > money);
+                while (money >= need) {
+                    if (need >= money)
+                        break;
 
-                if (cost > money) {
-                    if (upped == 0) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: $%s", StringUtils.replaceComma(cost - money));
-                        return false;
-                    }
+                    need = need + (upped * 1.05F * billion);
 
-                    playerData.setMoney(money - cost);
-                    playerData.setPrestige(prestige + upped);
+                    if (need >= money)
+                        break;
+
+                    upped = upped + 1;
+                    cost2 = need;
                 }
-                return true;
-        }
 
-        return true;
+                playerData.setMoney(money - cost2);
+                playerData.setPrestige(upped);
+
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
+        }
     }
 }

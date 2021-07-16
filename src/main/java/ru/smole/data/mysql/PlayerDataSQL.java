@@ -2,7 +2,8 @@ package ru.smole.data.mysql;
 
 import org.bukkit.ChatColor;
 import ru.smole.OpPrison;
-import ru.smole.data.rank.RankManager;
+import ru.smole.data.group.GroupsManager;
+import ru.xfenilafs.core.ApiManager;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ public class PlayerDataSQL {
                 +
                 String.format(
                         "'%s', '%f', '%f', '%f', '%f', '%s', '%f', '%d', '%s'",
-                        name, 0.0, 0.0, 0.0, 0.0, ChatColor.stripColor(RankManager.Rank.A.getName()), 0.0, 0, pickaxe)
+                        name, 0.0, 0.0, 0.0, 0.0, GroupsManager.Group.MANTLE.name(), 0.0, 0, pickaxe)
                 +
                 ");");
     }
@@ -51,9 +52,9 @@ public class PlayerDataSQL {
         return obj;
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, RankManager.Rank rank, double prestige, int fly, String pickaxe) {
-        db.update(String.format("UPDATE OpPrison SET name=%s, blocks=%f, money=%f, token=%f, multiplier=%f, rank=%s, prestige=%s, fly=%s, pickaxe=%s",
-                name, blocks, money, token, multiplier, ChatColor.stripColor(rank.getName()), prestige, fly, pickaxe));
+    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe) {
+        db.update(String.format("UPDATE OpPrison SET name='%s', blocks=%f, money=%f, token=%f, multiplier=%f, rank='%s', prestige=%f, fly=%d, pickaxe='%s' WHERE name='%s'",
+                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, name));
     }
 
     public static void set(String name, String table, String input) {

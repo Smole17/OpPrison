@@ -3,8 +3,10 @@ package ru.smole.data.booster;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
+import ru.smole.utils.StringUtils;
 import sexy.kostya.mineos.perms.PermissionGroup;
 
+import static ru.smole.OpPrison.BAR;
 import static ru.smole.OpPrison.BOOSTER;
 
 public class BoosterManager {
@@ -38,6 +40,9 @@ public class BoosterManager {
                 addBooster(1.0);
                 break;
         }
+
+        BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
+                StringUtils._fixDouble(1, BOOSTER) + "%"));
     }
 
     public void unload() {
@@ -63,11 +68,34 @@ public class BoosterManager {
                 delBooster(1.0);
                 break;
         }
+
+        BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
+                StringUtils._fixDouble(1, BOOSTER) + "%"));
     }
 
     protected void addBooster(double count) {
+        if (BOOSTER < 0) {
+            BOOSTER = 0.0;
+            return;
+        }
+
         BOOSTER = BOOSTER + count;
+
+        if (BOOSTER < 0) {
+            BOOSTER = 0.0;
+        }
     }
 
-    protected void delBooster(double count) { BOOSTER = BOOSTER - count; }
+    protected void delBooster(double count) {
+        if (BOOSTER < 0) {
+            BOOSTER = 0.0;
+            return;
+        }
+
+        BOOSTER = BOOSTER - count;
+
+        if (BOOSTER < 0) {
+            BOOSTER = 0.0;
+        }
+    }
 }

@@ -15,10 +15,11 @@ public class ScoreboardManager {
         scoreboardBuilder.scoreboardDisplay("§bOpPrison");
         scoreboardBuilder.scoreboardScope(BaseScoreboardScope.PROTOTYPE);
 
-        scoreboardBuilder.scoreboardLine(10, "");
-        scoreboardBuilder.scoreboardLine(9, "§b§l" + player.getName());
-        scoreboardBuilder.scoreboardLine(8, "  §fПрестижи: §bЗагрузка...");
-        scoreboardBuilder.scoreboardLine(7, "  §fДобыто блоков: §bЗагрузка...");
+        scoreboardBuilder.scoreboardLine(11, "");
+        scoreboardBuilder.scoreboardLine(10, "§b§l" + player.getName());
+        scoreboardBuilder.scoreboardLine(9, "  §fПрестижи: §bЗагрузка...");
+        scoreboardBuilder.scoreboardLine(8, "  §fДобыто блоков: §bЗагрузка...");
+        scoreboardBuilder.scoreboardLine(7, "  §fГруппа: §fЗагрузка...");
         scoreboardBuilder.scoreboardLine(6, "");
         scoreboardBuilder.scoreboardLine(5, "§b§lБаланс");
         scoreboardBuilder.scoreboardLine(4, "  §fДеньги: §aЗагрузка...");
@@ -29,17 +30,20 @@ public class ScoreboardManager {
         scoreboardBuilder.scoreboardUpdater(((baseScoreboard, boardPlayer) -> {
             PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
-            baseScoreboard.updateScoreboardLine(8, boardPlayer,
-                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(0, playerData.getPrestige())));
+            baseScoreboard.updateScoreboardLine(9, boardPlayer,
+                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(String.valueOf(playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));
 
             baseScoreboard.updateScoreboardLine(7, boardPlayer,
+                    ChatUtil.text("  §fГруппа: §f%s", playerData.getGroup().getName()));
+
+            baseScoreboard.updateScoreboardLine(8, boardPlayer,
                     ChatUtil.text("  §fДобыто блоков: §b%s", StringUtils._fixDouble(0, playerData.getBlocks())));
 
             baseScoreboard.updateScoreboardLine(4, boardPlayer,
-                    ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(1, playerData.getMoney())));
+                    ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(2, playerData.getMoney())));
 
             baseScoreboard.updateScoreboardLine(3, boardPlayer,
-                    ChatUtil.text("  §fТокены: §e⛃%s", StringUtils.formatDouble(1, playerData.getToken())));
+                    ChatUtil.text("  §fТокены: §e⛃%s", StringUtils.formatDouble(2, playerData.getToken())));
 
             baseScoreboard.updateScoreboardLine(2, boardPlayer,
                     ChatUtil.text("  §fМножитель: §d%sx", StringUtils._fixDouble(0, playerData.getMultiplier())));
