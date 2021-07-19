@@ -110,7 +110,7 @@ public class CrateItem {
 
                     case ACCESS:
                         itemStack = ApiManager.newItemBuilder(Material.STORAGE_MINECART)
-                                .setName(String.format("Доступ к %s набору", String.valueOf(value).replace("season", "Сезонному"))).setAmount(1).build();
+                                .setName(String.format("§fДоступ к %s §fнабору §8(/kit)", String.valueOf(value).replace("season", "Сезонному"))).setAmount(1).build();
                         playerData.getAccess().add(hValue);
                         break;
                 }

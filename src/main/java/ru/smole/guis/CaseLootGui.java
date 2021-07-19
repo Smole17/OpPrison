@@ -70,12 +70,16 @@ public class CaseLootGui extends BaseSimpleInventory {
                     return;
                 }
 
+                String p = String.valueOf(chance).split("\\.")[1];
+                int fix = p.equals("0") ? 0 : p.length();
+
                 addItem(
                         i,
                         ApiManager.newItemBuilder(itemStack.getType())
                                 .setName(itemStack.getItemMeta().getDisplayName())
                                 .setLore(
-                                       String.format("§fШанс выпадения: §b%s%%", StringUtils._fixDouble(String.valueOf(chance).contains(".0") ? 0 : 1, chance))
+                                       String.format("§fШанс выпадения: §b%s%%",
+                                               StringUtils._fixDouble(fix, chance))
                                 )
                                 .setAmount(itemStack.getAmount())
                                 .build()
