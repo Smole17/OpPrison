@@ -59,21 +59,9 @@ public class DatabaseManager {
                 "prestige DOUBLE, " +
                 "rank TEXT, " +
                 "fly INT, " +
-                "pickaxe TEXT)");
-    }
-
-    public Map<String, Double> getTopFromCriteria(String criteria, int amount) {
-        Map<String, Double> top = new LinkedHashMap<>();
-        ResultSet resultSet = getResult("SELECT * FROM `" + dbname + "` ORDER BY " + criteria + " DESC LIMIT " + amount);
-        try {
-            while (resultSet.next()) {
-                top.put(resultSet.getString("name"), resultSet.getDouble(criteria));
-
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return top;
+                "pickaxe TEXT, " +
+                "kit TEXT," +
+                "access TEXT)");
     }
 
     public void close() {

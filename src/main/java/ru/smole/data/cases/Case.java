@@ -8,8 +8,10 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import ru.smole.OpPrison;
 import ru.smole.commands.StatsCommand;
+import ru.smole.data.OpPlayer;
 import ru.smole.data.PlayerData;
 import ru.smole.utils.config.ConfigUtils;
 import ru.smole.utils.hologram.Hologram;
@@ -24,11 +26,12 @@ import java.util.stream.Collectors;
 public class Case {
 
     public static Map<String, Case> cases = new HashMap<>();
+
     private String id;
     private String name;
     private String key;
     private Location location;
-    private List<CaseItem> items;
+    private List<CaseItem> caseItems;
 
     public Case(String id, ConfigurationSection section) {
         this.id = id;
@@ -42,19 +45,19 @@ public class Case {
                 new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY() - 0.3, location.getBlockZ() + 0.5),
                 hologram -> {
                     hologram.addLine(name);
-                    hologram.addLine("§fЛКМ - Просмотр выпадаемых вещей");
-                    hologram.addLine("§fПКМ - Открыть кейс на ВСЕ ключи");
+                    hologram.addLine("§bЛКМ §f- Просмотр информации о кейсе");
+                    hologram.addLine("§bПКМ §f- Открыть кейс на ВСЕ ключи");
                 }
         );
 
         LeaderBoard.holograms.add(holoId);
-        this.items = new ArrayList<>();
+        this.caseItems = new ArrayList<>();
 
         ConfigurationSection itemsSection = section.getConfigurationSection("items");
         if (itemsSection != null && itemsSection.getKeys(false).size() > 0) {
             itemsSection.getKeys(false).forEach((item) -> {
                 try {
-                    this.items.add(new CaseItem(itemsSection.getConfigurationSection(item)));
+                    this.caseItems.add(new CaseItem(itemsSection.getConfigurationSection(item)));
                 } catch (NullPointerException var5) {
                     System.out.println("Error while loading case item in custom case " + id + " with item id " + item);
                 }
@@ -74,22 +77,37 @@ public class Case {
     }
 
     public void open(Player player) {
-        ItemStack itemHand = player.getInventory().getItemInMainHand();
+        OpPlayer opPlayer = new OpPlayer(player);
         String playerName = player.getName();
 
-        CaseItem caseItem = getRandomItem();
-        CaseItem.CaseItemType caseItemType = caseItem.getType();
+        PlayerInventory playerInventory = player.getInventory();
+        ItemStack itemHand = playerInventory.getItemInMainHand();
+        int count = 0;
 
-            for (int i = 0; i < itemHand.getAmount(); i++) {
-                if (caseItemType != CaseItem.CaseItemType.VAULT) {
-                    player.getInventory().addItem((ItemStack) caseItem.get(playerName));
-                    return;
-                }
+        for (int i = 0; i < 36; i++) {
+            ItemStack itemStack = playerInventory.getItem(i);
 
-                caseItem.get(playerName);
+            if (itemStack == null)
+                continue;
+
+            if (!itemHand.getItemMeta().getDisplayName().equals(itemStack.getItemMeta().getDisplayName()))
+                continue;
+
+            count = count + itemStack.getAmount();
+            itemStack.setAmount(0);
+        }
+
+        for (int i = 0; i < count; i++) {
+            CaseItem caseItem = getRandomItem();
+            CaseItem.CaseItemType caseItemType = caseItem.getType();
+
+            if (caseItemType == CaseItem.CaseItemType.ITEM) {
+                opPlayer.add(caseItem.get(playerName));
+                continue;
             }
 
-            itemHand.setAmount(0);
+            caseItem.get(playerName);
+        }
     }
 
     public CaseItem getRandomItem() {
@@ -97,7 +115,7 @@ public class Case {
         CaseItem returnedCaseItem = null;
 
         while (returnedCaseItem == null) {
-            CaseItem caseItem = items.get(random.nextInt(items.size()));
+            CaseItem caseItem = caseItems.get(random.nextInt(caseItems.size()));
 
             if (random.nextFloat() <= caseItem.getChance())
                 returnedCaseItem = caseItem;

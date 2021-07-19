@@ -11,7 +11,7 @@ public class FlyCommand extends BukkitCommand<Player> {
     protected boolean is;
 
     public FlyCommand() {
-        super("flying");
+        super("fly");
         is = false;
     }
 

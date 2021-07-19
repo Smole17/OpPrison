@@ -31,7 +31,7 @@ public class ScoreboardManager {
             PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
             baseScoreboard.updateScoreboardLine(9, boardPlayer,
-                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(String.valueOf(playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));
+                    ChatUtil.text("  §fПрестижи: §a%s", StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));
 
             baseScoreboard.updateScoreboardLine(7, boardPlayer,
                     ChatUtil.text("  §fГруппа: §f%s", playerData.getGroup().getName()));

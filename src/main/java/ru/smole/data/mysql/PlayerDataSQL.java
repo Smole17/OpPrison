@@ -14,12 +14,12 @@ public class PlayerDataSQL {
 
     public static void create(String name, String pickaxe) {
         db.update("INSERT INTO " +
-                "OpPrison(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe) " +
+                "OpPrison(name, blocks, money, token, multiplier, rank, prestige, fly, pickaxe, kit, access) " +
                 "VALUES("
                 +
                 String.format(
-                        "'%s', '%f', '%f', '%f', '%f', '%s', '%f', '%d', '%s'",
-                        name, 0.0, 0.0, 0.0, 0.0, GroupsManager.Group.MANTLE.name(), 0.0, 0, pickaxe)
+                        "'%s', '%f', '%f', '%f', '%f', '%s', '%f', '%d', '%s', '%s', '%s'",
+                        name, 0.0, 0.0, 0.0, 0.0, GroupsManager.Group.MANTLE.name(), 0.0, 0, pickaxe, null, null)
                 +
                 ");");
     }
@@ -52,9 +52,9 @@ public class PlayerDataSQL {
         return obj;
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe) {
-        db.update(String.format("UPDATE OpPrison SET name='%s', blocks=%f, money=%f, token=%f, multiplier=%f, rank='%s', prestige=%f, fly=%d, pickaxe='%s' WHERE name='%s'",
-                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, name));
+    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits, String access) {
+        db.update(String.format("UPDATE OpPrison SET name='%s', blocks=%f, money=%f, token=%f, multiplier=%f, rank='%s', prestige=%f, fly=%d, pickaxe='%s', kit='%s', access='%s' WHERE name='%s'",
+                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, name));
     }
 
     public static void set(String name, String table, String input) {

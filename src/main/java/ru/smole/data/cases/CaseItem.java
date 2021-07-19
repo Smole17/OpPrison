@@ -14,46 +14,39 @@ import ru.smole.commands.StatsCommand;
 import ru.smole.data.OpPlayer;
 import ru.smole.data.PlayerData;
 import ru.smole.data.items.Items;
+import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 
 @Data public class CaseItem {
 
-    private String name;
     private CaseItemType type;
-    private Material material;
-    private int amount;
     private double chance;
+    private String name;
 
     protected ItemStack itemStack;
     protected StatsCommand.Stat stat;
     protected double value;
 
     public CaseItem(ConfigurationSection section) {
-        this.name = section.getString("name");
         this.type = CaseItemType.valueOf(section.getString("type").toUpperCase());
 
+        ConfigurationSection op_item = section.getConfigurationSection("op-item");
         switch (type) {
             case ITEM:
-                ConfigurationSection op_item = section.getConfigurationSection("op-item");
-
-                String name = op_item.getString("name");
+                name = op_item.getString("name");
                 double value1 = op_item.getDouble("value");
 
                 itemStack = Items.getItem(name, value1);
                 break;
             case VAULT:
-                ConfigurationSection vault_item = section.getConfigurationSection("vault-item");
-
-                stat = StatsCommand.Stat.valueOf(vault_item.getString("stat").toUpperCase());
-                value = vault_item.getDouble("value");
+                stat = StatsCommand.Stat.valueOf(op_item.getString("name").toUpperCase());
+                value = op_item.getDouble("value");
         }
 
-        this.amount = section.getInt("amount");
         this.chance = section.getDouble("chance");
-        this.material = Material.valueOf(section.getString("material").toUpperCase());
     }
 
-    public Object get(String playerName) {
+    public ItemStack get(String playerName) {
         switch (type) {
             case ITEM:
                 return itemStack;
@@ -63,18 +56,21 @@ import ru.xfenilafs.core.ApiManager;
                 switch (stat) {
                     case MONEY:
                         playerData.addMoney(value);
+                        itemStack = ApiManager.newItemBuilder(Material.EMERALD).setName("§a$" + StringUtils.formatDouble(2, value)).setAmount(1).build();
                         break;
 
                     case TOKEN:
                         playerData.addToken(value);
+                        itemStack = ApiManager.newItemBuilder(Material.MAGMA_CREAM).setName("§e⛃" + StringUtils.formatDouble(2, value)).setAmount(1).build();
                         break;
 
                     case MULTIPLIER:
+                        itemStack = ApiManager.newItemBuilder(Material.EYE_OF_ENDER).setName("§dx" + StringUtils.formatDouble(2, value)).setAmount(1).build();
                         playerData.addMultiplier(value);
                         break;
                 }
 
-                return value;
+                return itemStack;
             }
 
         return null;

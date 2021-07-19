@@ -55,7 +55,7 @@ import java.util.List;
 
     KEY_FINDER("§4Добыча ключей",
             "Увеличивает количество добываемых ключей",
-            2, 0, 50, 2000000000,
+            2, 0, 50, 250000000,
             Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE),
 
     EXPLOSIVE("§4Взрыв",

@@ -33,11 +33,14 @@ import ru.smole.data.PlayerData;
 import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
+import ru.smole.data.items.crates.CrateItem;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.OpPlayer;
 import ru.smole.data.trade.Trade;
+import ru.smole.event.OpEvent;
+import ru.smole.event.OpEvents;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.guis.PickaxeGui;
 import ru.smole.utils.ItemStackUtils;
@@ -49,10 +52,7 @@ import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.ItemUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class PlayerListener implements Listener {
 
@@ -88,7 +88,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        ChatUtil.sendMessage(player, "yep");
 
         LeaderBoard.holograms.forEach(s -> {
             Hologram hologram = OpPrison.getInstance().getHologramManager().getCachedHologram(s);
@@ -101,6 +100,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        new OpEvents().asyncChat(event);
         sendChat(event);
     }
 
@@ -144,12 +144,6 @@ public class PlayerListener implements Listener {
     public void onOpen(InventoryOpenEvent event) {
         Player player = Bukkit.getPlayer(event.getPlayer().getName());
         OpPlayer opPlayer = new OpPlayer(player);
-        ChatUtil.sendMessage(player, event.getInventory().getType().name());
-
-        if (event.getInventory().getType() == InventoryType.PLAYER) {
-            ChatUtil.sendMessage(player, event.getInventory().getName());
-            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
-        }
 
         opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
     }
@@ -162,13 +156,17 @@ public class PlayerListener implements Listener {
         if (!crates.isEmpty())
             crates.forEach((s, crate) -> {
                 if (inv.getName().equals(crate.getType().getName())) {
-                    List<ItemStack> items = crate.getItems();
+                    Player player = Bukkit.getPlayer(event.getPlayer().getName());
+                    List<CrateItem> items = Crate.items;
+                    OpPlayer opPlayer = new OpPlayer(player);
 
                     if (!items.isEmpty()) {
-                        items.forEach(itemStack -> {
-                            Player player = Bukkit.getPlayer(event.getPlayer().getName());
+                        items.forEach(crateItem -> {
+                            ItemStack itemStack = crateItem.get(player.getName());
 
-                            new OpPlayer(player).add(itemStack);
+                            if (crateItem.getType() == CrateItem.CrateItemType.ITEM)
+                                opPlayer.add(itemStack);
+
                             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили недостающий предмет %s", itemStack.getItemMeta().getDisplayName());
                         });
 
@@ -221,6 +219,9 @@ public class PlayerListener implements Listener {
     }
 
     public void sendChat(AsyncPlayerChatEvent event) {
+        if (event.isCancelled())
+            return;
+
         Player player = event.getPlayer();
         String name = player.getName();
         String msg = event.getMessage();
@@ -231,7 +232,7 @@ public class PlayerListener implements Listener {
         String prefix = RPlayer.checkAndGet(name).getLongPrefix();
 
         String format = String.format("§8[§a%s§8] %s%s§7: §f",
-                StringUtils.formatDouble(String.valueOf(playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
+                StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
                 prefix.replace('&', '§'), player.getName()
         );
 

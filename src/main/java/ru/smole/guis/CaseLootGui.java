@@ -51,22 +51,33 @@ public class CaseLootGui extends BaseSimpleInventory {
                         .build()
         );
 
-        List<CaseItem> items = customCase.getItems();
+        List<CaseItem> items = customCase.getCaseItems();
 
         if (!items.isEmpty()) {
             int i = 1;
 
             for (CaseItem caseItem : items) {
                 double chance = caseItem.getChance() * 100.0D;
+                ItemStack itemStack = caseItem.get(player.getName());
+
+                if (itemStack == null) {
+                    System.out.println(caseItem.getType() == CaseItem.CaseItemType.ITEM ? caseItem.getName() : caseItem.getStat().name() + " | " + caseItem.getValue());
+                    return;
+                }
+
+                if (!itemStack.hasItemMeta()) {
+                    System.out.println(caseItem.getType() == CaseItem.CaseItemType.ITEM ? caseItem.getName() : caseItem.getStat().name() + " | " + caseItem.getValue());
+                    return;
+                }
 
                 addItem(
                         i,
-                        ApiManager.newItemBuilder(caseItem.getMaterial())
-                                .setName(caseItem.getName())
+                        ApiManager.newItemBuilder(itemStack.getType())
+                                .setName(itemStack.getItemMeta().getDisplayName())
                                 .setLore(
-                                        "§fШанс выпадения: §b" + StringUtils.fixDouble(1, chance)
+                                       String.format("§fШанс выпадения: §b%s%%", StringUtils._fixDouble(String.valueOf(chance).contains(".0") ? 0 : 1, chance))
                                 )
-                                .setAmount(caseItem.getAmount())
+                                .setAmount(itemStack.getAmount())
                                 .build()
                 );
 

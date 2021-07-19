@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.data.group.GroupsManager;
 
+import java.io.StringBufferInputStream;
+import java.util.List;
+
 @Data public class PlayerData {
 
     private String name;
@@ -15,8 +18,9 @@ import ru.smole.data.group.GroupsManager;
     private GroupsManager.Group group;
     private double prestige;
     private boolean fly;
+    private List<String> access;
 
-    public PlayerData(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, boolean fly) {
+    public PlayerData(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, boolean fly, List<String> access) {
         this.name = name;
         this.blocks = blocks;
         this.money = money;
@@ -25,6 +29,7 @@ import ru.smole.data.group.GroupsManager;
         this.group = group;
         this.prestige = prestige;
         this.fly = fly;
+        this.access = access;
     }
 
     public Player getPlayer() {

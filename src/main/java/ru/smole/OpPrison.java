@@ -29,6 +29,7 @@ import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.data.prestige.PrestigeManager;
+import ru.smole.event.OpEvent;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
@@ -88,12 +89,12 @@ public class OpPrison extends CorePlugin {
         ServerUtil.load();
         PickaxeManager.pickaxes = new HashMap<>();
         Items.init();
+        loadCrates();
 
         loadRegionsAndMines();
         loadCases();
         loadLeaderBoard();
         loadEffects();
-        loadCrates();
 
         registerListeners(
                 new PlayerListener(), new RegionListener()
@@ -102,7 +103,8 @@ public class OpPrison extends CorePlugin {
         registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
                 new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
-                new FlyCommand(), new TradeCommand(), new RestartCommand(), new HelpCommand()
+                new FlyCommand(), new TradeCommand(), new HelpCommand(), new KitCommand(),
+                new EventCommand()
         );
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -208,21 +210,21 @@ public class OpPrison extends CorePlugin {
             });
         }
 
-        Arrays.stream(Crate.crates.keySet().toArray())
-                .forEach(crateName ->
+        Arrays.stream(Crate.Type.values())
+                .forEach(crate ->
                         registerItem(
-                                crateName + "_crate",
-                                ApiManager
-                                        .newItemBuilder(Crate.crates.get((String) crateName).getType().getStack())
-                                        .build(),
+                                String.format("%s_crate", crate.name().toLowerCase()),
+                                objects -> ApiManager.newItemBuilder(crate.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
                                 (playerInteractEvent, itemStack) -> {
                                     Action action = playerInteractEvent.getAction();
 
                                     if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
                                         ItemStack item = playerInteractEvent.getItem();
 
-                                        item.setAmount(item.getAmount() - 1);
-                                        Crate.crates.get((String) crateName).open(playerInteractEvent.getPlayer());
+                                        if (Crate.crates.containsKey(crate.name().toLowerCase())) {
+                                            item.setAmount(item.getAmount() - 1);
+                                            Crate.crates.get(crate.name().toLowerCase()).open(playerInteractEvent.getPlayer());
+                                        }
                                     }
                                 })
                 );

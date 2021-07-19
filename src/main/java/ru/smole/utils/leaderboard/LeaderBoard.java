@@ -24,14 +24,13 @@ public class LeaderBoard {
                 location,
                 hologram -> {
                     hologram.addLine(ChatUtil.color(topName));
-                    hologram.addLine(ChatUtil.color(topName));
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 9; i++)
                         hologram.addLine(ChatUtil.text("§fЗагрузка..."));
                     hologram.addLine(ChatUtil.color("&8(обновление раз в 5 минут)"));
                 }
         );
 
-        OpPrison.getInstance().getServer().getScheduler().runTaskTimer(OpPrison.getInstance(), this::update, 0L, OpPrison.getInstance().getConfig().getInt("leaderBoard.update") * 20L);
+        update();
 
         holograms.add(criteria);
     }
@@ -41,7 +40,7 @@ public class LeaderBoard {
         ResultSet resultSet = OpPrison.getInstance().getBase().getResult("SELECT * FROM OpPrison ORDER BY " + criteria + " DESC LIMIT 10");
         try {
             for (int i = 1; resultSet.next(); i++) {
-                hologram.modifyLine(i, getLine(i, resultSet.getString("name"), StringUtils.fixDouble(0, resultSet.getDouble(criteria))));
+                hologram.modifyLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
             }
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -51,16 +50,20 @@ public class LeaderBoard {
     private String getLine(int i, String user, Double count) {
         if (i == 1) {
             String str = ChatColor.translateAlternateColorCodes('&', OpPrison.getInstance().getConfig().getString("leaderBoard.format1"));
-            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]", String.valueOf(StringUtils.fixDouble(1, count)));
+            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]",
+                    StringUtils.replaceComma(count));
         } else if (i == 2) {
             String str = ChatColor.translateAlternateColorCodes('&', OpPrison.getInstance().getConfig().getString("leaderBoard.format2"));
-            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]", String.valueOf(StringUtils.fixDouble(1, count)));
+            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]",
+                    StringUtils.replaceComma(count));
         } else if (i == 3) {
             String str = ChatColor.translateAlternateColorCodes('&', OpPrison.getInstance().getConfig().getString("leaderBoard.format3"));
-            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]", String.valueOf(StringUtils.fixDouble(1, count)));
+            return str.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]",
+                    StringUtils.replaceComma(count));
         } else {
             String line = ChatColor.translateAlternateColorCodes('&', OpPrison.getInstance().getConfig().getString("leaderBoard.format-default"));
-            return line.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]", String.valueOf(StringUtils.fixDouble(1, count)));
+            return line.replace("[top]", String.valueOf(i)).replace("[name]", user).replace("[count]",
+                    StringUtils.replaceComma(count));
         }
     }
 }

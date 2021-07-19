@@ -41,15 +41,10 @@ import java.util.function.Function;
 
 public class Items {
 
-    private Player player;
     private static @Getter
     Map<String, Function<Object[], ItemStack>> creators;
     private static @Getter
     Map<String, BiConsumer<PlayerInteractEvent, ItemStack>> interacts;
-
-    public Items(Player player) {
-        this.player = player;
-    }
 
     public static ItemStack getItem(String name, Object... params) {
         Function<Object[], ItemStack> creator = creators.get(name.toLowerCase());
@@ -69,21 +64,6 @@ public class Items {
         }
         return "";
     }
-
-
-//    public ItemStack getToken(double count) {
-//        ItemStack itemStack = getItem("token");
-//        ItemMeta itemMeta = itemStack.getItemMeta();
-//        List<String> lore = new ArrayList<>();
-//
-//        itemMeta.setDisplayName(String.format("§e⛃%s", StringUtils.fixDouble(2, count)));
-//        lore.add(String.format("§fСодержит - §e⛃%s", StringUtils._fixDouble(0, count)));
-//        lore.add("§7Нажмите для активации");
-//
-//        itemMeta.setLore(lore);
-//        itemStack.setItemMeta(itemMeta);
-//        return itemStack;
-//    }
 
     protected static ItemStack getPickaxe(String name) {
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
@@ -152,11 +132,12 @@ public class Items {
                  }
         );
 
-        registerItem("fly",
+        registerItem("fly", objects ->
                 ApiManager
                         .newItemBuilder(Material.FEATHER)
-                        .setName("§fДоступ к полёту §7(/flying)")
+                        .setName("§fДоступ к полёту §8/fly)")
                         .addLore("§7Нажмите для активации")
+                        .setAmount(((Double) objects[0]).intValue())
                         .build(),
                 (playerInteractEvent, itemStack) -> {
                     Player player = playerInteractEvent.getPlayer();
@@ -168,7 +149,7 @@ public class Items {
                         return;
 
                     playerDataMap.get(player.getName()).setFly(true);
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили доступ к полёту &8(/flying)");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили доступ к полёту &8(/fly)");
                 });
 
         registerItem("token", objects ->
@@ -265,7 +246,7 @@ public class Items {
                 );
     }
 
-    protected static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
+    public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
         creators.put(name.toLowerCase(), creator);
         if (interact != null)
             interacts.put(name.toLowerCase(), interact);
@@ -275,9 +256,9 @@ public class Items {
         registerItem(name, (o) -> item.clone(), interact);
     }
 
-    protected static void registerItem(String name, ItemStack item) {
-        registerItem(name, item, null);
-    }
+//    protected static void registerItem(String name, ItemStack item) {
+//        registerItem(name, item, null);
+//    }
 
     protected static ItemStack setTagName(ItemStack item, String name) {
         return ItemStackUtils.setTag(ApiManager.newItemBuilder(item), "op_item", new NBTTagString(name.toLowerCase())).build();
@@ -304,7 +285,7 @@ public class Items {
         TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен §fключ").build()),
         MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский §fключ").build()),
         EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический §fключ").build()),
-        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Легендарный §fключ").build()),
+        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§eЛегендарный §fключ").build()),
         MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический §fключ").build()),
         SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build());
 

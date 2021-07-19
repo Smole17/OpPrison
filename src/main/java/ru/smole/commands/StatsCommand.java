@@ -21,7 +21,7 @@ public class StatsCommand extends BukkitCommand<Player> {
 
     @Override
     protected void onExecute(Player player, String[] args) {
-        String msg = OpPrison.PREFIX + "/stats name BLOCKS/MONEY/TOKEN/MULTIPLIER/PRESTIGE/GROUP value";
+        String msg = OpPrison.PREFIX + "/stats name " + Arrays.toString(Stat.values()) + " value";
 
         if (args.length == 3) {
             Player target = Bukkit.getPlayer(args[0]);
@@ -36,20 +36,22 @@ public class StatsCommand extends BukkitCommand<Player> {
 
             Object value;
 
-            if (type != Stat.GROUP) {
+            if (type != Stat.GROUP && type != Stat.ACCESS) {
                 try {
                     value = Double.valueOf(args[2]);
                 } catch (Exception e) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
                     return;
                 }
-            } else {
+            } else if (type == Stat.GROUP) {
                 try {
                     value = GroupsManager.Group.getGroupFromString(args[2]);
                 } catch (Exception e) {
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Группа не найдена. Используйте данный список: %s", Arrays.toString(GroupsManager.Group.values()));
                     return;
                 }
+            } else {
+                value = args[2];
             }
 
             String piece = "null";
@@ -84,10 +86,16 @@ public class StatsCommand extends BukkitCommand<Player> {
                     targetData.setGroup(GroupsManager.Group.getGroupFromString(String.valueOf(value)));
                     piece = "была установлена группа";
                     break;
+
+                case ACCESS:
+                    targetData.getAccess().add(String.valueOf(value));
+                    piece = "было добавлено право";
+                    break;
             }
 
             if (value != null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: %s", targetName, piece, value);
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: §b%s", targetName, piece,
+                        value.getClass() == Double.class ? StringUtils._fixDouble(0, (double) value) : value);
                 return;
             }
         }
@@ -102,7 +110,8 @@ public class StatsCommand extends BukkitCommand<Player> {
         TOKEN(),
         MULTIPLIER(),
         PRESTIGE(),
-        GROUP();
+        GROUP(),
+        ACCESS();
 
         public static Stat getTypeFromString(String stat) {
             for (Stat type : Stat.values())

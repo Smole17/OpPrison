@@ -3,19 +3,123 @@ package ru.smole.data.items.crates;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
+import ru.smole.commands.StatsCommand;
 import ru.smole.data.OpPlayer;
+import ru.smole.data.PlayerData;
+import ru.smole.data.cases.CaseItem;
 import ru.smole.data.items.Items;
+import ru.smole.utils.StringUtils;
+import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.util.ChatUtil;
 
 @Data
-@AllArgsConstructor
 public class CrateItem {
 
     private Rare rare;
-    private ItemStack itemStack;
+    private CrateItemType type;
+    private double chance;
+    private String name;
+
+    protected ItemStack itemStack;
+    protected StatsCommand.Stat stat;
+    protected double value;
+    protected String hValue = "null";
+
+    public CrateItem(ConfigurationSection section) {
+        this.rare = Rare.valueOf(section.getString("rare").toUpperCase());
+        this.type = CrateItemType.valueOf(section.getString("type").toUpperCase());
+
+        ConfigurationSection op_item = section.getConfigurationSection("op-item");
+        switch (type) {
+            case ITEM:
+                name = op_item.getString("name");
+                value = op_item.getDouble("value");
+
+                itemStack = Items.getItem(name, value);
+                if (itemStack == null)
+                    return;
+
+                break;
+            case VAULT:
+                stat = StatsCommand.Stat.valueOf(op_item.getString("name").toUpperCase());
+                value = op_item.getDouble("value");
+
+                if (value == 0)
+                    hValue = op_item.getString("value");
+        }
+
+        this.chance = section.getDouble("chance");
+    }
+
+    public ItemStack get() {
+        switch (type) {
+            case ITEM:
+                return itemStack;
+            case VAULT:
+                switch (stat) {
+                    case MONEY:
+                        itemStack = ApiManager.newItemBuilder(Material.EMERALD).setName("§a$" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        break;
+
+                    case TOKEN:
+                        itemStack = ApiManager.newItemBuilder(Material.MAGMA_CREAM).setName("§e⛃" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        break;
+
+                    case MULTIPLIER:
+                        itemStack = ApiManager.newItemBuilder(Material.EYE_OF_ENDER).setName("§dx" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        break;
+                    case ACCESS:
+                        itemStack = ApiManager.newItemBuilder(Material.STORAGE_MINECART)
+                                .setName(String.format("Доступ к %s набору", hValue.replace("season", "§bСезонному"))).setAmount(1).build();
+                        break;
+                }
+
+                return itemStack;
+        }
+
+        return null;
+    }
+
+    public ItemStack get(String playerName) {
+        switch (type) {
+            case ITEM:
+                return itemStack;
+            case VAULT:
+                PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName);
+
+                switch (stat) {
+                    case MONEY:
+                        playerData.addMoney(value);
+                        itemStack = ApiManager.newItemBuilder(Material.EMERALD).setName("§a$" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        break;
+
+                    case TOKEN:
+                        playerData.addToken(value);
+                        itemStack = ApiManager.newItemBuilder(Material.MAGMA_CREAM).setName("§e⛃" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        break;
+
+                    case MULTIPLIER:
+                        itemStack = ApiManager.newItemBuilder(Material.EYE_OF_ENDER).setName("§dx" + StringUtils.formatDouble(2, value)).setAmount(1).build();
+                        playerData.addMultiplier(value);
+                        break;
+
+                    case ACCESS:
+                        itemStack = ApiManager.newItemBuilder(Material.STORAGE_MINECART)
+                                .setName(String.format("Доступ к %s набору", String.valueOf(value).replace("season", "Сезонному"))).setAmount(1).build();
+                        playerData.getAccess().add(hValue);
+                        break;
+                }
+
+                return itemStack;
+        }
+
+        return null;
+    }
 
     public void sendMessage(Player sender, Player player, String crateName) {
             ChatUtil.sendMessage(sender, OpPrison.PREFIX +
@@ -32,13 +136,22 @@ public class CrateItem {
     @AllArgsConstructor
     public enum Rare {
 
-        COMMON("§7ОБЫЧНЫЙ", 0.85),
-        RARE("§9РЕДКИЙ", 0.45),
-        EPIC("§5ЭПИЧЕСКИЙ", 0.25),
-        LEGENDARY("§6ЛЕГЕНДАРНЫЙ", 0.020),
-        MYTHICAL("§cМИФИЧЕСКИЙ", 0.01);
+        COMMON("§7ОБЫЧНЫЙ", 0.9),
+        RARE("§9РЕДКИЙ", 0.20),
+        EPIC("§5ЭПИЧЕСКИЙ", 0.10),
+        LEGENDARY("§6ЛЕГЕНДАРНЫЙ", 0.05),
+        MYTHICAL("§cМИФИЧЕСКИЙ", 0.005);
 
         private String name;
         private double chance;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum CrateItemType {
+
+        ITEM(),
+        VAULT()
+
     }
 }

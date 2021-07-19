@@ -1,5 +1,7 @@
 package ru.smole.utils;
 
+import ru.xfenilafs.core.util.NumberUtil;
+
 import java.text.DecimalFormat;
 
 public class StringUtils {
@@ -41,6 +43,7 @@ public class StringUtils {
     public static String unReplaceComma(String text) {
         return text.replaceAll(",", "");
     }
+
 //
 //    public static String trim(String string) {
 //        if (string.length() > 16)

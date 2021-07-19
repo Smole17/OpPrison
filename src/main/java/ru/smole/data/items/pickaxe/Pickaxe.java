@@ -141,7 +141,7 @@ import static ru.smole.OpPrison.MINES;
         Random random = new Random();
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
-        int i = luckyLevel >= 25 ? 5 : 3;
+        int i = luckyLevel >= 25 ? 6 : 3;
 
         switch (random.nextInt(i)) {
             case 0:
@@ -156,13 +156,24 @@ import static ru.smole.OpPrison.MINES;
                 playerData.addToken(token);
                 return "§e⛃" + StringUtils.replaceComma(token);
             case 3:
-                Items.Key.MINE.getStack().setAmount(4);
-                opPlayer.add(Items.Key.MINE.getStack());
-                return String.format("%s §fx4", Items.Key.MINE.getStack().getItemMeta().getDisplayName());
+                double count = 4;
+                ItemStack mineKey = Items.getItem("mine_key", count);
+
+                if (mineKey == null)
+                    break;
+
+                opPlayer.add(mineKey);
+                return String.format("%s §fx4", mineKey.getItemMeta().getDisplayName());
             case 4:
-                Items.Key.EPIC.getStack().setAmount(2);
-                opPlayer.add(Items.Key.EPIC.getStack());
-                return String.format("%s §fx2", Items.Key.EPIC.getStack().getItemMeta().getDisplayName());
+            case 5:
+                count = 2;
+                ItemStack epicKey = Items.getItem("epic_key", count);
+
+                if (epicKey == null)
+                    break;
+
+                opPlayer.add(epicKey);
+                return String.format("%s §fx2", epicKey.getItemMeta().getDisplayName());
         }
 
         return "ничего";
@@ -197,7 +208,7 @@ import static ru.smole.OpPrison.MINES;
         double ig_moneyLevel = upgrades.get(Upgrade.IG_MONEY).getCount();
 
         double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 800.5 * fortuneLevel : 800.5) * (multiplier == 0 ? 1 : multiplier);
-        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 175 * (token_minerLevel / 2) : 175;
+        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 250 * (token_minerLevel / 2) : 250;
 
         if (OpPrison.BOOSTER > 0) {
             cost = cost + (cost * OpPrison.BOOSTER / 100);
@@ -278,9 +289,11 @@ import static ru.smole.OpPrison.MINES;
             double chance = (key_finderLevel / 50) / 40;
             if (random.nextFloat() <= chance) {
                 int type = random.nextInt(3) + 1;
-                String keyName = type == 1 || type == 3 ? "token" : "mine";
+                double count = 1;
+                ItemStack key = type == 1 || type == 3 ? Items.getItem("token_key", count) : Items.getItem("mine_key", count);
 
-                ItemStack key = Items.getItem(keyName + "_key", 1.0);
+                if (key == null)
+                    return;
 
                 opPlayer.add(key);
                 Upgrade.KEY_FINDER.sendProcMessage(player, key.getItemMeta().getDisplayName());

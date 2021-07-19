@@ -21,10 +21,7 @@ import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ItemUtil;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PickaxeGui extends BaseSimpleInventory {
     public PickaxeGui() {
@@ -116,24 +113,26 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                         ClickType clickType = inventoryClickEvent.getClick();
 
-                        if (clickType == ClickType.MIDDLE) {
-                            upgrades.remove(upgrade);
-                            upgrades.put(upgrade, new Upgrade.UpgradeStat(count, !isIs, isMessage));
+                        switch (clickType) {
+                            case MIDDLE:
+                                upgrades.remove(upgrade);
+                                upgrades.put(upgrade, new Upgrade.UpgradeStat(count, !isIs, isMessage));
 
-                            player.closeInventory();
+                                player.closeInventory();
 
-                            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
-                            return;
-                        }
+                                opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
 
-                        if (clickType == ClickType.CONTROL_DROP) {
-                            upgrades.remove(upgrade);
-                            upgrades.put(upgrade, new Upgrade.UpgradeStat(count, isIs, !isMessage));
+                                return;
 
-                            player.closeInventory();
+                            case CONTROL_DROP:
+                                upgrades.remove(upgrade);
+                                upgrades.put(upgrade, new Upgrade.UpgradeStat(count, isIs, !isMessage));
 
-                            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
-                            return;
+                                player.closeInventory();
+
+                                opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+
+                                return;
                         }
 
                         if (upgrade.isMaxLevel(count)) {
@@ -180,7 +179,7 @@ public class PickaxeGui extends BaseSimpleInventory {
             lore.clear();
         }
 
-        addItem(14, Items.getItem("pickaxe", player.getName()));
+        addItem(14, Objects.requireNonNull(Items.getItem("pickaxe", player.getName())));
         setGlassPanel();
     }
 

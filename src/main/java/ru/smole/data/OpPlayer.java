@@ -8,6 +8,7 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import ru.smole.commands.KitCommand;
 import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
@@ -19,7 +20,6 @@ import java.util.Arrays;
 public class OpPlayer {
 
     private @Getter Player player;
-    private @Getter Items items;
     private @Getter GroupsManager groupsManager;
     private @Getter PrestigeManager prestigeManager;
     private @Getter PickaxeManager pickaxeManager;
@@ -27,7 +27,6 @@ public class OpPlayer {
 
     public OpPlayer(Player player) {
         this.player = player;
-        items = new Items(player);
         groupsManager = new GroupsManager(player);
         prestigeManager = new PrestigeManager(player);
         pickaxeManager = new PickaxeManager(player);
