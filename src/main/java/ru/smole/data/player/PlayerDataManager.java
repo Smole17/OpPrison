@@ -30,10 +30,17 @@ public class PlayerDataManager {
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
 
-        List<String> access = new ArrayList<>();
-        playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
-        pickaxeManager.create();
-        PlayerDataSQL.create(name, pickaxeManager.getStats());
+        PlayerDataSQL.load(name, pickaxeManager.getStats(), playerName -> {
+            opPlayer.set(Items.getItem("pickaxe", name), 1);
+            ScoreboardManager.loadScoreboard(player);
+            OpPrison.BAR.removeAll();
+            Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
+
+            List<String> access = new ArrayList<>();
+            playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
+            pickaxeManager.create();
+        });
+
         opPlayer.getBoosterManager().load();
     }
 
@@ -47,15 +54,7 @@ public class PlayerDataManager {
                 hiders.hidePlayer(OpPrison.getInstance(), player);
         });
 
-        if (!PlayerDataSQL.playerExists(name)) {
-            create(player);
-            opPlayer.set(Items.getItem("pickaxe", name), 1);
-            ScoreboardManager.loadScoreboard(player);
-            OpPrison.BAR.removeAll();
-            Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
-
-            return;
-        }
+        create(player);
 
         double blocks = (double) PlayerDataSQL.get(name, "blocks");
         double money = (double) PlayerDataSQL.get(name, "money");

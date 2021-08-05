@@ -28,7 +28,6 @@ import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.mysql.DatabaseManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
@@ -39,6 +38,8 @@ import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.CorePlugin;
+import ru.xfenilafs.core.database.RemoteDatabaseConnectionHandler;
+import ru.xfenilafs.core.database.RemoteDatabasesApi;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
@@ -59,7 +60,7 @@ public class OpPrison extends CorePlugin {
     private @Getter
     ConfigManager configManager;
     private @Getter
-    DatabaseManager base;
+    RemoteDatabaseConnectionHandler base;
     private @Getter
     BukkitTask pickaxeTask;
     private @Getter
@@ -81,11 +82,12 @@ public class OpPrison extends CorePlugin {
         playerDataManager = new PlayerDataManager();
         gangDataManager = new GangDataManager();
         configManager = new ConfigManager();
-        base = new DatabaseManager("46.105.122.17",
-                "azerusdms",
+        base = RemoteDatabasesApi.getInstance().createMysqlConnection(RemoteDatabasesApi.getInstance().createConnectionFields(
+                "46.105.122.17",
                 "azerusdms",
                 "AGHKSF8123AIYWT1862t3iJKGHFASDqqqq",
-                false);
+                "OpPrison"
+        ));
         discordBot = new DiscordBot("ODcwNzczMjExMzcyMDczMDgw.YQRovw.hA0SnRF-GXIGzON4AJ3cBqE2w_Y");
 
         BAR_FORMAT = String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
@@ -122,7 +124,7 @@ public class OpPrison extends CorePlugin {
 
     public void onPluginDisable() {
         Bukkit.getOnlinePlayers().forEach(playerDataManager::unload);
-        base.close();
+        base.handleDisconnect();
         BAR.removeAll();
         gangDataManager.unload();
     }
