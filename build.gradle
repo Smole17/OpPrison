@@ -1,12 +1,8 @@
-import org.apache.tools.ant.filters.ReplaceTokens
+
 
 plugins {
     id 'java'
 }
-
-group = 'ru.smole'
-version = '1.0'
-
 repositories {
     mavenCentral()
     maven {
@@ -18,32 +14,35 @@ repositories {
     }
 
     maven {
-        url = 'https://papermc.io/repo/repository/maven-public/'
-    }
-
-    maven {
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 
     maven {
-        url = 'https://jitpack.io'
+        url = 'https://m2.dv8tion.net/releases'
     }
 }
 
 dependencies {
+
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
 
 //    compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
-    compileOnly 'org.projectlombok:lombok:1.18.20'
 
+    compile ('net.dv8tion:JDA:4.3.0_277') {
+        exclude module: 'opus-java'
+    }
+    compile 'org.apache.commons:commons-collections4:4.4'
+
+    compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 }
 
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
+jar {
+    from {
+        configurations.compile
+        .collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

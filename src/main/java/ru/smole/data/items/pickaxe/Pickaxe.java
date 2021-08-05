@@ -2,28 +2,21 @@ package ru.smole.data.items.pickaxe;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.items.Items;
-import ru.smole.data.OpPlayer;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.mines.Mine;
-import ru.smole.utils.BlockUtil;
 import ru.smole.utils.StringUtils;
-import ru.xfenilafs.core.regions.Region;
-import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -148,7 +141,7 @@ import static ru.smole.OpPrison.MINES;
                 double money = luckyLevel >= 25 ? 2500000000000D : 1000000000000D;
 
                 playerData.addMoney(money);
-                return "§a$" + StringUtils.replaceComma( money);
+                return "§a$" + StringUtils.replaceComma(money);
             case 1:
             case 2:
                 double token = luckyLevel >= 25 ? 1500000000D : 500000000D;
@@ -233,12 +226,12 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (blessingsLevel > 0 && upgrades.get(Upgrade.BLESSINGS).isIs()) {
-            double chance = blessingsLevel / 55000;
+            double chance = blessingsLevel / 60000;
             if (new Random().nextFloat() <= chance) {
-                double bless = token / 20 * blessingsLevel / 125;
+                double bless = token * blessingsLevel / 100;
                 Upgrade.BLESSINGS.setName("§bБлагославление");
                 Bukkit.getOnlinePlayers().forEach(onPlayer -> {
-                    Upgrade.BLESSINGS.sendProcMessagePlayer(onPlayer, name, String.format("§e%s⛃", StringUtils.replaceComma(bless)));
+                    Upgrade.BLESSINGS.sendProcMessagePlayer(onPlayer, name, String.format("§e⛃%s", StringUtils.replaceComma(bless)));
                     OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(onPlayer.getName()).addToken(bless);
                 });
             }
@@ -247,40 +240,7 @@ import static ru.smole.OpPrison.MINES;
         if (luckyLevel > 0 && upgrades.get(Upgrade.LUCKY).isIs()) {
             double chance = (luckyLevel / 50) / 40;
             if (new Random().nextFloat() <= chance) {
-                Upgrade.LUCKY.sendProcMessage(player, getRandomReward(player, key_finderLevel));
-            }
-        }
-
-        if (token_merchantLevel > 0 && upgrades.get(Upgrade.TOKEN_MERCHANT).isIs()) {
-            double chance = (token_merchantLevel / 5) / 40000;
-            if (new Random().nextFloat() <= chance) {
-                double t_merchant = token * token_merchantLevel / 10;
-                token = token + t_merchant;
-                playerData.addToken(token);
-                Upgrade.TOKEN_MERCHANT.sendProcMessage(player, String.format("§e%s⛃", StringUtils.replaceComma(t_merchant)));
-
-                token = 750 * token_minerLevel;
-            }
-        }
-
-
-        if (explosiveLevel > 0 && upgrades.get(Upgrade.EXPLOSIVE).isIs()) {
-            double chance = (explosiveLevel / 10) / 100;
-            if (new Random().nextFloat() <= chance) {
-                int blocks = explosive(block);
-
-                cost = cost * blocks;
-                token = token * blocks;
-            }
-        }
-
-        if (jack_hammerLevel > 0 && upgrades.get(Upgrade.JACK_HAMMER).isIs()) {
-            double chance = (jack_hammerLevel / 10) / 4750;
-            if (new Random().nextFloat() <= chance) {
-                int blocks = breakLayer(block);
-
-                cost = cost * blocks;
-                token = token * blocks;
+                Upgrade.LUCKY.sendProcMessage(player, getRandomReward(player, luckyLevel));
             }
         }
 
@@ -300,8 +260,20 @@ import static ru.smole.OpPrison.MINES;
             }
         }
 
+        if (token_merchantLevel > 0 && upgrades.get(Upgrade.TOKEN_MERCHANT).isIs()) {
+            double chance = (token_merchantLevel / 5) / 40000;
+            if (new Random().nextFloat() <= chance) {
+                double t_merchant = token * token_merchantLevel / 10;
+                token = token + t_merchant;
+                playerData.addToken(token);
+                Upgrade.TOKEN_MERCHANT.sendProcMessage(player, String.format("§e⛃%s", StringUtils.replaceComma(t_merchant)));
+
+                token = 750 * token_minerLevel;
+            }
+        }
+
         if (multi_finderLevel > 0 && upgrades.get(Upgrade.MULTI_FINDER).isIs()) {
-            double chance = (multi_finderLevel / 5) / 55000;
+            double chance = (multi_finderLevel / 5) / 40000;
             Random random = new Random();
             if (random.nextFloat() <= chance) {
                 int multi = random.nextInt(3) + 1;
@@ -317,6 +289,40 @@ import static ru.smole.OpPrison.MINES;
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");
             }
+        }
+
+        if (explosiveLevel > 0 && upgrades.get(Upgrade.EXPLOSIVE).isIs()) {
+            double chance = (explosiveLevel / 10) / 100;
+            if (new Random().nextFloat() <= chance) {
+                int blocks = explosive(block);
+
+                cost = cost * blocks;
+                token = token * blocks;
+            }
+
+            playerData.addBlocks(1);
+            playerData.addMoney(cost);
+            playerData.addToken(token);
+            pickaxe.addExp(1);
+
+            return;
+        }
+
+        if (jack_hammerLevel > 0 && upgrades.get(Upgrade.JACK_HAMMER).isIs()) {
+            double chance = (jack_hammerLevel / 10) / 4750;
+            if (new Random().nextFloat() <= chance) {
+                int blocks = breakLayer(block);
+
+                cost = cost * blocks;
+                token = token * blocks;
+            }
+
+            playerData.addBlocks(1);
+            playerData.addMoney(cost);
+            playerData.addToken(token);
+            pickaxe.addExp(1);
+
+            return;
         }
 
         playerData.addBlocks(1);

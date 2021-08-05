@@ -1,15 +1,10 @@
-package ru.smole.utils;
+package ru.smole.utils.server;
 
-import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import ru.luvas.rmcs.utils.LagMeter;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerDataManager;
+import ru.smole.data.player.PlayerDataManager;
 import ru.xfenilafs.core.util.ChatUtil;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 
 public class ServerUtil {
 

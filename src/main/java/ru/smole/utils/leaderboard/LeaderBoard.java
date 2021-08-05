@@ -9,38 +9,35 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import ru.smole.OpPrison;
 import ru.smole.utils.StringUtils;
-import ru.smole.utils.hologram.Hologram;
+import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.util.ChatUtil;
 
 public class LeaderBoard {
-    public static List<String> holograms = new ArrayList<>();
+    public static List<SimpleHolographic> holograms = new ArrayList<>();
 
     private final String criteria;
+    private final SimpleHolographic simpleHolographic;
 
     public LeaderBoard(String topName, Location location, String criteria) {
         this.criteria = criteria;
-        OpPrison.getInstance().getHologramManager().createHologram(
-                criteria,
-                location,
-                hologram -> {
-                    hologram.addLine(ChatUtil.color(topName));
-                    for (int i = 0; i < 9; i++)
-                        hologram.addLine(ChatUtil.text("§fЗагрузка..."));
-                    hologram.addLine(ChatUtil.color("&8(обновление раз в 5 минут)"));
-                }
-        );
+        simpleHolographic = new SimpleHolographic(location);
 
+        simpleHolographic.addTextLine(ChatUtil.text(topName));
+
+        for (int i = 0; i < 10; i++)
+            simpleHolographic.addTextLine(ChatUtil.text("§fЗагрузка..."));
+
+        simpleHolographic.addTextLine(ChatUtil.text("&8(обновление раз в 5 минут)"));
         update();
 
-        holograms.add(criteria);
+        holograms.add(simpleHolographic);
     }
 
     public void update() {
-        Hologram hologram = OpPrison.getInstance().getHologramManager().getCachedHologram(criteria);
         ResultSet resultSet = OpPrison.getInstance().getBase().getResult("SELECT * FROM OpPrison ORDER BY " + criteria + " DESC LIMIT 10");
         try {
             for (int i = 1; resultSet.next(); i++) {
-                hologram.modifyLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
+                simpleHolographic.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
             }
         } catch (SQLException exception) {
             exception.printStackTrace();

@@ -3,6 +3,7 @@ package ru.smole.utils;
 import ru.xfenilafs.core.util.NumberUtil;
 
 import java.text.DecimalFormat;
+import java.util.Random;
 
 public class StringUtils {
 
@@ -42,6 +43,19 @@ public class StringUtils {
 
     public static String unReplaceComma(String text) {
         return text.replaceAll(",", "");
+    }
+
+    public static String generateString(int length) {
+        String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        Random random = new Random();
+        StringBuilder builder = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            builder.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+        }
+
+        return builder.toString();
     }
 
 //

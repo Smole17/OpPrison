@@ -1,11 +1,10 @@
-package ru.smole.data;
+package ru.smole.data.player;
 
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.data.group.GroupsManager;
 
-import java.io.StringBufferInputStream;
 import java.util.List;
 
 @Data public class PlayerData {

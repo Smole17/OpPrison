@@ -2,9 +2,7 @@ package ru.smole.data.booster;
 
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
-import ru.smole.OpPrison;
 import ru.smole.utils.StringUtils;
-import sexy.kostya.mineos.perms.PermissionGroup;
 
 import static ru.smole.OpPrison.BAR;
 import static ru.smole.OpPrison.BOOSTER;

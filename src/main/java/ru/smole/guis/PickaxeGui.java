@@ -6,15 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.OpPlayer;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
@@ -63,17 +62,16 @@ public class PickaxeGui extends BaseSimpleInventory {
                 lore.add("");
 
                 if (!upgrade.isMaxLevel(count)) {
-                    lore.add(String.format("§b§l+ §f1 уровень: §e%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
-                    lore.add(String.format("§b§l+ §f10 уровней: §e%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
-                    lore.add(String.format("§b§l+ §f%s уровней: §e%s §8(( Q ))",
-                            StringUtils.formatDouble(0, maxUpgrades),
+                    lore.add(String.format("§b§l+ §f1 уровень: §e⛃%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
+                    lore.add(String.format("§b§l+ §f10 уровней: §e⛃%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
+                    lore.add(String.format("§b§l+ §f%s уровней: §e⛃%s §8(( Q ))",
+                            StringUtils.formatDouble(2, maxUpgrades),
                             // maxUpgrades > upgrade.getMax_level() ? upgrade.getMax_level() : maxUpgrades
                             StringUtils.formatDouble(2, maxTokens)));
                     lore.add("");
                 }
 
                 lore.add(String.format("§b§l* §fСтатус: %s §8(( СКМ ))", isIs ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
-                lore.add(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
             } else {
                 lore.add(String.format("§b§l* §fДоступно с §b%s §fуровня", StringUtils._fixDouble(0, need_level)));
             }
@@ -81,6 +79,9 @@ public class PickaxeGui extends BaseSimpleInventory {
             if (!isCanGroup) {
                 lore.add(String.format("§b§l* §fДоступно от §b%s §fгруппы", group.getName()));
             }
+
+            if (upgrade.isNeedMessage())
+                lore.add(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
 
             ItemUtil.ItemBuilder itemBuilder =
                     ApiManager.newItemBuilder(type)
@@ -101,38 +102,34 @@ public class PickaxeGui extends BaseSimpleInventory {
                     slot,
                     item,
                     (baseInventory, inventoryClickEvent) -> {
-                        if (!upgrade.isUnlock(pickaxe_level)) {
-                            player.closeInventory();
-                            return;
-                        }
-
-                        if (!isCanGroup) {
-                            player.closeInventory();
-                            return;
-                        }
-
                         ClickType clickType = inventoryClickEvent.getClick();
 
-                        switch (clickType) {
-                            case MIDDLE:
-                                upgrades.remove(upgrade);
-                                upgrades.put(upgrade, new Upgrade.UpgradeStat(count, !isIs, isMessage));
-
-                                player.closeInventory();
-
-                                opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
-
-                                return;
-
-                            case CONTROL_DROP:
+                        if (upgrade.isNeedMessage())
+                            if (clickType == ClickType.CONTROL_DROP) {
                                 upgrades.remove(upgrade);
                                 upgrades.put(upgrade, new Upgrade.UpgradeStat(count, isIs, !isMessage));
 
                                 player.closeInventory();
 
                                 opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
-
                                 return;
+                            }
+
+                        if (!upgrade.isUnlock(pickaxe_level))
+                            return;
+
+                        if (!isCanGroup)
+                            return;
+
+                        if (clickType == ClickType.MIDDLE) {
+                            upgrades.remove(upgrade);
+                            upgrades.put(upgrade, new Upgrade.UpgradeStat(count, !isIs, isMessage));
+
+                            player.closeInventory();
+
+                            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+
+                            return;
                         }
 
                         if (upgrade.isMaxLevel(count)) {

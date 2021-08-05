@@ -1,14 +1,9 @@
-package ru.smole.data;
+package ru.smole.data.player;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import ru.smole.commands.KitCommand;
 import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;

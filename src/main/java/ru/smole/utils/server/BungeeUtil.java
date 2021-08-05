@@ -1,4 +1,4 @@
-package ru.smole.utils;
+package ru.smole.utils.server;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteArrayDataInput;

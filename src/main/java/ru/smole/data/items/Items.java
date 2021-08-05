@@ -3,26 +3,23 @@ package ru.smole.data.items;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.NBTTagString;
+import org.apache.logging.log4j.util.BiConsumer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.smole.OpPrison;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.OpPlayer;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.cases.Case;
 import ru.smole.data.group.GroupsManager;
-import ru.smole.data.items.crates.Crate;
-import ru.smole.data.items.crates.CrateItem;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
@@ -35,8 +32,6 @@ import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.ItemUtil;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Items {
@@ -71,6 +66,7 @@ public class Items {
         List<String> lore = new ArrayList<>();
 
         lore.add("");
+        lore.add("§b§lЗачарования");
         for (Upgrade upgrade : Upgrade.values()) {
             double count = pickaxe
                     .getUpgrades()
@@ -80,11 +76,12 @@ public class Items {
             if (count == 0)
                 continue;
 
-            lore.add(String.format("%s %s", upgrade.getName(), StringUtils._fixDouble(0, count)));
+            lore.add(String.format("%s| %s %s", ChatColor.getLastColors(upgrade.getName()), upgrade.getName(), StringUtils._fixDouble(0, count)));
         }
         lore.add("");
-        lore.add(String.format("§fУровень: §b%s", (int) pickaxe.getLevel()));
-        lore.add(String.format("§fОпыт: §b%s/%s", (int) pickaxe.getExp(), (int) pickaxe.getNeedExp()));
+        lore.add("§b§lСтатистика");
+        lore.add(String.format("§b| §fУровень: §b%s", (int) pickaxe.getLevel()));
+        lore.add(String.format("§b| §fОпыт: §b%s/%s", (int) pickaxe.getExp(), (int) pickaxe.getNeedExp()));
 
         double efficiency = pickaxe.getUpgrades().get(Upgrade.EFFICIENCY).getCount();
 
@@ -199,7 +196,6 @@ public class Items {
                                     Player player = event.getPlayer();
                                     Action action = event.getAction();
                                     Block block = event.getClickedBlock();
-
                                     if (action == Action.RIGHT_CLICK_BLOCK && event.hasBlock()) {
                                         Case customCase = Case.getCustomCaseByLocation(block);
 

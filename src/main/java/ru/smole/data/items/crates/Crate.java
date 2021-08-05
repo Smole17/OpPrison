@@ -11,8 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.cases.CaseItem;
+import ru.smole.data.player.OpPlayer;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
@@ -55,7 +54,7 @@ public class Crate {
     public void open(Player player) {
         Bukkit.getOnlinePlayers().forEach(onPlayer ->
                 ChatUtil.sendMessage(onPlayer, OpPrison.PREFIX +
-                        String.format("%s открывает %s&f...",
+                        String.format("&b%s &fоткрывает %s&f...",
                                 player.getName(), type.getName())));
 
         new CrateGui(type.getName()).openInventory(player);

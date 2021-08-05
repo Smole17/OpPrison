@@ -1,8 +1,8 @@
-package ru.smole.data;
+package ru.smole.data.player;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import ru.luvas.rmcs.commands._addgroup;
 import ru.smole.OpPrison;
 import ru.smole.commands.HideCommand;
 import ru.smole.commands.KitCommand;
@@ -11,6 +11,8 @@ import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
+import ru.smole.data.player.OpPlayer;
+import ru.smole.data.player.PlayerData;
 import ru.smole.scoreboard.ScoreboardManager;
 
 import java.util.*;
@@ -32,6 +34,7 @@ public class PlayerDataManager {
         playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
         pickaxeManager.create();
         PlayerDataSQL.create(name, pickaxeManager.getStats());
+        opPlayer.getBoosterManager().load();
     }
 
     public void load(Player player) {
@@ -48,7 +51,8 @@ public class PlayerDataManager {
             create(player);
             opPlayer.set(Items.getItem("pickaxe", name), 1);
             ScoreboardManager.loadScoreboard(player);
-            OpPrison.BAR.addPlayer(player);
+            OpPrison.BAR.removeAll();
+            Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
 
             return;
         }
@@ -70,7 +74,9 @@ public class PlayerDataManager {
         opPlayer.getBoosterManager().load();
         KitCommand.KitsGui.load(name);
         ScoreboardManager.loadScoreboard(player);
-        OpPrison.BAR.addPlayer(player);
+
+        OpPrison.BAR.removeAll();
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
     }
 
     public void unload(Player player) {
@@ -98,6 +104,9 @@ public class PlayerDataManager {
         opPlayer.getBoosterManager().unload();
         pickaxeManager.unload();
         playerDataMap.remove(name);
+
+        OpPrison.BAR.removeAll();
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
     }
 
     public void updateTop(Player player) {

@@ -3,23 +3,19 @@ package ru.smole.data.cases;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import ru.smole.OpPrison;
-import ru.smole.commands.StatsCommand;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.config.ConfigUtils;
-import ru.smole.utils.hologram.Hologram;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @Getter
@@ -39,18 +35,13 @@ public class Case {
         this.key = section.getString("key").toUpperCase();
         this.location = ConfigUtils.loadLocationFromConfigurationSection(section);
 
-        String holoId = "case_" + id;
-        OpPrison.getInstance().getHologramManager().createHologram(
-                holoId,
-                new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY() - 0.3, location.getBlockZ() + 0.5),
-                hologram -> {
-                    hologram.addLine(name);
-                    hologram.addLine("§bЛКМ §f- Просмотр информации о кейсе");
-                    hologram.addLine("§bПКМ §f- Открыть кейс на ВСЕ ключи");
-                }
-        );
+        SimpleHolographic simpleHolographic = new SimpleHolographic(new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY() - 0.2, location.getBlockZ() + 0.5));
+        simpleHolographic.addTextLine(name);
+        simpleHolographic.addTextLine("§bЛКМ §f- Просмотр информации о кейсе");
+        simpleHolographic.addTextLine("§bПКМ §f- Открыть кейс на ВСЕ ключи");
+        simpleHolographic.addTextLine("§8§o(сообщений о выпавших предметов нет)");
 
-        LeaderBoard.holograms.add(holoId);
+        LeaderBoard.holograms.add(simpleHolographic);
         this.caseItems = new ArrayList<>();
 
         ConfigurationSection itemsSection = section.getConfigurationSection("items");
@@ -101,10 +92,16 @@ public class Case {
             CaseItem caseItem = getRandomItem();
             CaseItem.CaseItemType caseItemType = caseItem.getType();
 
+            if (caseItem.getChance() <= 0.01) {
+                ChatUtil.broadcast(OpPrison.PREFIX + "Игрок &b%s &fвыбил с %sа: %s",
+                        playerName, name, caseItemType == CaseItem.CaseItemType.ITEM ? caseItem.getItemStack().getItemMeta().getDisplayName() : "не установлено");
+            }
+
             if (caseItemType == CaseItem.CaseItemType.ITEM) {
                 opPlayer.add(caseItem.get(playerName));
                 continue;
             }
+
 
             caseItem.get(playerName);
         }

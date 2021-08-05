@@ -1,29 +1,22 @@
 package ru.smole.commands;
 
-import lombok.Data;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.var;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.OpPlayer;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
-import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ChatUtil;
-import ru.xfenilafs.core.util.NumberUtil;
 
 import java.util.*;
 
@@ -127,7 +120,7 @@ public class KitCommand extends BukkitCommand<Player> {
                         ApiManager
                                 .newItemBuilder(Material.valueOf(material))
                                 .setName(name)
-                                .setLore("§7Нажмите ЛКМ, чтобы забрать набор", "§7Нажмите ПКМ, чтобы просмотреть список предметво")
+                                .setLore("§7Нажмите ЛКМ, чтобы забрать набор", "§7Нажмите ПКМ, чтобы просмотреть список предметов")
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {
                             ClickType clickType = inventoryClickEvent.getClick();
@@ -175,6 +168,16 @@ public class KitCommand extends BukkitCommand<Player> {
                         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы уже забирали данный набор");
                         return;
                     }
+
+                try {
+                    GroupsManager.Group group = GroupsManager.Group.getGroupFromString(kit.toUpperCase());
+
+                    if (group != null)
+                        if (!group.isCan(OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName).getGroup())) {
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к набору");
+                            return;
+                        }
+                } catch (Exception ignored) {}
 
                 kitsList.add(kit);
                 playerKits.remove(playerName);
@@ -227,6 +230,9 @@ public class KitCommand extends BukkitCommand<Player> {
 
         public static String save(String playerName) {
             if (playerKits.isEmpty())
+                return "null";
+
+            if (playerKits.get(playerName).isEmpty())
                 return "null";
 
             StringBuilder builder = new StringBuilder();

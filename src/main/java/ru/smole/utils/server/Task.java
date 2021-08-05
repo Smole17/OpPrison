@@ -1,4 +1,4 @@
-package ru.smole.utils;
+package ru.smole.utils.server;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

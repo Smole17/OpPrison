@@ -6,8 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
-import ru.smole.data.items.Items;
+import ru.smole.data.player.PlayerData;
 import ru.xfenilafs.core.ApiManager;
 
 public class GroupsManager {

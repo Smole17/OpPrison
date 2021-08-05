@@ -2,7 +2,7 @@ package ru.smole.data.prestige;
 
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -32,7 +32,7 @@ public class PrestigeManager {
         double upped = prestige + 1;
         double money = playerData.getMoney();
 
-        double c = 100000000D;
+        double c = 10000000D;
         double cost = prestige == 0 ? c : upped * 1.05F * c;
 
         if (cost > money) {

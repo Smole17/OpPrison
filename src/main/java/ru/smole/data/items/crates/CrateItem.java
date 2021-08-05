@@ -9,9 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.commands.StatsCommand;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.PlayerData;
-import ru.smole.data.cases.CaseItem;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.items.Items;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
@@ -75,7 +73,7 @@ public class CrateItem {
                         break;
                     case ACCESS:
                         itemStack = ApiManager.newItemBuilder(Material.STORAGE_MINECART)
-                                .setName(String.format("Доступ к %s набору", hValue.replace("season", "§bСезонному"))).setAmount(1).build();
+                                .setName(String.format("Доступ к %s набору §8(/kit)", hValue.replace("season", "§bСезонному"))).setAmount(1).build();
                         break;
                 }
 
@@ -110,7 +108,7 @@ public class CrateItem {
 
                     case ACCESS:
                         itemStack = ApiManager.newItemBuilder(Material.STORAGE_MINECART)
-                                .setName(String.format("§fДоступ к %s §fнабору §8(/kit)", String.valueOf(value).replace("season", "Сезонному"))).setAmount(1).build();
+                                .setName(String.format("§fДоступ к %s §fнабору §8(/kit)", hValue.replace("season", "Сезонному"))).setAmount(1).build();
                         playerData.getAccess().add(hValue);
                         break;
                 }
@@ -123,7 +121,7 @@ public class CrateItem {
 
     public void sendMessage(Player sender, Player player, String crateName) {
             ChatUtil.sendMessage(sender, OpPrison.PREFIX +
-                    String.format("%s открыл %s &fи получил %s %s &fx%s",
+                    String.format("&b%s &fоткрыл %s &fи получил %s %s &fx%s",
                             player.getName(),
                             crateName,
                             rare.getName(),

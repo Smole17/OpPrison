@@ -1,16 +1,13 @@
 package ru.smole.data.items.pickaxe;
 
 import lombok.Getter;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import ru.smole.data.items.Items;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.OpPlayer;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PickaxeManager {
@@ -30,7 +27,7 @@ public class PickaxeManager {
         upgradeMap = new HashMap<>();
 
         for (Upgrade upgrade : Upgrade.values()) {
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, true));
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage()));
         }
 
 
@@ -79,7 +76,7 @@ public class PickaxeManager {
 
             double count = Double.parseDouble(arg_1);
 
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, true));
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, upgrade.isNeedMessage()));
         }
 
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);

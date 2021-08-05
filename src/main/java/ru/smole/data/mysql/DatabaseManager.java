@@ -8,8 +8,6 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Getter
 public class DatabaseManager {
@@ -62,6 +60,12 @@ public class DatabaseManager {
                 "pickaxe TEXT, " +
                 "kit TEXT," +
                 "access TEXT)");
+
+        update("CREATE TABLE IF NOT EXISTS " +
+                "OpPrisonGangs(" +
+                "name VARCHAR(5), " +
+                "members TEXT, " +
+                "score DOUBLE");
     }
 
     public void close() {

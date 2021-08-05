@@ -7,10 +7,8 @@ import org.bukkit.inventory.ItemStack;
 import ru.smole.data.cases.Case;
 import ru.smole.data.cases.CaseItem;
 import ru.smole.data.items.Items;
-import ru.smole.data.items.crates.CrateItem;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
-import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryClickHandler;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 
 import java.util.List;
@@ -58,7 +56,7 @@ public class CaseLootGui extends BaseSimpleInventory {
 
             for (CaseItem caseItem : items) {
                 double chance = caseItem.getChance() * 100.0D;
-                ItemStack itemStack = caseItem.get(player.getName());
+                ItemStack itemStack = caseItem.get();
 
                 if (itemStack == null) {
                     System.out.println(caseItem.getType() == CaseItem.CaseItemType.ITEM ? caseItem.getName() : caseItem.getStat().name() + " | " + caseItem.getValue());

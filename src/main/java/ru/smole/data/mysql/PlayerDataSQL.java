@@ -1,9 +1,7 @@
 package ru.smole.data.mysql;
 
-import org.bukkit.ChatColor;
 import ru.smole.OpPrison;
 import ru.smole.data.group.GroupsManager;
-import ru.xfenilafs.core.ApiManager;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

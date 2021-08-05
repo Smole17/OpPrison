@@ -1,5 +1,5 @@
 name: OpPrison
-version: @version@
+version: 1.0
 main: ru.smole.OpPrison
 authors: [ NeSmole ]
 depend:

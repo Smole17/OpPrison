@@ -3,7 +3,7 @@ package ru.smole.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.util.ChatUtil;

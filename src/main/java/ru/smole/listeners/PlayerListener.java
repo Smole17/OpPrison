@@ -1,17 +1,16 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
+import discord.DiscordBot;
 import lombok.val;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -22,37 +21,23 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import ru.luvas.rmcs.player.RPlayer;
-import ru.luvas.rmcs.utils.UtilChat;
 import ru.smole.OpPrison;
+import ru.smole.data.player.OpPlayer;
+import ru.smole.data.player.PlayerData;
+import ru.smole.data.player.PlayerDataManager;
 import ru.smole.data.cases.Case;
-import ru.smole.data.PlayerData;
-import ru.smole.data.PlayerDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
-import ru.smole.data.items.pickaxe.Pickaxe;
-import ru.smole.data.items.pickaxe.PickaxeManager;
-import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.OpPlayer;
-import ru.smole.data.trade.Trade;
-import ru.smole.event.OpEvent;
 import ru.smole.event.OpEvents;
 import ru.smole.guis.CaseLootGui;
-import ru.smole.guis.PickaxeGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
-import ru.smole.utils.hologram.Hologram;
-import ru.smole.utils.hologram.HologramManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
-import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.util.ChatUtil;
-import ru.xfenilafs.core.util.ItemUtil;
 
-import java.util.*;
+import java.util.List;
 
 public class PlayerListener implements Listener {
 
@@ -87,14 +72,9 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
-        Player player = event.getPlayer();
-
-        LeaderBoard.holograms.forEach(s -> {
-            Hologram hologram = OpPrison.getInstance().getHologramManager().getCachedHologram(s);
-
-            hologram.removeReceiver(player);
-            hologram.addReceiver(player);
-            hologram.refreshHologram();
+        LeaderBoard.holograms.forEach(simpleHolographic -> {
+            simpleHolographic.remove();
+            simpleHolographic.spawn();
         });
     }
 
@@ -106,28 +86,29 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        Items.interact(event);
-
         Player player = event.getPlayer();
         Block block = event.getClickedBlock();
         Action action = event.getAction();
 
-        if (event.hasBlock()) {
-            Case customCase = Case.getCustomCaseByLocation(block);
+        switch (action) {
+            case LEFT_CLICK_BLOCK:
+            if (event.hasBlock()) {
+                Case customCase = Case.getCustomCaseByLocation(block);
 
-            if (block.getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && customCase != null)
-                switch (action) {
-                    case LEFT_CLICK_BLOCK:
-                        new CaseLootGui(customCase).openInventory(player);
-                        event.setCancelled(true);
-
-                        break;
-                    case RIGHT_CLICK_BLOCK:
-                        event.setCancelled(true);
-
-                        break;
+                if (block.getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && customCase != null) {
+                    new CaseLootGui(customCase).openInventory(player);
+                    event.setCancelled(true);
                 }
+            }
+
+            break;
+            case RIGHT_CLICK_BLOCK:
+
+            event.setCancelled(true);
+            break;
         }
+
+        Items.interact(event);
     }
 
     @EventHandler
@@ -179,7 +160,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player player = Bukkit.getPlayer(event.getWhoClicked().getName());
-        ItemStack curItem = event.getCurrentItem();
+        ItemStack curItem = event.getCurrentItem(); 
 
         if(event.getHotbarButton() != -1) {
             ItemStack item = player.getInventory().getContents()[event.getHotbarButton()];
@@ -193,24 +174,19 @@ public class PlayerListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
 
-        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
-        Trade trade = Trade.getTrading(playerData);
-        if (trade != null) {
-            trade.handleClick(event);
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        if (Items.isSomePickaxe(event.getCursor(), event.getWhoClicked().getName())) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        ItemStack item = event.getItemDrop().getItemStack();
-
-        if (item.getType() == Material.AIR)
-            return;
-
-        if (Items.isSomePickaxe(item, event.getPlayer().getName())) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
+        ChatUtil.sendMessage(event.getPlayer(), OpPrison.PREFIX + "Вы не можете выбрасывать предметы. Используйте §b/trash");
     }
 
     @EventHandler
@@ -238,7 +214,7 @@ public class PlayerListener implements Listener {
 
         List<String> lore = Lists.newArrayList(
                 String.format("&fНик: &b%s %s", prefix, name),
-                "&fПрестижи: &b" + StringUtils.formatDouble(2, playerData.getPrestige()),
+                "&fПрестижи: &a" + StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
                 "&fДобыто блоков: &e" + StringUtils._fixDouble(0, playerData.getBlocks()),
                 "&fГруппа: &b" + playerData.getGroup().getName(),
                 "",
@@ -260,6 +236,12 @@ public class PlayerListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
 
         Bukkit.getConsoleSender().sendMessage(format + msg);
+
+        DiscordBot discordBot = OpPrison.getInstance().getDiscordBot();
+
+        discordBot.sendMessage("основной",
+                ChatColor.stripColor(prefix.replace("&", "§")) + name + ": " + msg
+        );
     }
 
 

@@ -1,7 +1,7 @@
 package ru.smole.commands;
 
 import org.bukkit.entity.Player;
-import ru.smole.data.OpPlayer;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.data.prestige.PrestigeManager;
 import ru.xfenilafs.core.command.BukkitCommand;
 

@@ -6,102 +6,96 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import ru.smole.OpPrison;
-import ru.smole.data.PlayerData;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
 import ru.xfenilafs.core.util.ChatUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @AllArgsConstructor public enum Upgrade {
 
     EFFICIENCY("§7Эффективность",
             "Увеличивает скорость добычи блоков",
-            0,10, 300,  50000,
-            Material.ANVIL, GroupsManager.Group.MANTLE),
+            0,10, 300,  70000,
+            Material.ANVIL, GroupsManager.Group.MANTLE, false),
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
             0,100, 500000, 15000,
-            Material.DIAMOND, GroupsManager.Group.MANTLE),
+            Material.DIAMOND, GroupsManager.Group.MANTLE, false),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
             0, 20, 50000, 1000000,
-            Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE),
+            Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",
             "Выдаёт эффект для ускоренного копания",
             1,0, 5, 25000,
-            Material.GLOWSTONE_DUST, GroupsManager.Group.MANTLE),
+            Material.GLOWSTONE_DUST, GroupsManager.Group.MANTLE, false),
 
     SPEED("§fСкорость",
             "Выдаёт эффект для ускоренного передвижения",
             1,0, 5, 25000,
-            Material.SUGAR, GroupsManager.Group.MANTLE),
+            Material.SUGAR, GroupsManager.Group.MANTLE, false),
 
     JUMP_BOOST("§aПрыгучесть",
             "Выдаёт эффект для повышенной прыгучести",
             1,0, 5, 25000,
-            Material.SLIME_BALL, GroupsManager.Group.MANTLE),
+            Material.SLIME_BALL, GroupsManager.Group.MANTLE, false),
 
     NIGHT_VISION("§5Ночное зрение",
             "Выдаёт эффект ночного зрения",
             1, 0, 1, 25000,
-            Material.BROWN_MUSHROOM, GroupsManager.Group.MANTLE),
+            Material.BROWN_MUSHROOM, GroupsManager.Group.MANTLE, false),
 
     KEY_FINDER("§4Добыча ключей",
             "Увеличивает количество добываемых ключей",
             2, 0, 50, 250000000,
-            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE),
+            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, true),
 
     EXPLOSIVE("§4Взрыв",
             "Увеличивает шанс на взрыв по площади 5x5x5 блоков",
-            5, 0, 500, 150000000,
-            Material.TNT, GroupsManager.Group.MANTLE),
+            5, 0, 500, 100000000,
+            Material.TNT, GroupsManager.Group.MANTLE, false),
 
     LUCKY("§9Удача",
             "Выдаёт случайно токены, монеты, а начиная с 25 уровня - ключи",
-            10, 0, 50, 7000000000D,
-            Material.LAPIS_ORE, GroupsManager.Group.MANTLE),
+            10, 0, 50, 17500000000D,
+            Material.LAPIS_ORE, GroupsManager.Group.MANTLE, true),
 
     BLESSINGS("§bБлагославление",
             "Выдаёт токены всем на сервере. Количество зависит от Добычи токенов",
             15, 0, 1000, 125000000,
-            Material.MAGMA_CREAM, GroupsManager.Group.MANTLE),
+            Material.MAGMA_CREAM, GroupsManager.Group.MANTLE, true),
 
     TOKEN_MERCHANT("§eМножитель токенов",
             "Выдаёт умноженное количество токенов",
-            20, 0, 5000, 50000000,
-            Material.ENDER_PEARL, GroupsManager.Group.MANTLE),
+            20, 0, 5000, 40000000,
+            Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true),
 
     MULTI_FINDER("§dНахождение множителя",
             "Выдаёт от 1-го до 3-ёх множителей Вам",
-            25, 0, 1000, 500000000,
-            Material.BOOK, GroupsManager.Group.MANTLE),
+            25, 0, 1000, 1000000000,
+            Material.BOOK, GroupsManager.Group.MANTLE, true),
 
-    JACK_HAMMER("§cУдар тора",
+    JACK_HAMMER("§cРазрушитель",
             "Увеличивает шанс на ломание целого слоя в шахте",
-            40, 0, 500, 350000000,
-            Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE),
+            40, 0, 500, 2300000000D,
+            Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_FINDER("§5Добыча престижей",
             "Увеличивает шанс при копание найти престижи. Количество зависит от уровня",
             50, 0, 1000, 500000000,
-            Material.BEACON, GroupsManager.Group.MANTLE),
+            Material.BEACON, GroupsManager.Group.MANTLE, true),
 
     PRESTIGE_MERCHANT("§2Множитель престижей",
             "Умножает добываемые престижей от прокачки \"Добыча престижей\"",
-            55, 0, 5000, 200000000,
-            Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE),
+            55, 0, 5000, 150000000,
+            Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false),
 
     IG_MONEY("§4Мистер Крабс",
             "С ОЧЕНЬ маленьким шансом выдаст Вам чек, при активации которого вы получите донат валюту",
-            70, 0, 10, 1250000000000D,
-            Material.PAPER, GroupsManager.Group.COSMOS);
+            70, 0, 10, 12500000000000D,
+            Material.PAPER, GroupsManager.Group.COSMOS, true);
 
     private @Getter @Setter String name;
     private @Getter String describe;
@@ -111,6 +105,7 @@ import java.util.List;
     private @Getter double start_cost;
     private @Getter Material material;
     private @Getter GroupsManager.Group group;
+    private @Getter boolean needMessage;
 
     public Object[] getMaxUpgrades(PlayerData playerData, double level) {
         Object[] obj = {null, null};
@@ -121,7 +116,7 @@ import java.util.List;
         double token = playerData.getToken();
 
         while (token >= need) {
-            if (level >= max_level)
+            if (level >= max_level + 1)
                 break;
 
             if (need >= token)
@@ -184,13 +179,15 @@ import java.util.List;
     }
 
     public void sendProcMessage(Player player, String reward) {
-        if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
-            ChatUtil.sendMessage(player, "%s &7>> &fПринесло вам %s", name, reward);
+        if (needMessage)
+            if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
+                ChatUtil.sendMessage(player, "&8[%s&8] &fПринесло вам %s", name, reward);
     }
 
     public void sendProcMessagePlayer(Player player, String name, String reward) {
-        if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
-            ChatUtil.sendMessage(player, "%s %s &7>> &fПринесло вам %s", this.name, name, reward);
+        if (needMessage)
+            if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
+                ChatUtil.sendMessage(player, "&8[%s %s&8] &fПринесло вам %s", this.name, name, reward);
     }
 
     @Data
