@@ -1,8 +1,6 @@
 package ru.smole.data.gang;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.ArrayList;
