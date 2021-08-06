@@ -5,16 +5,16 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
+import ru.smole.data.gang.GangPlayer;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.Arrays;
+import static ru.smole.data.gang.GangPlayer.GangPlayerType;
 
 import static ru.smole.OpPrison.PREFIX;
 import static ru.smole.OpPrison.getInstance;
-import static ru.smole.data.gang.GangData.GangPlayer;
-import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 
 public class GangCommand extends BukkitCommand<Player> {
     public GangCommand() {

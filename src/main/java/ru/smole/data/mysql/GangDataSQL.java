@@ -3,9 +3,6 @@ package ru.smole.data.mysql;
 import ru.smole.OpPrison;
 import ru.xfenilafs.core.database.query.row.ValueQueryRow;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GangDataSQL {
@@ -51,14 +48,14 @@ public class GangDataSQL {
     }
 
     public static void save(String name, String members, double score) {
-        OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
+        OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,
                 "UPDATE OpPrisonGangs SET `name` = ?, `members` = ?, `income` = ?, `score` = ?  WHERE `name` = ?",
                 name, members, score, name
         );
     }
 
     public static void set(String name, String table, String input) {
-        OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
+        OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,
                 "UPDATE OpPrisonGangs SET" + table + " = ?  WHERE `name` = ?",
                 input, name
         );

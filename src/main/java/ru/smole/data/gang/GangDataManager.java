@@ -1,18 +1,14 @@
 package ru.smole.data.gang;
 
-import com.google.common.io.BaseEncoding;
-import com.mysql.jdbc.util.Base64Decoder;
-import com.sun.xml.internal.org.jvnet.staxex.Base64EncoderStream;
 import lombok.Getter;
 import lombok.val;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import ru.smole.data.mysql.GangDataSQL;
-import sun.misc.BASE64Encoder;
 
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
+import static ru.smole.data.gang.GangPlayer.GangPlayerType;
 
 public class GangDataManager {
 
@@ -23,8 +19,8 @@ public class GangDataManager {
     }
 
     public void create(String name, String owner) {
-        Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
-        gangPlayerMap.put(owner, new GangData.GangPlayer(owner, GangPlayerType.LEADER, 0.0));
+        Map<String, GangPlayer> gangPlayerMap = new HashMap<>();
+        gangPlayerMap.put(owner, new GangPlayer(owner, GangPlayerType.LEADER, 0.0));
 
         gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
         GangDataSQL.create(name, owner);
@@ -76,9 +72,9 @@ public class GangDataManager {
         return gangData;
     }
 
-    protected Map<String, GangData.GangPlayer> getGangPlayers(String name) {
+    protected Map<String, GangPlayer> getGangPlayers(String name) {
         String members = Base64Coder.decodeString(String.valueOf(GangDataSQL.get(name, "members")));
-        Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
+        Map<String, GangPlayer> gangPlayerMap = new HashMap<>();
 
         for (String s : members.split(",")) {
             String[] data = s.split("-");
@@ -94,19 +90,19 @@ public class GangDataManager {
 
             double score = Double.parseDouble(data[2]);
 
-            gangPlayerMap.put(playerName, new GangData.GangPlayer(playerName, type, score));
+            gangPlayerMap.put(playerName, new GangPlayer(playerName, type, score));
         }
 
         return gangPlayerMap;
     }
 
-    protected String getGangPlayers(Map<String, GangData.GangPlayer> gangPlayerMap) {
+    protected String getGangPlayers(Map<String, GangPlayer> gangPlayerMap) {
         StringBuilder builder = new StringBuilder();
 
         int i = 1;
         String format = "%s-%s-%s,";
 
-        for (GangData.GangPlayer gangPlayer : gangPlayerMap.values()) {
+        for (GangPlayer gangPlayer : gangPlayerMap.values()) {
             if (i == gangPlayerMap.size())
                 format = "%s-%s-%s";
 

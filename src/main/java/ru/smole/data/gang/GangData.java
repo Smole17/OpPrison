@@ -44,7 +44,7 @@ public class GangData {
     }
 
     public List<GangPlayer> findGangPlayers(GangPlayer.GangPlayerType type) {
-        return gangPlayerMap.values().stream().filter(gangPlayer -> gangPlayer.type == type).collect(Collectors.toList());
+        return gangPlayerMap.values().stream().filter(gangPlayer -> gangPlayer.getType() == type).collect(Collectors.toList());
     }
 
     public List<GangPlayer> findGangPlayers(GangPlayer.GangPlayerType... type) {
@@ -54,48 +54,5 @@ public class GangData {
             gangPlayerList.addAll(findGangPlayers(gangPlayerType));
 
         return gangPlayerList;
-    }
-
-
-
-    @AllArgsConstructor
-    @Data
-    public static class GangPlayer {
-
-        private String playerName;
-        private GangPlayerType type;
-        private double score;
-
-        @AllArgsConstructor
-        @Getter
-        public enum GangPlayerType {
-
-            DEFAULT("§8Участник"),
-            OLDEST("§7Старейшина"),
-            MANAGER("§fСоруководитель"),
-            LEADER("§f§lГлава");
-
-            private final String name;
-
-            public static GangPlayerType getTypeFromOrdinal(int ordinal) {
-                for (GangPlayerType type : GangPlayerType.values()) {
-                    if (type.ordinal() == ordinal)
-                        return type;
-                }
-
-                return null;
-            }
-        }
-
-        public boolean upType() {
-            int ordinal = type.ordinal();
-            GangPlayerType upped = GangPlayerType.getTypeFromOrdinal(ordinal + 1);
-
-            if (upped == null)
-                return false;
-
-            setType(upped);
-            return true;
-        }
     }
 }

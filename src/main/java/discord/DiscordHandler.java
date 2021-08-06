@@ -56,9 +56,6 @@ public class DiscordHandler {
             if (memberName.equals("OpPrison"))
                 return;
 
-            if (!event.getChannel().getName().equals("основной"))
-                return;
-
             val players = Bukkit.getOnlinePlayers();
 
             if (players.isEmpty())
@@ -161,9 +158,9 @@ public class DiscordHandler {
     }
 
     public void loadMembers() {
-        guild.getMembersWithRoles(role).forEach(member -> {
-            verified.put(member.getNickname(), member.getUser().getAsTag());
-        });
+        guild.getMembersWithRoles(role).forEach(member ->
+                verified.put(member.getNickname(), member.getUser().getAsTag())
+        );
     }
 
     public boolean contains(String playerName) {
