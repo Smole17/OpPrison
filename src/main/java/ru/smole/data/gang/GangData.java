@@ -3,6 +3,7 @@ package ru.smole.data.gang;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.ArrayList;
@@ -27,13 +28,13 @@ public class GangData {
 
     public void sendMessage(String message) {
         gangPlayerMap.values().forEach(gangPlayer ->
-                ChatUtil.sendMessage(gangPlayer.getPlayerName(),"&8[&f%s&8] &f" + message, name)
+                ChatUtil.sendMessage(gangPlayer.getPlayerName(),"&8[%s&8] &f" + message, name)
         );
     }
 
     public void sendMessage(String message, Object... objects) {
         gangPlayerMap.values().forEach(gangPlayer ->
-                ChatUtil.sendMessage(gangPlayer.getPlayerName(), "&8[&f%s&8] &f" + message, name, objects)
+                ChatUtil.sendMessage(gangPlayer.getPlayerName(), "&8[%s&8] &f" + message, name, objects)
         );
     }
 
@@ -41,6 +42,12 @@ public class GangData {
         double added = score + count;
         setScore(added);
         return added;
+    }
+
+
+
+    public GangPlayer getGangPlayer(String playerName) {
+        return gangPlayerMap.get(playerName);
     }
 
     public List<GangPlayer> findGangPlayers(GangPlayer.GangPlayerType type) {
@@ -62,9 +69,12 @@ public class GangData {
     @Data
     public static class GangPlayer {
 
-        private String playerName;
+        private String name;
         private GangPlayerType type;
-        private double score;
+
+        public String getPlayerName() {
+            return Bukkit.getOfflinePlayer(name).getName();
+        }
 
         @AllArgsConstructor
         @Getter
@@ -95,6 +105,17 @@ public class GangData {
                 return false;
 
             setType(upped);
+            return true;
+        }
+
+        public boolean deUpType() {
+            int ordinal = type.ordinal();
+            GangPlayerType deUpped = GangPlayerType.getTypeFromOrdinal(ordinal - 1);
+
+            if (deUpped == null)
+                return false;
+
+            setType(deUpped);
             return true;
         }
     }

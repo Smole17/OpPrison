@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import ru.smole.OpPrison;
 import ru.smole.utils.StringUtils;
+import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -28,20 +29,18 @@ public class LeaderBoard {
             simpleHolographic.addTextLine(ChatUtil.text("§fЗагрузка..."));
 
         simpleHolographic.addTextLine(ChatUtil.text("&8(обновление раз в 5 минут)"));
-        update();
 
         holograms.add(simpleHolographic);
+        update();
     }
 
     public void update() {
-        ResultSet resultSet = OpPrison.getInstance().getBase().getResult("SELECT * FROM OpPrison ORDER BY " + criteria + " DESC LIMIT 10");
-        try {
-            for (int i = 1; resultSet.next(); i++) {
-                simpleHolographic.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
-            }
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
+        OpPrison.getInstance().getBase().getExecuteHandler()
+                .executeQuery(true, "SELECT * FROM players ORDER BY " + criteria + " DESC LIMIT 10")
+                .thenAccept(resultSet -> {
+                    for (int i = 1; resultSet.next(); i++)
+                        simpleHolographic.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
+                });
     }
 
     private String getLine(int i, String user, Double count) {

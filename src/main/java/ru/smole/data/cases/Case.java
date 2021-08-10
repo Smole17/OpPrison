@@ -3,11 +3,16 @@ package ru.smole.data.cases;
 import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.material.Chest;
+import org.bukkit.material.Directional;
 import ru.smole.OpPrison;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.config.ConfigUtils;
@@ -55,6 +60,21 @@ public class Case {
 
             });
         }
+
+
+        Block block = location.getBlock();
+        block.setType(Material.CHEST);
+
+        BlockState state = block.getState();
+        Directional data = (Directional) state.getData();
+
+        data.setFacingDirection(BlockFace.WEST);
+
+        if (key.equals("TOKEN") || key.equals("LEGENDARY") || key.equals("MYTHICAL")) {
+            data.setFacingDirection(BlockFace.NORTH);
+        }
+
+        state.update();
 
         cases.put(id, this);
     }

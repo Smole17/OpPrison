@@ -14,6 +14,7 @@ import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.scoreboard.ScoreboardManager;
+import ru.smole.utils.leaderboard.LeaderBoard;
 
 import java.util.*;
 
@@ -30,15 +31,14 @@ public class PlayerDataManager {
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
 
-        PlayerDataSQL.load(name, pickaxeManager.getStats(), playerName -> {
+        PlayerDataSQL.load(name, pickaxeManager, playerName -> {
+            List<String> access = new ArrayList<>();
+            playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
+
             opPlayer.set(Items.getItem("pickaxe", name), 1);
             ScoreboardManager.loadScoreboard(player);
             OpPrison.BAR.removeAll();
             Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
-
-            List<String> access = new ArrayList<>();
-            playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
-            pickaxeManager.create();
         });
 
         opPlayer.getBoosterManager().load();
@@ -76,6 +76,12 @@ public class PlayerDataManager {
 
         OpPrison.BAR.removeAll();
         Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
+        LeaderBoard.holograms.forEach(simpleHolographic -> {
+            simpleHolographic.addReceivers(player);
+            simpleHolographic.addViewers(player);
+            simpleHolographic.remove();
+            simpleHolographic.spawn();
+        });
     }
 
     public void unload(Player player) {
@@ -112,8 +118,8 @@ public class PlayerDataManager {
         String name = player.getName();
         PlayerData data = playerDataMap.get(name);
 
-        PlayerDataSQL.set(name, "blocks", String.valueOf(data.getBlocks()));
-        PlayerDataSQL.set(name, "prestige", String.valueOf(data.getPrestige()));
+        PlayerDataSQL.set(name, "blocks", data.getBlocks());
+        PlayerDataSQL.set(name, "prestige", data.getPrestige());
     }
 
     protected List<String> getList(String str) {

@@ -35,7 +35,7 @@ public class DiscordBot extends ListenerAdapter {
     public DiscordBot(String token) throws LoginException {
         this.token = token;
 
-        jda = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS)
+        jda = JDABuilder.create(token, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
                 .addEventListeners(this)
                 .build();
     }

@@ -37,6 +37,8 @@ public class BoosterManager {
             case 90:
                 addBooster(1.0);
                 break;
+            case 901:
+                addBooster(2.0);
         }
 
         BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
@@ -65,6 +67,8 @@ public class BoosterManager {
             case 90:
                 delBooster(1.0);
                 break;
+            case 901:
+                delBooster(2.0);
         }
 
         BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",

@@ -1,15 +1,14 @@
 package ru.smole.data.gang;
 
-import com.google.common.io.BaseEncoding;
-import com.mysql.jdbc.util.Base64Decoder;
-import com.sun.xml.internal.org.jvnet.staxex.Base64EncoderStream;
 import lombok.Getter;
 import lombok.val;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Guild;
+import org.bukkit.ChatColor;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
+import ru.smole.OpPrison;
 import ru.smole.data.mysql.GangDataSQL;
-import sun.misc.BASE64Encoder;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
@@ -22,16 +21,22 @@ public class GangDataManager {
         gangDataMap = new HashMap<>();
     }
 
-    public void create(String name, String owner) {
+    public void create(String name, String leader) {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
-        gangPlayerMap.put(owner, new GangData.GangPlayer(owner, GangPlayerType.LEADER, 0.0));
+        gangPlayerMap.put(leader, new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
 
         gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
-        GangDataSQL.create(name, owner);
+        GangDataSQL.create(name, leader);
+
+        Guild guild = OpPrison.getInstance().getDiscordBot().getGuild();
+        guild.createTextChannel("gang-" + ChatColor.stripColor(name), guild.getCategoryById("874391171500216371")).complete();
     }
 
     public void load() {
         String[] name = (String[]) GangDataSQL.get("name");
+
+        if (name == null)
+            return;
 
         for (String s : name) {
             double score = (Double) GangDataSQL.get(s, "score");
@@ -56,8 +61,12 @@ public class GangDataManager {
         gangDataMap.clear();
     }
 
-    public boolean playerHasGuild(String playerName) {
+    public boolean playerHasGang(String playerName) {
         return getGangFromPlayer(playerName) != null;
+    }
+
+    public boolean playerInGang(GangData gangData, String playerName) {
+        return gangData.getGangPlayerMap().containsKey(playerName);
     }
 
     public GangData getGangFromPlayer(String playerName) {
@@ -92,9 +101,7 @@ public class GangDataManager {
                 throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
             }
 
-            double score = Double.parseDouble(data[2]);
-
-            gangPlayerMap.put(playerName, new GangData.GangPlayer(playerName, type, score));
+            gangPlayerMap.put(playerName, new GangData.GangPlayer(playerName, type));
         }
 
         return gangPlayerMap;
@@ -104,14 +111,14 @@ public class GangDataManager {
         StringBuilder builder = new StringBuilder();
 
         int i = 1;
-        String format = "%s-%s-%s,";
+        String format = "%s-%s,";
 
         for (GangData.GangPlayer gangPlayer : gangPlayerMap.values()) {
             if (i == gangPlayerMap.size())
-                format = "%s-%s-%s";
+                format = "%s-%s";
 
             String member = String.format(format,
-                    gangPlayer.getPlayerName(), gangPlayer.getType().name(), gangPlayer.getScore());
+                    gangPlayer.getPlayerName(), gangPlayer.getType().name());
 
             builder.append(member);
             i++;

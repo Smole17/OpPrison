@@ -94,7 +94,7 @@ public class StatsCommand extends BukkitCommand<Player> {
             }
 
             if (value != null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: §b%s", targetName, piece,
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f%s: §b%s", targetName, piece,
                         value.getClass() == Double.class ? StringUtils._fixDouble(0, (double) value) : value);
                 return;
             }

@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class GangDataSQL {
 
     public static void create(String name, String owner) {
-        OpPrison.getInstance().getBase().getTable("OpPrisonGangs")
+        OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .insertQuery()
 
@@ -25,7 +25,7 @@ public class GangDataSQL {
     public static Object get(String name, String table) {
         AtomicReference<Object> obj = null;
 
-        OpPrison.getInstance().getBase().getTable("OpPrisonGangs")
+        OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
 
@@ -38,28 +38,28 @@ public class GangDataSQL {
     }
 
     public static Object get(String table) {
-        AtomicReference<Object> obj = null;
+        Object[] obj = {null};
 
-        OpPrison.getInstance().getBase().getTable("OpPrisonGangs")
+        OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
 
                 .executeQueryAsync(OpPrison.getInstance().getBase())
-                .thenAccept(result -> obj.set(result.getObject(table)));
+                .thenAccept(result -> obj[0] = result.getObject(table));
 
-        return obj;
+        return obj[0];
     }
 
     public static void save(String name, String members, double score) {
         OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE OpPrisonGangs SET `name` = ?, `members` = ?, `income` = ?, `score` = ?  WHERE `name` = ?",
+                "UPDATE gangs SET `name` = ?, `members` = ?, `income` = ?, `score` = ?  WHERE `name` = ?",
                 name, members, score, name
         );
     }
 
     public static void set(String name, String table, String input) {
         OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE OpPrisonGangs SET" + table + " = ?  WHERE `name` = ?",
+                "UPDATE gangs SET" + table + " = ?  WHERE `name` = ?",
                 input, name
         );
     }

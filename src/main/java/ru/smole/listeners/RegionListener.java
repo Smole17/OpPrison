@@ -7,6 +7,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
@@ -22,7 +23,7 @@ import static ru.smole.OpPrison.*;
 
 public class RegionListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         Predicate<Mine> predicate = mine -> mine.getZone().contains(block);
@@ -40,7 +41,7 @@ public class RegionListener implements Listener {
         event.setDropItems(false);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onBlockPlace(BlockPlaceEvent event) {
         if (!BUILD_MODE.contains(event.getPlayer())) {
             event.setCancelled(true);

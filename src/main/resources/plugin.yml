@@ -4,3 +4,4 @@ main: ru.smole.OpPrison
 authors: [ NeSmole ]
 depend:
   - SMCS
+  - SlimeWorldManager

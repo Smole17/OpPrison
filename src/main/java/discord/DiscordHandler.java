@@ -44,6 +44,7 @@ public class DiscordHandler {
         loadMembers();
 
         bot.handleMessage(event -> {
+            if (event.getChannel().getName().equals("основной")) {
             Member member = Objects.requireNonNull(event.getMember());
             String memberName = member.getNickname();
 
@@ -54,9 +55,6 @@ public class DiscordHandler {
             String text = message.getContentDisplay();
 
             if (memberName.equals("OpPrison"))
-                return;
-
-            if (!event.getChannel().getName().equals("основной"))
                 return;
 
             val players = Bukkit.getOnlinePlayers();
@@ -109,54 +107,55 @@ public class DiscordHandler {
 
                 player.spigot().sendMessage(spigotMessage[0]);
             });
+            }
         });
+
         bot.handleMessage(event -> {
-            Member member = Objects.requireNonNull(event.getMember());
-            String memberName = member.getNickname();
-
-            Message message = event.getMessage();
-            String text = message.getContentDisplay();
-
-            if (memberName != null && memberName.equals("OpPrison"))
-                return;
-
             TextChannel channel = event.getChannel();
 
-            if (!channel.getName().equals(verify))
-                return;
+            if (channel.getName().equals(verify)) {
+                Member member = Objects.requireNonNull(event.getMember());
+                String memberName = member.getNickname();
 
-            String[] args = text.split("\\s");
-            if (!text.startsWith("!verify") && args.length != 2) {
-                bot.sendMessage(verify, "Используйте: !verify <код>");
-                return;
+                Message message = event.getMessage();
+                String text = message.getContentDisplay();
+
+                if (memberName != null && memberName.equals("OpPrison"))
+                    return;
+
+                String[] args = text.split("\\s");
+                if (!text.startsWith("!verify") && args.length != 2) {
+                    bot.sendMessage(verify, "Используйте: !verify <код>");
+                    return;
+                }
+
+                if (!verifyMap.containsKey(args[1])) {
+                    bot.sendMessage(verify, "Неверный код!");
+                    return;
+                }
+
+                Guild guild = channel.getGuild();
+
+                if (role == null) {
+                    bot.sendMessage(verify, "Бот не настроен. Срочно обратитесь к администрации!");
+                    return;
+                }
+
+                PlayerData playerData = verifyMap.get(args[1]);
+                String playerName = playerData.getName();
+                String tag = event.getAuthor().getAsTag();
+
+                guild.addRoleToMember(member, role).complete();
+                member.modifyNickname(playerName).complete();
+
+                verified.put(playerName, tag);
+                verifyMap.remove(args[1]);
+                Bukkit.getScheduler().cancelTask(DiscordCommand.taskMap.get(playerName));
+
+                Player player = Bukkit.getPlayer(playerName);
+                if (player != null)
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно привязали свой игровой аккаунт к &b%s&f дискорд аккаунту", tag);
             }
-
-            if (!verifyMap.containsKey(args[1])) {
-                bot.sendMessage(verify, "Неверный код!");
-                return;
-            }
-
-            Guild guild = channel.getGuild();
-
-            if (role == null) {
-                bot.sendMessage(verify, "Бот не настроен. Срочно обратитесь к администрации!");
-                return;
-            }
-
-            PlayerData playerData = verifyMap.get(args[1]);
-            String playerName = playerData.getName();
-            String tag = event.getAuthor().getAsTag();
-
-            guild.addRoleToMember(member, role).complete();
-            member.modifyNickname(playerName).complete();
-
-            verified.put(playerName, tag);
-            verifyMap.remove(args[1]);
-            Bukkit.getScheduler().cancelTask(DiscordCommand.taskMap.get(playerName));
-
-            Player player = Bukkit.getPlayer(playerName);
-            if (player != null)
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы успешно привязали свой игровой аккаунт к &b%s&f дискорд аккаунту", tag);
         });
     }
 

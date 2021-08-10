@@ -38,7 +38,8 @@ public class HelpCommand extends BukkitCommand<Player> {
         ChatUtil.sendMessage(player, OpPrison.PREFIX + String.format("Найденная информация: %s", description));
     }
 
-    @AllArgsConstructor public enum Guide {
+    @AllArgsConstructor
+    public enum Guide {
 
         BOOSTER(
                 "\n   Бустеры в зависимости от процента, " +
@@ -83,7 +84,8 @@ public class HelpCommand extends BukkitCommand<Player> {
         GAME(
                 "\n   OpPrison - идея была взята с запада. " +
                         "\n   Тут основное внимание сконцентрированно на копание, прокачку престижей" +
-                        "\n   и прокачку кирки в 100x100x100 шахтах."
+                        "\n   и прокачку кирки в 100x100x100 шахтах." +
+                        "\n   Локации доступны через /warp"
         );
 
         private @Getter String desc;

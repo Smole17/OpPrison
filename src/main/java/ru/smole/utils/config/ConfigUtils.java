@@ -19,18 +19,14 @@ public class ConfigUtils {
         return new Location(world, x, y, z);
     }
 
-    public static void saveLocationToConfigurationSection(Location location, Config config, String sectionName) {
-        ConfigurationSection section;
-        if (config.getConfiguration().getConfigurationSection(sectionName) != null)
-            section = config.getConfiguration().getConfigurationSection(sectionName);
-        else
-            section = config.getConfiguration().createSection(sectionName);
-        section.set("world", location.getWorld().getName());
-        section.set("x", StringUtils.fixDouble(1, location.getX()));
-        section.set("y", StringUtils.fixDouble(1, location.getY()));
-        section.set("z", StringUtils.fixDouble(1, location.getZ()));
-        section.set("yaw", StringUtils.fixDouble(1, location.getYaw()));
-        section.set("pitch", StringUtils.fixDouble(1, location.getPitch()));
-        config.save();
+    public static Location loadLocationFromConfigurationSectionSplit(ConfigurationSection section) {
+        String[] split = section.getString("location").split(" ");
+        World world = Bukkit.getWorld(split[0]);
+        double x = Double.parseDouble(split[1]);
+        double y = Double.parseDouble(split[2]);
+        double z = Double.parseDouble(split[3]);
+        float yaw = Float.parseFloat(split[4]);
+        float pitch = Float.parseFloat(split[5]);
+        return new Location(world, x, y, z, yaw, pitch);
     }
 }

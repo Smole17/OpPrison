@@ -20,27 +20,37 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import ru.smole.commands.*;
-import ru.smole.data.gang.GangDataManager;
-import ru.smole.data.player.PlayerDataManager;
 import ru.smole.data.cases.Case;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
+import ru.smole.data.pads.LaunchPad;
+import ru.smole.data.player.PlayerDataManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
+import ru.smole.utils.StringUtils;
+import ru.smole.utils.WorldBorderUtils;
+import ru.smole.utils.config.ConfigManager;
+import ru.smole.utils.config.ConfigUtils;
+import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.smole.utils.server.BungeeUtil;
 import ru.smole.utils.server.ServerUtil;
-import ru.smole.utils.StringUtils;
-import ru.smole.utils.config.ConfigManager;
-import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.CorePlugin;
 import ru.xfenilafs.core.database.RemoteDatabaseConnectionHandler;
+import ru.xfenilafs.core.database.RemoteDatabaseTable;
 import ru.xfenilafs.core.database.RemoteDatabasesApi;
+import ru.xfenilafs.core.database.query.row.TypedQueryRow;
+import ru.xfenilafs.core.holographic.ProtocolHolographic;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
+import ru.xfenilafs.core.holographic.manager.ProtocolHolographicManager;
+import ru.xfenilafs.core.protocollib.entity.FakeBaseMob;
+import ru.xfenilafs.core.protocollib.entity.FakeEntityClickable;
+import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
 
@@ -48,12 +58,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.smole.data.items.Items.registerItem;
+import static ru.xfenilafs.core.database.query.RemoteDatabaseRowType.*;
 
 @Slf4j
 public class OpPrison extends CorePlugin {
 
-    public @Getter
-    static OpPrison instance;
+    public @Getter static OpPrison instance;
 
     private @Getter
     PlayerDataManager playerDataManager;
@@ -67,10 +77,15 @@ public class OpPrison extends CorePlugin {
     DiscordBot discordBot;
     private @Getter
     GangDataManager gangDataManager;
+    private @Getter
+    RemoteDatabaseTable players;
+    private @Getter
+    RemoteDatabaseTable gangs;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
+    public static final List<LaunchPad> PADS = new ArrayList<>();
     public static String PREFIX = "§7§l> §f";
     public static String BAR_FORMAT;
     public static BossBar BAR;
@@ -83,11 +98,35 @@ public class OpPrison extends CorePlugin {
         gangDataManager = new GangDataManager();
         configManager = new ConfigManager();
         base = RemoteDatabasesApi.getInstance().createMysqlConnection(RemoteDatabasesApi.getInstance().createConnectionFields(
-                "46.105.122.17",
-                "azerusdms",
-                "AGHKSF8123AIYWT1862t3iJKGHFASDqqqq",
+                "localhost",
+                "root",
+                "42aDYaGhg7w9Fv",
                 "OpPrison"
         ));
+
+        base.newDatabaseQuery("players").createTableQuery().setCanCheckExists(true)
+                .queryRow(new TypedQueryRow(TEXT,"name"))
+                .queryRow(new TypedQueryRow(DOUBLE,"blocks"))
+                .queryRow(new TypedQueryRow(DOUBLE,"money"))
+                .queryRow(new TypedQueryRow(DOUBLE,"token"))
+                .queryRow(new TypedQueryRow(DOUBLE,"multiplier"))
+                .queryRow(new TypedQueryRow(DOUBLE,"prestige"))
+                .queryRow(new TypedQueryRow(TEXT,"rank"))
+                .queryRow(new TypedQueryRow(INT,"fly"))
+                .queryRow(new TypedQueryRow(TEXT,"pickaxe"))
+                .queryRow(new TypedQueryRow(TEXT,"kit"))
+                .queryRow(new TypedQueryRow(TEXT,"access"))
+                .executeSync(base);
+
+        base.newDatabaseQuery("gangs").createTableQuery().setCanCheckExists(true)
+                .queryRow(new TypedQueryRow(TEXT, "name"))
+                .queryRow(new TypedQueryRow(TEXT, "members"))
+                .queryRow(new TypedQueryRow(DOUBLE, "score"))
+                .executeSync(base);
+
+        players = base.getTable("players");
+        gangs = base.getTable("gangs");
+
         discordBot = new DiscordBot("ODcwNzczMjExMzcyMDczMDgw.YQRovw.hA0SnRF-GXIGzON4AJ3cBqE2w_Y");
 
         BAR_FORMAT = String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
@@ -114,8 +153,8 @@ public class OpPrison extends CorePlugin {
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
                 new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
                 new FlyCommand(), new HelpCommand(), new KitCommand(), new EventCommand(),
-                new TrashCommand(), new DiscordCommand(null), new RestartCommand(),
-                new GangCommand()
+                new TrashCommand(), new DiscordCommand(null), new RestartCommand(), new GangCommand(),
+                new GangChatCommand()
         );
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -132,6 +171,7 @@ public class OpPrison extends CorePlugin {
     private void loadRegionsAndMines() {
         FileConfiguration config = configManager.getRegionConfig().getConfiguration();
         ConfigurationSection regions = config.getConfigurationSection("regions");
+
         regions.getKeys(false).forEach(key -> {
             ConfigurationSection section = regions.getConfigurationSection(key);
             String name = section.getString("name");
@@ -166,6 +206,8 @@ public class OpPrison extends CorePlugin {
                             Double.parseDouble(minPoint[3])
                     )
             );
+
+            WorldBorderUtils.spawn(region.getZone().getWorld(), region.getZone().getCenter(), 180);
             REGIONS.put(name.toLowerCase(), region);
         });
         log.info("Loaded {} regions!", REGIONS.size());
@@ -199,6 +241,12 @@ public class OpPrison extends CorePlugin {
         log.info("Loaded {} mines!", MINES.size());
 
         Bukkit.getScheduler().runTaskTimer(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
+
+        FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
+        ConfigurationSection pads = misc.getConfigurationSection("pads");
+        pads.getKeys(false).forEach(s ->
+                PADS.add(new LaunchPad(pads.getConfigurationSection(s)))
+        );
     }
 
     private void loadCases() {
@@ -243,27 +291,27 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadLeaderBoard() {
+        FileConfiguration miscConfig = configManager.getMiscConfig().getConfiguration();
         LeaderBoard blocks = new LeaderBoard(
                 "&bТоп по блокам",
-                new Location(Bukkit.getWorld("world"), 34, 122, 2),
+                ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-block")),
                 "blocks"
         );
 
         LeaderBoard prestige = new LeaderBoard(
                 "&bТоп по престижам",
-                new Location(Bukkit.getWorld("world"), 23, 122, 2),
+                ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-prestige")),
                 "prestige"
         );
 
-        SimpleHolographic simpleHolographic = new SimpleHolographic(new Location(Bukkit.getWorld("world"), 28.5, 121.5, 1));
+        SimpleHolographic simpleHolographic = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("info")));
 
         simpleHolographic.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
         simpleHolographic.addEmptyLine();
-        simpleHolographic.addTextLine("§fВсю полезную информация Вы можете узнать через §b/help");
+        simpleHolographic.addTextLine("§fВсю полезную информацию Вы можете узнать через §b/help");
         simpleHolographic.addTextLine("§fВаша основная цель - прокачать свою кирку как можно лучше");
         simpleHolographic.addEmptyLine();
         simpleHolographic.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
-
         LeaderBoard.holograms.add(simpleHolographic);
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {

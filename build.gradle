@@ -1,8 +1,10 @@
-
-
 plugins {
     id 'java'
 }
+
+group 'ru.smole'
+version '1.0'
+
 repositories {
     mavenCentral()
     maven {
@@ -20,6 +22,10 @@ repositories {
     maven {
         url = 'https://m2.dv8tion.net/releases'
     }
+
+    maven {
+        url = "https://repo.glaremasters.me/repository/concuncan/"
+    }
 }
 
 dependencies {
@@ -35,8 +41,9 @@ dependencies {
     }
     compile 'org.apache.commons:commons-collections4:4.4'
 
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compile 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
 
 jar {

@@ -7,6 +7,7 @@ public class ConfigManager {
 
     private Config config;
     private Config regionConfig;
+    private Config miscConfig;
 
     public ConfigManager() {
         init();
@@ -15,5 +16,6 @@ public class ConfigManager {
     private void init() {
         config = new Config("config.yml", "config.yml");
         regionConfig = new Config("regions.yml", "regions.yml");
+        miscConfig = new Config("misc.yml", "misc.yml");
     }
 }

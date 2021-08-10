@@ -1,6 +1,5 @@
-package ru.smole.event;
+package ru.smole.data.event;
 
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class OpEvents implements OpEvent {
