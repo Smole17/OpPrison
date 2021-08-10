@@ -160,9 +160,9 @@ public class DiscordHandler {
     }
 
     public void loadMembers() {
-        guild.getMembersWithRoles(role).forEach(member -> {
-            verified.put(member.getNickname(), member.getUser().getAsTag());
-        });
+        guild.getMembersWithRoles(role).forEach(member ->
+                verified.put(member.getNickname(), member.getUser().getAsTag())
+        );
     }
 
     public boolean contains(String playerName) {

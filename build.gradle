@@ -1,10 +1,8 @@
+
+
 plugins {
     id 'java'
 }
-
-group 'ru.smole'
-version '1.0'
-
 repositories {
     mavenCentral()
     maven {
@@ -22,28 +20,20 @@ repositories {
     maven {
         url = 'https://m2.dv8tion.net/releases'
     }
-
-    maven {
-        url = "https://repo.glaremasters.me/repository/concuncan/"
-    }
 }
 
 dependencies {
-
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
+
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
 //    compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
 
-    compile ('net.dv8tion:JDA:4.3.0_277') {
-        exclude module: 'opus-java'
-    }
+    compile 'net.dv8tion:JDA:4.3.0_277'
     compile 'org.apache.commons:commons-collections4:4.4'
-
-    compile 'org.projectlombok:lombok:1.18.10'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
 
 jar {
