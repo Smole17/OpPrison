@@ -1,0 +1,19 @@
+info:
+  world: spawn
+  x: 0
+  y: 62
+  z: 0
+tops-block:
+  world: spawn
+  x: 10
+  y: 62
+  z: 10
+tops-prestige:
+  world: spawn
+  x: 20
+  y: 62
+  z: 20
+pads:
+  1:
+    location: spawn 1 62 2
+    velocity: 1 2
