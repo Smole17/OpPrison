@@ -1,11 +1,12 @@
 package ru.smole.data.booster;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.utils.StringUtils;
+import ru.xfenilafs.core.util.ChatUtil;
 
-import static ru.smole.OpPrison.BAR;
-import static ru.smole.OpPrison.BOOSTER;
+import static ru.smole.OpPrison.*;
 
 public class BoosterManager {
 
@@ -19,6 +20,15 @@ public class BoosterManager {
         int id = RPlayer.checkAndGet(player.getName()).getMainPermissionGroup().getId();
 
         switch (id) {
+            case 10:
+                addBooster(0.05);
+                break;
+            case 20:
+                addBooster(0.1);
+                break;
+            case 30:
+                addBooster(0.15);
+                break;
             case 40:
                 addBooster(0.2);
                 break;
@@ -39,10 +49,15 @@ public class BoosterManager {
                 break;
             case 901:
                 addBooster(2.0);
+                break;
         }
 
         BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
                 StringUtils._fixDouble(1, BOOSTER) + "%"));
+
+        Player neSmole = Bukkit.getPlayer("NeSmole");
+        if (neSmole != null)
+            ChatUtil.sendMessage(neSmole, PREFIX + "&bBAR UPDATE: " + BOOSTER);
     }
 
     public void unload() {
