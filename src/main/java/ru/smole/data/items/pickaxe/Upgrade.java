@@ -73,19 +73,19 @@ import ru.xfenilafs.core.util.ChatUtil;
             Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true),
 
     MULTI_FINDER("§dНахождение множителя",
-            "Выдаёт от 1-го до 3-ёх множителей Вам",
+            "Выдаёт от 1-го до 3-ёх множителей",
             25, 0, 1000, 1000000000,
             Material.BOOK, GroupsManager.Group.MANTLE, true),
 
     JACK_HAMMER("§cРазрушитель",
             "Увеличивает шанс на ломание целого слоя в шахте",
-            40, 0, 500, 2300000000D,
+            25, 0, 500, 2300000000D,
             Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_FINDER("§5Добыча престижей",
             "Увеличивает шанс при копание найти престижи. Количество зависит от уровня",
             50, 0, 1000, 500000000,
-            Material.BEACON, GroupsManager.Group.MANTLE, true),
+            Material.BEACON, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_MERCHANT("§2Множитель престижей",
             "Умножает добываемые престижей от прокачки \"Добыча престижей\"",
@@ -197,5 +197,6 @@ import ru.xfenilafs.core.util.ChatUtil;
         private double count;
         private boolean is;
         private boolean isMessage;
+        private boolean isCompleteQ;
     }
 }

@@ -3,9 +3,15 @@ package ru.smole.data.player;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import ru.luvas.rmcs.player.RPlayer;
+import ru.smole.data.gang.GangData;
 import ru.smole.data.group.GroupsManager;
+import ru.smole.data.npc.question.Question;
+import sexy.kostya.mineos.achievements.Achievement;
+import sexy.kostya.mineos.achievements.Achievements;
 
 import java.util.List;
+import java.util.Map;
 
 @Data public class PlayerData {
 
@@ -18,8 +24,11 @@ import java.util.List;
     private double prestige;
     private boolean fly;
     private List<String> access;
+    private Map<String, Question> questions;
 
-    public PlayerData(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, boolean fly, List<String> access) {
+    public PlayerData(String name, double blocks, double money, double token, double multiplier,
+                      GroupsManager.Group group, double prestige, boolean fly, List<String> access,
+                      Map<String, Question> questions) {
         this.name = name;
         this.blocks = blocks;
         this.money = money;
@@ -29,6 +38,7 @@ import java.util.List;
         this.prestige = prestige;
         this.fly = fly;
         this.access = access;
+        this.questions = questions;
     }
 
     public Player getPlayer() {
@@ -38,6 +48,27 @@ import java.util.List;
     public double addBlocks(double count) {
         double added = blocks + count;
         setBlocks(added);
+
+        Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
+
+        if (blocks >= 10000) {
+            if (!achievements.hasAchievement(Achievement.OP_NEW_MINER)) {
+                achievements.addAchievement(Achievement.OP_NEW_MINER);
+            }
+        }
+
+        if (blocks >= 100000) {
+            if (!achievements.hasAchievement(Achievement.OP_MIDDLE_MINER)) {
+                achievements.addAchievement(Achievement.OP_MIDDLE_MINER);
+            }
+        }
+
+        if (blocks >= 1000000) {
+            if (!achievements.hasAchievement(Achievement.OP_MASTER_MINER)) {
+                achievements.addAchievement(Achievement.OP_MASTER_MINER);
+            }
+        }
+
         return added;
     }
 
@@ -50,6 +81,15 @@ import java.util.List;
     public double addToken(double count) {
         double added = token + count;
         setToken(added);
+
+        if (token >= 1000000000000D) {
+            Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
+
+            if (!achievements.hasAchievement(Achievement.OP_1T_TOKENS)) {
+                achievements.addAchievement(Achievement.OP_1T_TOKENS);
+            }
+        }
+
         return added;
     }
 

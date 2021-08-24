@@ -1,6 +1,5 @@
 package ru.smole.commands;
 
-import discord.DiscordBot;
 import lombok.var;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -11,10 +10,10 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.player.OpPlayer;
-import ru.smole.data.items.Items;
 import ru.smole.data.event.OpEvent;
 import ru.smole.data.event.OpEvents;
+import ru.smole.data.items.Items;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.ItemStackUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
@@ -79,8 +78,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
 
     public void number(CommandSender sender, String name, int i, ItemStack itemMain) {
         OpEvent opEvent = new OpEvents();
-        DiscordBot discordBot = OpPrison.instance.getDiscordBot();
-        var events = opEvent.getEvents();
+        var events = opEvent.getChatEvents();
 
         int random = new Random().nextInt(i) + 1;
         final boolean[][] is = {{false}};
@@ -120,8 +118,6 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 ChatUtil.broadcast("    §fЗагаданное число было: §b%s", random);
                 ChatUtil.broadcast("    §fПобедителем события стал: §b%s", target.getName());
                 ChatUtil.broadcast("");
-
-                discordBot.sendMessage("основной","Победителем события стал: " + target.getName());
 
                 new OpPlayer(target).add(itemMain);
 
@@ -165,20 +161,11 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         ChatUtil.broadcast("");
 
 
-        discordBot.sendMessage("основной",
-                "-",
-                sender.getName() + " начал новое событие отгадай число",
-                "Диапозон: 1-" + i,
-                "Награда: " + itemMain.getItemMeta().getDisplayName(),
-                "ЗАГАДАННОЕ ЧИСЛО: " + random,
-                "-"
-        );
     }
 
     public void chat(CommandSender sender, String name, boolean is) {
         OpEvent opEvent = new OpEvents();
-        DiscordBot discordBot = OpPrison.instance.getDiscordBot();
-        var events = opEvent.getEvents();
+        var events = opEvent.getChatEvents();
 
         opEvent.getActiveEvents().remove(name);
         events.remove(name);
@@ -194,11 +181,6 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         });
 
         opEvent.start(name);
-        discordBot.sendMessage("основной",
-                "-",
-                sender.getName() + " " + (!is ? "включил" : "отключил") + " возможность писать в чат",
-                "-"
-        );
 
         ChatUtil.broadcast("");
         ChatUtil.broadcast(OpPrison.PREFIX + "&b%s &f%s возможность писать в чат", sender.getName(), !is ? "включил" : "отключил");

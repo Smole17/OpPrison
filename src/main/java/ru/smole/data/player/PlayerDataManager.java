@@ -2,8 +2,10 @@ package ru.smole.data.player;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.commands.GangCommand;
 import ru.smole.commands.HideCommand;
 import ru.smole.commands.KitCommand;
 import ru.smole.data.group.GroupsManager;
@@ -11,6 +13,8 @@ import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
+import ru.smole.data.npc.NpcInitializer;
+import ru.smole.data.npc.question.Question;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.scoreboard.ScoreboardManager;
@@ -20,28 +24,10 @@ import java.util.*;
 
 public class PlayerDataManager {
 
-    private @Getter Map<String, PlayerData> playerDataMap;
+    private final @Getter Map<String, PlayerData> playerDataMap;
 
     public PlayerDataManager() {
         playerDataMap = new HashMap<>();
-    }
-
-    public void create(Player player) {
-        OpPlayer opPlayer = new OpPlayer(player);
-        PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
-        String name = player.getName();
-
-        PlayerDataSQL.load(name, pickaxeManager, playerName -> {
-            List<String> access = new ArrayList<>();
-            playerDataMap.put(name, new PlayerData(name, 0, 0, 0 ,0, GroupsManager.Group.MANTLE, 0, false, access));
-
-            opPlayer.set(Items.getItem("pickaxe", name), 1);
-            ScoreboardManager.loadScoreboard(player);
-            OpPrison.BAR.removeAll();
-            Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
-        });
-
-        opPlayer.getBoosterManager().load();
     }
 
     public void load(Player player) {
@@ -54,7 +40,9 @@ public class PlayerDataManager {
                 hiders.hidePlayer(OpPrison.getInstance(), player);
         });
 
-        create(player);
+        PlayerDataSQL.tryLoad(name, pickaxeManager);
+
+        opPlayer.getBoosterManager().load();
 
         double blocks = (double) PlayerDataSQL.get(name, "blocks");
         double money = (double) PlayerDataSQL.get(name, "money");
@@ -65,23 +53,37 @@ public class PlayerDataManager {
         boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         String access = (String) PlayerDataSQL.get(name, "access");
+        Map<String, Question> questions = getQuestionsFromString((String) PlayerDataSQL.get(name, "questions"));
 
-        playerDataMap.put(name, new PlayerData(name, blocks, money, token, multiplier, group, prestige, fly, getList(access)));
+        playerDataMap.put(
+                name,
+                new PlayerData(
+                        name, blocks, money, token, multiplier,
+                        group, prestige, fly, getListFromString(access),
+                        questions
+                )
+        );
         PickaxeManager.getPickaxes().put(name, pickaxe);
 
         pickaxeManager.load();
-        opPlayer.getBoosterManager().load();
         KitCommand.KitsGui.load(name);
         ScoreboardManager.loadScoreboard(player);
+        GangCommand.invitedList.put(name, new ArrayList<>());
 
         OpPrison.BAR.removeAll();
         Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
+
         LeaderBoard.holograms.forEach(simpleHolographic -> {
-            simpleHolographic.addReceivers(player);
-            simpleHolographic.addViewers(player);
-            simpleHolographic.remove();
+            if (!simpleHolographic.getLocation().getWorld().equals(player.getWorld()))
+                return;
+
             simpleHolographic.spawn();
         });
+
+        if (playerDataMap.get(name).isFly()) {
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        }
     }
 
     public void unload(Player player) {
@@ -103,9 +105,13 @@ public class PlayerDataManager {
         int fly = data.isFly() ? 1 : 0;
         String pickaxe = pickaxeManager.getStats();
         List<String> access = data.getAccess();
+        Map<String, Question> questions = data.getQuestions();
 
         HideCommand.hide.remove(player);
-        PlayerDataSQL.save(name, blocks, money, token, multiplier, group, prestige, fly, pickaxe, KitCommand.KitsGui.save(name), getString(access));
+        PlayerDataSQL.save(
+                name, blocks, money, token, multiplier, group, prestige, fly, pickaxe,
+                KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions)
+        );
         opPlayer.getBoosterManager().unload();
         pickaxeManager.unload();
         playerDataMap.remove(name);
@@ -122,11 +128,14 @@ public class PlayerDataManager {
         PlayerDataSQL.set(name, "prestige", data.getPrestige());
     }
 
-    protected List<String> getList(String str) {
+    protected List<String> getListFromString(String str) {
+        if (str == null || str.equals("null"))
+            return new ArrayList<>();
+
         return new ArrayList<>(Arrays.asList(str.split(",")));
     }
 
-    protected String getString(List<String> list) {
+    protected String getStringFromList(List<String> list) {
         StringBuilder sb = new StringBuilder();
         String format = "%s,";
 
@@ -136,6 +145,43 @@ public class PlayerDataManager {
                 format = format.replace(",", "");
 
             sb.append(String.format(format, s));
+        }
+
+        return sb.toString();
+    }
+
+    protected Map<String, Question> getQuestionsFromString(String str) {
+        Map<String, Question> questions = new HashMap<>();
+
+        if (str == null || str.equals("null"))
+            return questions;
+
+        for (String s : str.split(",")) {
+            if (s == null)
+                break;
+
+            String[] args = s.split("\\.");
+
+            if (args.length <= 1)
+                break;
+
+            questions.put(args[0], new Question(Question.QuestionStep.valueOf(args[1].toUpperCase())));
+        }
+
+        return questions;
+    }
+
+    protected String getStringFromQuestions(Map<String, Question> questions) {
+        StringBuilder sb = new StringBuilder();
+        String format = "%s.%s,";
+
+        int i = 1;
+        for (String s : questions.keySet()) {
+            Question question = questions.get(s);
+            if (i == questions.size())
+                format = format.replace(",", "");
+
+            sb.append(String.format(format, s, question.getStep().name().toUpperCase()));
         }
 
         return sb.toString();

@@ -35,14 +35,8 @@ public class GangChatCommand extends BukkitCommand<Player> {
 
         String message = String.join(" ", args);
         GangData gangData = gangDataManager.getGangFromPlayer(playerName);
-        String gangName = gangData.getName();
 
         GangData.GangPlayer gangPlayer = gangData.getGangPlayer(playerName);
-
-        main.getDiscordBot().sendMessage(
-                "gang-" + gangName,
-                ChatColor.stripColor(String.format("%s &7%s: &f%s", gangPlayer.getType().getName(), playerName, message).replace("&", "§"))
-        );
 
         gangData.sendMessage(gangPlayer.getType().getName() + " &7" + playerName + ": &f" + message);
     }

@@ -7,11 +7,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.items.Items;
+import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.player.OpPlayer;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import javax.naming.PartialResultException;
 import java.util.Arrays;
 
 @CommandPermission(permission = "opprison.admin")
@@ -33,26 +36,43 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
         Player target = Bukkit.getPlayer(args[0]);
 
         if (target == null) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX +  "Игрок не найден");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
             return;
         }
 
-        OpPlayer opPlayer = new OpPlayer(target);
+        switch (args[1]) {
+            case "jack_hammer":
+                Upgrade.UpgradeStat jack = PickaxeManager.getPickaxes().get(target.getName()).getUpgrades().get(Upgrade.JACK_HAMMER);
 
-        double amount = 1;
+                if (jack.isCompleteQ()) {
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы уже имеете этот предмет");
+                    return;
+                }
 
-        try {
-            amount = Double.parseDouble(args[2]);
-        } catch (Exception ignored) {}
+                jack.setCompleteQ(true);
 
-        ItemStack itemStack = Items.getItem(args[1], amount);
+                break;
+            default:
+                OpPlayer opPlayer = new OpPlayer(target);
 
-        if (itemStack == null) {
-            ChatUtil.sendMessage(player, "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
-            return;
+                double amount = 1;
+
+                try {
+                    amount = Double.parseDouble(args[2]);
+                } catch (Exception ignored) {
+                }
+
+                ItemStack itemStack = Items.getItem(args[1], amount);
+
+                if (itemStack == null) {
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
+                    return;
+                }
+
+                opPlayer.add(itemStack);
+                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+
+                break;
         }
-
-        opPlayer.add(itemStack);
-        ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
     }
 }

@@ -23,7 +23,7 @@ public class PlayerDataSQL {
 
     private static RemoteDatabaseConnectionHandler base = OpPrison.getInstance().getBase();
 
-    public static void load(String name, PickaxeManager pickaxe, Consumer<String> consumer) {
+    public static void tryLoad(String name, PickaxeManager pickaxe) {
         OpPrison.getInstance().getPlayers()
                 .newDatabaseQuery()
                 .selectQuery()
@@ -49,10 +49,9 @@ public class PlayerDataSQL {
                                 .queryRow(new ValueQueryRow("pickaxe", pickaxe.getStats()))
                                 .queryRow(new ValueQueryRow("kit", null))
                                 .queryRow(new ValueQueryRow("access", null))
+                                .queryRow(new ValueQueryRow("questions", null))
 
                                 .executeSync(base);
-
-                        consumer.accept(name);
                     }
                 });
     }
@@ -75,10 +74,10 @@ public class PlayerDataSQL {
         return obj[0];
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits, String access) {
+    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits, String access, String questions) {
         base.getExecuteHandler().executeUpdate(true,
-                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?  WHERE `name` = ?",
-                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, name
+                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ?  WHERE `name` = ?",
+                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, name
         );
     }
 

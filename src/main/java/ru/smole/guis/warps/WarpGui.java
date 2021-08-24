@@ -21,7 +21,7 @@ import ru.xfenilafs.core.util.TeleportUtil;
 import java.util.Objects;
 
 public class WarpGui extends BaseSimpleInventory {
-    private ConfigManager configManager;
+    private final ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
         super(6, "Точки телепортации (Основные)");
@@ -129,7 +129,7 @@ public class WarpGui extends BaseSimpleInventory {
 
                 addItem(slot,
                         ApiManager.newItemBuilder(material)
-                                .setName("§a" + StringUtils.formatDouble(0, needPrestige) + " §fпрестижей шахта")
+                                .setName("§a" + name + " §fпрестижей шахта")
                                 .setLore("§7Нажмите, для телепортации")
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {

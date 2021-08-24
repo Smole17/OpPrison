@@ -110,14 +110,14 @@ public class HelpCommand extends BukkitCommand<Player> {
 
         GAME(
                 "\n" + " " +
-                "\n   §bPrison OP §f- классический кликер в тюремном стиле с шахтами, " +
+                "\n   §bOpPrison §f- неклассический кликер в тюремном стиле с шахтами, " +
                 "\n   который был создан, вдохновившись западными режимами этой тематики." +
                 "\n   Тут основное внимание сконцентрировано на плавное и приятное копание," +
-                "\n   прокачку престижей, улучшение кирок, а так же соревнование с гильдиями других игроков. " +
+                "\n   прокачку престижей, улучшение кирок, а так же соревнование §mс бандами других игроков§f. " +
                 "\n" + " "
         );
 
-        private @Getter String desc;
+        private final @Getter String desc;
 
         public static Guide getGuideFromString(String guide) {
             for (Guide type : Guide.values()) {

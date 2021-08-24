@@ -74,6 +74,10 @@ public class Case {
             data.setFacingDirection(BlockFace.NORTH);
         }
 
+        if (key.equals("MINE")) {
+            data.setFacingDirection(BlockFace.SOUTH);
+        }
+
         state.update();
 
         cases.put(id, this);

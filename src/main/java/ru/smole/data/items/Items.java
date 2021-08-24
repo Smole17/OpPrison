@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
@@ -30,6 +31,8 @@ import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.player.CorePlayer;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.ItemUtil;
+import sexy.kostya.mineos.achievements.Achievement;
+import sexy.kostya.mineos.achievements.Achievements;
 
 import java.util.*;
 import java.util.function.Function;
@@ -234,6 +237,12 @@ public class Items {
 
                                     if (new OpPlayer(player).getGroupsManager().isCan(group)) {
                                         return;
+                                    }
+
+                                    Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
+
+                                    if (!achievements.hasAchievement(Achievement.OP_ANY_GROUP)) {
+                                        achievements.addAchievement(Achievement.OP_ANY_GROUP);
                                     }
 
                                     playerDataMap.get(player.getName()).setGroup(group);

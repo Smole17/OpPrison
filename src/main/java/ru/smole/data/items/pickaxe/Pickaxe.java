@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.items.Items;
@@ -16,6 +17,8 @@ import ru.smole.data.player.OpPlayer;
 import ru.smole.mines.Mine;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
+import sexy.kostya.mineos.achievements.Achievement;
+import sexy.kostya.mineos.achievements.Achievements;
 
 import java.util.Map;
 import java.util.Random;
@@ -56,6 +59,15 @@ import static ru.smole.OpPrison.MINES;
 
     public void addLevel(double count) {
         setLevel(level + count);
+
+        if (level >= 40) {
+            Achievement ach = Achievement.OP_PICKAXE_LEVEL;
+            Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
+
+            if (!achievements.hasAchievement(ach)) {
+                achievements.addAchievement(ach);
+            }
+        }
     }
 
     protected int explosive(Block block) {
@@ -70,16 +82,17 @@ import static ru.smole.OpPrison.MINES;
                             loc.getBlockY() + y,
                             loc.getBlockZ() + z);
 
+                    if (MINES.get(-1).getZone().contains(block1))
+                        return i;
+
                     Predicate<Mine> predicate = mine -> mine.getZone().contains(block1);
                     boolean noneMine = MINES.values().stream().noneMatch(predicate);
 
                     if (noneMine)
                         continue;
 
-
                     if (block1.getType() == Material.AIR)
                         continue;
-
 
                     block1.setType(Material.AIR);
                     i = i + 1;
@@ -95,6 +108,9 @@ import static ru.smole.OpPrison.MINES;
         final int[] i = {0};
 
         MINES.values().forEach(mine -> {
+            if (mine.getLevel() == -1)
+                return;
+
             Cuboid cuboid = mine.getZone();
 
             int minX = cuboid.getMinPoint().getBlockX();
@@ -118,7 +134,6 @@ import static ru.smole.OpPrison.MINES;
 
                     if (block1.getType() == Material.AIR)
                         continue;
-
 
                     block1.setType(Material.AIR);
                     i[0] = i[0] + 1;

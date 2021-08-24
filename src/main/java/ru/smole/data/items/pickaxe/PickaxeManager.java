@@ -13,9 +13,9 @@ import java.util.Map;
 public class PickaxeManager {
 
     public static @Getter Map<String, Pickaxe> pickaxes;
-    private Player player;
+    private final Player player;
 
-    private String name;
+    private final String name;
     private Map<Upgrade, Upgrade.UpgradeStat> upgradeMap;
 
     public PickaxeManager(Player player) {
@@ -26,9 +26,8 @@ public class PickaxeManager {
     public void create() {
         upgradeMap = new HashMap<>();
 
-        for (Upgrade upgrade : Upgrade.values()) {
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage()));
-        }
+        for (Upgrade upgrade : Upgrade.values())
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
 
 
         Pickaxe pickaxe = new Pickaxe(
@@ -76,7 +75,7 @@ public class PickaxeManager {
 
             double count = Double.parseDouble(arg_1);
 
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, upgrade.isNeedMessage()));
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, upgrade.isNeedMessage(), Boolean.parseBoolean(args[2])));
         }
 
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
@@ -100,13 +99,14 @@ public class PickaxeManager {
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Upgrade.UpgradeStat> upgradesMap = pickaxes.get(name).getUpgrades();
 
-            String format = "%s-%s,";
+            String format = "%s-%s-%s,";
 
             if (upgrade.ordinal() == Upgrade.values().length -1) {
                 format = format.replace(",", "");
             }
 
-            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, upgradesMap.get(upgrade).getCount())));
+            Upgrade.UpgradeStat stat = upgradesMap.get(upgrade);
+            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, stat.getCount()), stat.isCompleteQ()));
         }
 
         return builder.toString();

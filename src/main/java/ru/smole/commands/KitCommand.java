@@ -220,7 +220,7 @@ public class KitCommand extends BukkitCommand<Player> {
                 return;
             }
 
-            if (kitsSQL.equals("null"))
+            if (kitsSQL == null || kitsSQL.equals(null))
                 return;
 
             kitsList.addAll(Arrays.asList(kitsSQL.split(",")));
@@ -230,10 +230,13 @@ public class KitCommand extends BukkitCommand<Player> {
 
         public static String save(String playerName) {
             if (playerKits.isEmpty())
-                return "null";
+                return null;
+
+            if (!playerKits.containsKey(playerName))
+                    return null;
 
             if (playerKits.get(playerName).isEmpty())
-                return "null";
+                return null;
 
             StringBuilder builder = new StringBuilder();
             String format = "%s,";

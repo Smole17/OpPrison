@@ -1,9 +1,10 @@
 package ru.smole.utils;
 
-import ru.xfenilafs.core.util.NumberUtil;
-
-import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StringUtils {
 
@@ -56,6 +57,12 @@ public class StringUtils {
         }
 
         return builder.toString();
+    }
+
+    public static String getRandomString(List<String> strings) {
+        Random random = new Random();
+
+        return strings.get(random.nextInt(strings.size() - 1));
     }
 
 //

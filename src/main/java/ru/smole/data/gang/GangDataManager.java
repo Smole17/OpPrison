@@ -2,14 +2,12 @@ package ru.smole.data.gang;
 
 import lombok.Getter;
 import lombok.val;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
-import org.bukkit.ChatColor;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-import ru.smole.OpPrison;
+import ru.smole.commands.GangCommand;
 import ru.smole.data.mysql.GangDataSQL;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 
@@ -25,11 +23,8 @@ public class GangDataManager {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
         gangPlayerMap.put(leader, new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
 
-        gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
-        GangDataSQL.create(name, leader);
-
-        Guild guild = OpPrison.getInstance().getDiscordBot().getGuild();
-        guild.createTextChannel("gang-" + ChatColor.stripColor(name), guild.getCategoryById("874391171500216371")).complete();
+        gangDataMap.put(name.toLowerCase(), new GangData(name, gangPlayerMap, 0.0));
+        GangDataSQL.create(name.toLowerCase(), leader);
     }
 
     public void load() {

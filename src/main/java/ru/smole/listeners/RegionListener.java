@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
+import ru.smole.data.event.OpEvents;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.mines.Mine;
@@ -126,6 +127,7 @@ public class RegionListener implements Listener {
         Player player = event.getPlayer();
         String name = player.getName();
 
+        OpEvents.blockBreak(event);
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event);
     }

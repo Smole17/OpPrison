@@ -1,17 +1,14 @@
 package ru.smole.utils.leaderboard;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import ru.smole.OpPrison;
 import ru.smole.utils.StringUtils;
-import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.util.ChatUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LeaderBoard {
     public static List<SimpleHolographic> holograms = new ArrayList<>();

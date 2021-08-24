@@ -84,6 +84,7 @@ public class BoosterManager {
                 break;
             case 901:
                 delBooster(2.0);
+                break;
         }
 
         BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",

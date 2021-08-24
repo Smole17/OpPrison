@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
@@ -19,6 +20,8 @@ import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ItemUtil;
+import sexy.kostya.mineos.achievements.Achievement;
+import sexy.kostya.mineos.achievements.Achievements;
 
 import java.util.*;
 
@@ -32,11 +35,14 @@ public class PickaxeGui extends BaseSimpleInventory {
     public void drawInventory(@NonNull Player player) {
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+        OpPlayer opPlayer = new OpPlayer(player);
 
         List<String> lore = new ArrayList<>();
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Upgrade.UpgradeStat> upgrades = pickaxe.getUpgrades();
             double pickaxe_level = pickaxe.getLevel();
+
+            int slot = 28 + upgrade.ordinal();
 
             double count = upgrades.get(upgrade).getCount();
             Material type = upgrade.getMaterial();
@@ -52,11 +58,57 @@ public class PickaxeGui extends BaseSimpleInventory {
             boolean isCanGroup = group.isCan(playerData.getGroup());
             boolean isIs = upgrades.get(upgrade).isIs();
             boolean isMessage = upgrades.get(upgrade).isMessage();
+            boolean isCompleteQ = upgrades.get(upgrade).isCompleteQ();
+
+            if (pickaxe_level < need_level || !isCanGroup || !isCompleteQ) {
+                ItemUtil.ItemBuilder iBuilder = ApiManager.newItemBuilder(Material.COAL_BLOCK)
+                        .setName("§cЗАБЛОКИРОВАНО")
+                        .setLore(
+                                ""
+                        );
+
+                if (upgrade == Upgrade.BLESSINGS)
+                    iBuilder = ApiManager.newItemBuilder(upgrade.getMaterial())
+                            .setName(upgrade.getName())
+                            .setLore("§8" + upgrade.getDescribe(), "");
+
+                if (pickaxe_level <= need_level)
+                    iBuilder.addLore(String.format("§b§l* §fДоступно с §b%s §fуровня", StringUtils._fixDouble(0, need_level)));
+
+                if (!isCanGroup)
+                    iBuilder.addLore(String.format("§b§l* §fДоступно с %s §fгруппы", group.getName()));
+
+                if (!isCompleteQ)
+                    iBuilder.addLore("§b§l* §fНеобходимо прохождение задания");
+
+                if (upgrade == Upgrade.BLESSINGS) {
+                    iBuilder.addLore("");
+                    iBuilder.addLore(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
+                }
+
+                addItem(
+                        slot,
+                        iBuilder.build(),
+                        (baseInventory, inventoryClickEvent) -> {
+                            if (upgrade == Upgrade.BLESSINGS) {
+                                if (inventoryClickEvent.getClick() == ClickType.CONTROL_DROP) {
+                                    upgrades.get(upgrade).setMessage(!isMessage);
+
+                                    player.closeInventory();
+
+                                    opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+                                }
+                            }
+                        }
+                );
+
+                continue;
+            }
 
             lore.add("§8§o" + upgrade.getDescribe());
             lore.add("");
 
-            if (pickaxe_level >= need_level && isCanGroup) {
+            if (pickaxe_level >= need_level) {
                 lore.add(String.format("§b§l* §fТекущий уровень: §b%s", (int) count));
                 lore.add(String.format("§b§l* §fМаксимальный уровень: §b%s", (int) upgrade.getMax_level()));
                 lore.add("");
@@ -72,16 +124,10 @@ public class PickaxeGui extends BaseSimpleInventory {
                 }
 
                 lore.add(String.format("§b§l* §fСтатус: %s §8(( СКМ ))", isIs ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
-            } else {
-                lore.add(String.format("§b§l* §fДоступно с §b%s §fуровня", StringUtils._fixDouble(0, need_level)));
-            }
 
-            if (!isCanGroup) {
-                lore.add(String.format("§b§l* §fДоступно от §b%s §fгруппы", group.getName()));
+                if (upgrade.isNeedMessage())
+                    lore.add(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
             }
-
-            if (upgrade.isNeedMessage())
-                lore.add(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
 
             ItemUtil.ItemBuilder itemBuilder =
                     ApiManager.newItemBuilder(type)
@@ -95,8 +141,6 @@ public class PickaxeGui extends BaseSimpleInventory {
                 itemBuilder.setDurability(0);
 
             ItemStack item = itemBuilder.build();
-            int slot = 28 + upgrade.ordinal();
-            OpPlayer opPlayer = new OpPlayer(player);
 
             addItem(
                     slot,
@@ -106,8 +150,7 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                         if (upgrade.isNeedMessage())
                             if (clickType == ClickType.CONTROL_DROP) {
-                                upgrades.remove(upgrade);
-                                upgrades.put(upgrade, new Upgrade.UpgradeStat(count, isIs, !isMessage));
+                                upgrades.get(upgrade).setMessage(!isMessage);
 
                                 player.closeInventory();
 
@@ -115,15 +158,8 @@ public class PickaxeGui extends BaseSimpleInventory {
                                 return;
                             }
 
-                        if (!upgrade.isUnlock(pickaxe_level))
-                            return;
-
-                        if (!isCanGroup)
-                            return;
-
                         if (clickType == ClickType.MIDDLE) {
-                            upgrades.remove(upgrade);
-                            upgrades.put(upgrade, new Upgrade.UpgradeStat(count, !isIs, isMessage));
+                            upgrades.get(upgrade).setIs(!isIs);
 
                             player.closeInventory();
 
@@ -141,12 +177,8 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                         switch (clickType) {
                             case LEFT:
-                                if (playerToken >= needToken) {
-                                    double up = count + 1;
-
-                                    updatePickaxe(playerData, player, needToken, new Upgrade.UpgradeStat(up, isIs, isMessage), upgrade, upgrades);
-                                    return;
-                                }
+                                if (playerToken >= needToken)
+                                    updatePickaxe(playerData, player, needToken, upgrade, upgrades);
 
                                 return;
 
@@ -157,18 +189,15 @@ public class PickaxeGui extends BaseSimpleInventory {
                                     if (up > upgrade.getMax_level())
                                         return;
 
-                                    updatePickaxe(playerData, player, tenTokens, new Upgrade.UpgradeStat(up, isIs, isMessage), upgrade, upgrades);
+                                    updatePickaxe(playerData, player, tenTokens, upgrade, upgrades);
                                     return;
                                 }
 
                                 return;
 
                             case DROP:
-                                if (playerToken >= maxTokens) {
-                                    double up = count + maxUpgrades;
-
-                                    updatePickaxe(playerData, player, maxTokens, new Upgrade.UpgradeStat(up, isIs, isMessage), upgrade, upgrades);
-                                }
+                                if (playerToken >= maxTokens)
+                                    updatePickaxe(playerData, player, maxTokens, upgrade, upgrades);
 
                         }
                     });
@@ -181,13 +210,37 @@ public class PickaxeGui extends BaseSimpleInventory {
     }
 
 
-    protected void updatePickaxe(PlayerData playerData, Player player, double tokens, Upgrade.UpgradeStat up, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap) {
+    protected void updatePickaxe(PlayerData playerData, Player player, double tokens, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap) {
         playerData.setToken(playerData.getToken() - tokens);
-        upgradeMap.remove(upgrade);
-        upgradeMap.put(upgrade, up);
+        Upgrade.UpgradeStat up = upgradeMap.get(upgrade);
 
         OpPlayer opPlayer = new OpPlayer(player);
         opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+
+        Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
+
+        switch (upgrade) {
+            case BLESSINGS:
+                if (!achievements.hasAchievement(Achievement.OP_BLESSINGS_LEVEL)) {
+                    achievements.addAchievement(Achievement.OP_BLESSINGS_LEVEL);
+                }
+
+                break;
+
+            case EFFICIENCY:
+                if (upgrade.isMaxLevel(up.getCount()) && !achievements.hasAchievement(Achievement.OP_MAX_EFFICIENCY_LEVEL)) {
+                    achievements.addAchievement(Achievement.OP_MAX_EFFICIENCY_LEVEL);
+                }
+
+                break;
+
+            case FORTUNE:
+                if (upgrade.isMaxLevel(up.getCount()) && !achievements.hasAchievement(Achievement.OP_MAX_FORTUNE_LEVEL)) {
+                    achievements.addAchievement(Achievement.OP_MAX_FORTUNE_LEVEL);
+                }
+
+                break;
+        }
 
         updateInventory(player);
     }

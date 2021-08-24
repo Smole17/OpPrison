@@ -1,10 +1,10 @@
 package ru.smole;
 
-import discord.DiscordBot;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,13 +21,18 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import ru.smole.commands.*;
 import ru.smole.data.cases.Case;
+import ru.smole.data.event.OpEvent;
+import ru.smole.data.event.OpEvents;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
+import ru.smole.data.npc.NpcInitializer;
+import ru.smole.data.npc.question.Question;
 import ru.smole.data.pads.LaunchPad;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.player.PlayerDataManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
@@ -45,16 +50,13 @@ import ru.xfenilafs.core.database.RemoteDatabaseConnectionHandler;
 import ru.xfenilafs.core.database.RemoteDatabaseTable;
 import ru.xfenilafs.core.database.RemoteDatabasesApi;
 import ru.xfenilafs.core.database.query.row.TypedQueryRow;
-import ru.xfenilafs.core.holographic.ProtocolHolographic;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
-import ru.xfenilafs.core.holographic.manager.ProtocolHolographicManager;
-import ru.xfenilafs.core.protocollib.entity.FakeBaseMob;
-import ru.xfenilafs.core.protocollib.entity.FakeEntityClickable;
-import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
+import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static ru.smole.data.items.Items.registerItem;
@@ -72,10 +74,6 @@ public class OpPrison extends CorePlugin {
     private @Getter
     RemoteDatabaseConnectionHandler base;
     private @Getter
-    BukkitTask pickaxeTask;
-    private @Getter
-    DiscordBot discordBot;
-    private @Getter
     GangDataManager gangDataManager;
     private @Getter
     RemoteDatabaseTable players;
@@ -91,6 +89,9 @@ public class OpPrison extends CorePlugin {
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
+    private BukkitTask pickaxeTask;
+    private BukkitTask eventTask;
+
     @SneakyThrows
     public void onPluginEnable() {
         instance = this;
@@ -100,7 +101,7 @@ public class OpPrison extends CorePlugin {
         base = RemoteDatabasesApi.getInstance().createMysqlConnection(RemoteDatabasesApi.getInstance().createConnectionFields(
                 "localhost",
                 "root",
-                "42aDYaGhg7w9Fv",
+                "OZ|NF6za38YMWSOV6PJMXR$Xv96WqlG*hDL4Ev{98{@d6q*|LN",
                 "OpPrison"
         ));
 
@@ -116,6 +117,7 @@ public class OpPrison extends CorePlugin {
                 .queryRow(new TypedQueryRow(TEXT,"pickaxe"))
                 .queryRow(new TypedQueryRow(TEXT,"kit"))
                 .queryRow(new TypedQueryRow(TEXT,"access"))
+                .queryRow(new TypedQueryRow(TEXT,"questions"))
                 .executeSync(base);
 
         base.newDatabaseQuery("gangs").createTableQuery().setCanCheckExists(true)
@@ -127,12 +129,25 @@ public class OpPrison extends CorePlugin {
         players = base.getTable("players");
         gangs = base.getTable("gangs");
 
-        discordBot = new DiscordBot("ODcwNzczMjExMzcyMDczMDgw.YQRovw.hA0SnRF-GXIGzON4AJ3cBqE2w_Y");
-
         BAR_FORMAT = String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
                 StringUtils._fixDouble(1, BOOSTER) + "%");
 
         BAR = Bukkit.createBossBar(BAR_FORMAT, BarColor.BLUE, BarStyle.SOLID);
+
+        registerListeners(
+                new PlayerListener(), new RegionListener()
+        );
+
+        registerCommands(
+                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
+                new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
+                new FlyCommand(), new HelpCommand(), new KitCommand(), new EventCommand(),
+                new TrashCommand(), new RestartCommand(), new GangCommand(), new GangChatCommand(),
+                new SpawnCommand(), new EnderChestCommand()
+        );
+
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
 
         gangDataManager.load();
         ServerUtil.load();
@@ -144,21 +159,9 @@ public class OpPrison extends CorePlugin {
         loadCases();
         loadLeaderBoard();
         loadEffects();
+        loadEvents();
 
-        registerListeners(
-                new PlayerListener(), new RegionListener()
-        );
-
-        registerCommands(
-                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
-                new FlyCommand(), new HelpCommand(), new KitCommand(), new EventCommand(),
-                new TrashCommand(), new DiscordCommand(null), new RestartCommand(), new GangCommand(),
-                new GangChatCommand()
-        );
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
+        NpcInitializer.init();
     }
 
     public void onPluginDisable() {
@@ -166,6 +169,36 @@ public class OpPrison extends CorePlugin {
         base.handleDisconnect();
         BAR.removeAll();
         gangDataManager.unload();
+    }
+
+    public void loadCrates() {
+        ConfigurationSection section = this.getConfig().getConfigurationSection("crates");
+
+        if (section != null && section.getKeys(false).size() > 0) {
+            section.getKeys(false).forEach((key) -> {
+                ConfigurationSection keySection = section.getConfigurationSection(key);
+                new Crate(key, keySection);
+            });
+        }
+
+        Arrays.stream(Crate.Type.values())
+                .forEach(crate ->
+                        registerItem(
+                                String.format("%s_crate", crate.name().toLowerCase()),
+                                objects -> ApiManager.newItemBuilder(crate.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
+                                (playerInteractEvent, itemStack) -> {
+                                    Action action = playerInteractEvent.getAction();
+
+                                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                                        ItemStack item = playerInteractEvent.getItem();
+
+                                        if (Crate.crates.containsKey(crate.name().toLowerCase())) {
+                                            item.setAmount(item.getAmount() - 1);
+                                            Crate.crates.get(crate.name().toLowerCase()).open(playerInteractEvent.getPlayer());
+                                        }
+                                    }
+                                })
+                );
     }
 
     private void loadRegionsAndMines() {
@@ -207,7 +240,7 @@ public class OpPrison extends CorePlugin {
                     )
             );
 
-            WorldBorderUtils.spawn(region.getZone().getWorld(), region.getZone().getCenter(), 180);
+            WorldBorderUtils.spawn(region.getZone().getWorld(), region.getZone().getCenter(), 250);
             REGIONS.put(name.toLowerCase(), region);
         });
         log.info("Loaded {} regions!", REGIONS.size());
@@ -258,36 +291,6 @@ public class OpPrison extends CorePlugin {
                 new Case(key, keySection);
             });
         }
-    }
-
-    public void loadCrates() {
-        ConfigurationSection section = this.getConfig().getConfigurationSection("crates");
-
-        if (section != null && section.getKeys(false).size() > 0) {
-            section.getKeys(false).forEach((key) -> {
-                ConfigurationSection keySection = section.getConfigurationSection(key);
-                new Crate(key, keySection);
-            });
-        }
-
-        Arrays.stream(Crate.Type.values())
-                .forEach(crate ->
-                        registerItem(
-                                String.format("%s_crate", crate.name().toLowerCase()),
-                                objects -> ApiManager.newItemBuilder(crate.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
-                                (playerInteractEvent, itemStack) -> {
-                                    Action action = playerInteractEvent.getAction();
-
-                                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                                        ItemStack item = playerInteractEvent.getItem();
-
-                                        if (Crate.crates.containsKey(crate.name().toLowerCase())) {
-                                            item.setAmount(item.getAmount() - 1);
-                                            Crate.crates.get(crate.name().toLowerCase()).open(playerInteractEvent.getPlayer());
-                                        }
-                                    }
-                                })
-                );
     }
 
     private void loadLeaderBoard() {
@@ -377,5 +380,87 @@ public class OpPrison extends CorePlugin {
                         }
                     }
                 }), 20, 20);
+    }
+
+    private void loadEvents() {
+        OpEvent opEvent = new OpEvents();
+        Map<String, Double> blocks = new HashMap<>();
+        var events = opEvent.getBreakEvents();
+
+        String name = "sofos";
+        events.put(name, event -> {
+            Player player = event.getPlayer();
+            String playerName = player.getName();
+
+            if (MINES.get(-1).getBlocks().stream().noneMatch(resourceBlock -> resourceBlock.getType() == event.getBlock().getType()))
+                return;
+
+            blocks.remove(playerName);
+            blocks.put(playerName, blocks.get(playerName) + 1);
+        });
+
+        eventTask =
+                Bukkit.getScheduler().runTaskTimer(
+                        this,
+                        () -> {
+                            if (Bukkit.getOnlinePlayers().size() < 5) {
+                                return;
+                            }
+
+                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 1500000;
+
+                            if (Bukkit.getOnlinePlayers().stream().noneMatch(predicate))
+                                return;
+
+                            ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fначалось");
+                            ChatUtil.broadcast("");
+                            ChatUtil.broadcast("   Суть события в том, чтобы телепортироваться на шахту 150.000.000 &8&o(150M) &fпрестижей");
+                            ChatUtil.broadcast("   и накопать больше всех блоков за 20 минут");
+                            ChatUtil.broadcast("");
+
+                            Bukkit.getOnlinePlayers().forEach(player -> blocks.put(player.getName(), 0.0));
+                            opEvent.start(name);
+
+                            Bukkit.getScheduler().runTaskLater(
+                                    this,
+                                    () -> {
+                                        ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fзавершилось");
+                                        ChatUtil.broadcast("");
+
+                                        int[] i = {1};
+
+                                        blocks.entrySet()
+                                                .stream()
+                                                .sorted(Map.Entry.comparingByValue())
+                                                .limit(3)
+                                                .forEachOrdered(x -> {
+                                                    ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
+
+                                                    PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
+                                                    double added = playerData.getToken() * 0.15 / i[0];
+
+                                                    playerData.addToken(added);
+                                                    i[0]++;
+
+                                                    Question question = playerData.getQuestions().get("SOFOS");
+                                                    Question.QuestionStep step = question.getStep();
+
+                                                    if (step == Question.QuestionStep.COMPLETING) {
+                                                        question.setStep(Question.QuestionStep.ALR_COMPLETED);
+                                                    }
+                                                });
+
+                                        ChatUtil.broadcast("");
+
+
+                                        blocks.clear();
+                                        opEvent.stop(name);
+                                    },
+                                    20 * 60 * 20
+                            );
+                        },
+                        20 * 60 * 40,
+                        20 * 60 * 40
+                        );
     }
 }

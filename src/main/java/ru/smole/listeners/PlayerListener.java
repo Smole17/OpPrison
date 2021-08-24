@@ -1,12 +1,12 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
-import discord.DiscordBot;
 import lombok.val;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,18 +19,18 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
+import ru.smole.data.cases.Case;
+import ru.smole.data.event.OpEvent;
+import ru.smole.data.event.OpEvents;
+import ru.smole.data.items.Items;
+import ru.smole.data.items.crates.Crate;
+import ru.smole.data.items.crates.CrateItem;
 import ru.smole.data.pads.LaunchPad;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.player.PlayerDataManager;
-import ru.smole.data.cases.Case;
-import ru.smole.data.items.Items;
-import ru.smole.data.items.crates.Crate;
-import ru.smole.data.items.crates.CrateItem;
-import ru.smole.data.event.OpEvents;
 import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
@@ -38,7 +38,6 @@ import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,16 +74,19 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
         event.setRespawnLocation(OpPrison.REGIONS.get("spawn").getSpawnLocation());
         LeaderBoard.holograms.forEach(simpleHolographic -> {
-            simpleHolographic.remove();
+            if (!simpleHolographic.getLocation().getWorld().equals(player.getWorld()))
+                return;
+
             simpleHolographic.spawn();
         });
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
-        new OpEvents().asyncChat(event);
+        OpEvents.asyncChat(event);
         sendChat(event);
     }
 
@@ -175,13 +177,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        int[] list = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-
         if (Items.isSomePickaxe(event.getCursor(), event.getWhoClicked().getName()))
-            for (int i : list) {
-                if (event.getNewItems().containsKey(i))
-                    event.setCancelled(true);
-            }
+            event.setCancelled(true);
     }
 
     @EventHandler
@@ -265,12 +262,6 @@ public class PlayerListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(players -> players.spigot().sendMessage(_component));
 
         Bukkit.getConsoleSender().sendMessage(format + msg);
-
-        DiscordBot discordBot = OpPrison.getInstance().getDiscordBot();
-
-        discordBot.sendMessage("основной",
-                ChatColor.stripColor(prefix.replace("&", "§")) + name + ": " + msg
-        );
     }
 
 

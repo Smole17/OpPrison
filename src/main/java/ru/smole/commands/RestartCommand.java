@@ -8,7 +8,7 @@ import ru.xfenilafs.core.command.annotation.CommandPermission;
 @CommandPermission(permission = "opprison.admin")
 public class RestartCommand extends BukkitCommand<Player> {
     public RestartCommand() {
-        super("restart");
+        super("oprestart");
     }
 
     @Override

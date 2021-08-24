@@ -16,10 +16,6 @@ repositories {
     maven {
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
-
-    maven {
-        url = 'https://m2.dv8tion.net/releases'
-    }
 }
 
 dependencies {
@@ -31,11 +27,6 @@ dependencies {
 
 //    compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', includes: ['*.jar'])
-
-    compile('net.dv8tion:JDA:4.3.0_277') {
-        exclude module: 'opus-java'
-    }
-    compile 'org.apache.commons:commons-collections4:4.4'
 }
 
 jar {

@@ -1,7 +1,9 @@
 package ru.smole.commands;
 
 import lombok.val;
-import net.dv8tion.jda.api.entities.Guild;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -10,18 +12,25 @@ import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
+import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static ru.smole.OpPrison.PREFIX;
 import static ru.smole.data.gang.GangData.GangPlayer;
 import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 
+@CommandPermission(permission = "opprison.admin")
 public class GangCommand extends BukkitCommand<Player> {
     public GangCommand() {
         super("gang", "g");
     }
+
+    public static final Map<String, List<String>> invitedList = new HashMap<>();
 
     @Override
     protected void onExecute(Player player, String[] args) {
@@ -75,11 +84,6 @@ public class GangCommand extends BukkitCommand<Player> {
                             gangData.sendMessage("Банда была удалена главой &b" + playerName);
                             gangDataMap.remove(gangName);
 
-                            Guild guild = OpPrison.getInstance().getDiscordBot().getGuild();
-                            guild.getTextChannelsByName("gang-" + gangName, true).forEach(textChannel -> {
-                                textChannel.delete().complete();
-                            });
-
                             return;
 
                         case "leave":
@@ -103,18 +107,19 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            if (args[1].contains("&k") || args[1].contains("&r")) {
-                                ChatUtil.sendMessage(player, PREFIX + "Вы используете запрещённый цветовой символ в название");
+                            if (args[1].contains("&")) {
+                                ChatUtil.sendMessage(player, PREFIX + "Цветовые символы временно запрещены");
                                 return;
                             }
 
-                            if (ChatUtil.color(args[1]).length() > 5) {
-                                ChatUtil.sendMessage(player, PREFIX + "Название банды не может превышать 5 символов &8&o(& не учитывается)");
-                                return;
-                            }
-
+                            gangDataMap.remove(gangName);
                             gangData.setName(args[1]);
-                            ChatUtil.sendMessage(player, PREFIX + "Вы переименовали банду %s", ChatUtil.color(args[1]));
+
+                            gangDataMap.put(gangData.getName(), gangData);
+                            gangData.sendMessage(
+                                    "%s %s &fпереименовал банду в %s",
+                                    gangPlayerType.getName(), gangPlayer.getPlayerName(), ChatUtil.color(args[1])
+                            );
 
                             return;
 
@@ -125,11 +130,16 @@ public class GangCommand extends BukkitCommand<Player> {
                             }
 
                             if (!gangDataManager.playerInGang(gangData, args[1].toLowerCase())) {
-                                ChatUtil.sendMessage(player, "Игрок &b%s &fне найден в банде", Bukkit.getOfflinePlayer(args[1]).getName());
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок &b%s &fне найден в банде", Bukkit.getOfflinePlayer(args[1]).getName());
                                 return;
                             }
 
                             GangPlayer kickedGangPlayer = gangData.getGangPlayer(args[1].toLowerCase());
+
+                            if (kickedGangPlayer.getType().ordinal() >= gangPlayerType.ordinal()) {
+                                ChatUtil.sendMessage(player, PREFIX + "Вы не можете исключить данного игрока");
+                                return;
+                            }
 
                             gangData.sendMessage("%s %s &fбыл выгнан из банды %s %s",
                                     kickedGangPlayer.getType().getName(), kickedGangPlayer.getPlayerName(),
@@ -137,6 +147,30 @@ public class GangCommand extends BukkitCommand<Player> {
                             );
 
                             gangPlayersMap.remove(playerName);
+
+                            return;
+
+                        case "setleader":
+                            if (gangPlayerType.ordinal() < GangPlayerType.LEADER.ordinal()) {
+                                ChatUtil.sendMessage(player, PREFIX + "Ваша роль в банде слишком мала для этого действия");
+                                return;
+                            }
+
+                            if (!gangData.getGangPlayerMap().containsKey(args[1].toLowerCase())) {
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не найден");
+                                return;
+                            }
+
+                            GangPlayer newLeader = gangPlayersMap.get(args[1].toLowerCase());
+
+                            gangData.sendMessage(
+                                    "%s %s &fпередал главу % %",
+                                    gangPlayerType.getName(), gangPlayer.getPlayerName(),
+                                    newLeader.getType().getName(), newLeader.getPlayerName()
+                                    );
+
+                            newLeader.setType(GangPlayerType.LEADER);
+                            gangPlayer.setType(GangPlayerType.MANAGER);
 
                             return;
 
@@ -153,12 +187,16 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
+                            if (promotedGangPlayer.getType().equals(GangPlayerType.getTypeFromOrdinal(gangPlayerType.ordinal() -1))) {
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен.");
+                            }
+
                             if (promotedGangPlayer.upType()) {
                                 gangData.sendMessage("Игрок %s &fбыл повышен до %s", promotedGangPlayer.getPlayerName(), promotedGangPlayer.getType().getName());
                                 return;
                             }
 
-                            ChatUtil.sendMessage(player, "Игрок не может быть повышен. Используйте &b/gang setleader <Ник игрока>");
+                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен.");
 
                             return;
 
@@ -175,12 +213,16 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
+                            if (demotedGangPlayer.getType().ordinal() >= gangPlayerType.ordinal()) {
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен.");
+                            }
+
                             if (demotedGangPlayer.deUpType()) {
                                 gangData.sendMessage("Игрок %s &fбыл понижен до %s", demotedGangPlayer.getPlayerName(), demotedGangPlayer.getType().getName());
                                 return;
                             }
 
-                            ChatUtil.sendMessage(player, "Игрок не может быть понижен.");
+                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен.");
 
                             return;
 
@@ -195,7 +237,12 @@ public class GangCommand extends BukkitCommand<Player> {
                             ChatUtil.sendMessage(player, PREFIX + "Банда %s&f:", args[1]);
                             ChatUtil.sendMessage(player, "   &fКоличество очков: &b%s", StringUtils.replaceComma(playerGangData.getScore()));
 
-                            val gangPlayers = playerGangData.findGangPlayers(GangPlayerType.LEADER, GangPlayerType.MANAGER, GangPlayerType.OLDEST, GangPlayerType.DEFAULT);
+                            val gangPlayers = playerGangData.findGangPlayers(
+                                    GangPlayerType.LEADER,
+                                    GangPlayerType.MANAGER,
+                                    GangPlayerType.OLDEST,
+                                    GangPlayerType.DEFAULT
+                            );
                             StringBuilder builder = new StringBuilder();
 
                             gangPlayers.forEach(tempGangPlayer -> {
@@ -213,6 +260,68 @@ public class GangCommand extends BukkitCommand<Player> {
                             ChatUtil.sendMessage(player, builder.toString());
 
                             return;
+
+                        case "invite":
+                            if (gangPlayerType.ordinal() < GangPlayerType.OLDEST.ordinal()) {
+                                ChatUtil.sendMessage(player, PREFIX + "Ваша роль в банде слишком мала для этого действия");
+                                return;
+                            }
+
+                            Player invitedPlayer = Bukkit.getPlayer(args[1]);
+
+                            if (invitedPlayer == null) {
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не найден");
+                                return;
+                            }
+
+                            String invitedName = invitedPlayer.getName();
+
+                            if (gangDataManager.playerHasGang(invitedName)) {
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок уже состоит в банде");
+                                return;
+                            }
+
+                            invitedList.get(invitedName).add(gangData.getName());
+                            ChatUtil.sendMessage(player, PREFIX + "Вы пригласили &b%s &fв банду. У него есть &b1 минута&f, чтобы принять", invitedName);
+
+                            BaseComponent[] component = ChatUtil
+                                    .newBuilder(
+                                            String.format("Вас пригласили в %s&f банду. У Вас есть §b1 минута§f, чтобы принять &8&o(/gang accept %s)",
+                                                    gangData.getName().replace("&", "§"), gangData.getName())
+                                    )
+                                    .setHoverEvent(HoverEvent.Action.SHOW_TEXT, "§7Нажмите, чтобы вывести команду")
+                                    .setClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/gang accept " + gangData.getName())
+                                    .build();
+
+                            invitedPlayer.spigot().sendMessage(component);
+
+                            Bukkit.getScheduler().runTaskLater(
+                                    OpPrison.getInstance(),
+                                    () -> invitedList.get(invitedName).remove(gangData.getName()),
+                                    20 * 60);
+
+                            return;
+
+                        case "accept":
+                            List<String> invitedGangs = invitedList.get(playerName);
+
+                            if (invitedGangs.isEmpty()) {
+                                ChatUtil.sendMessage(player, PREFIX + "У вас нет активных приглашений");
+                                return;
+                            }
+
+                            GangData acceptedGang = gangDataMap.get(args[1]);
+
+                            if (acceptedGang == null || !invitedGangs.contains(acceptedGang.getName())) {
+                                ChatUtil.sendMessage(player, PREFIX + "Банда не найдена");
+                                return;
+                            }
+
+                            invitedList.get(playerName).remove(acceptedGang.getName());
+                            acceptedGang.getGangPlayerMap().put(playerName.toLowerCase(), new GangPlayer(playerName, GangPlayerType.DEFAULT));
+                            acceptedGang.sendMessage("Игрок &b%s &fвступил в банду", playerName);
+
+                            return;
                     }
 
                     break;
@@ -228,13 +337,13 @@ public class GangCommand extends BukkitCommand<Player> {
             case 2:
                 switch (args[0]) {
                     case "create":
-                        if (args[1].contains("&k") || args[1].contains("&r")) {
-                            ChatUtil.sendMessage(player, PREFIX + "Вы используете запрещённый цветовой символ в название");
+                        if (args[1].length() > 5) {
+                            ChatUtil.sendMessage(player, PREFIX + "Название банды не может превышать 5 символов");
                             return;
                         }
 
-                        if (ChatUtil.color(args[1].replace("&", "§")).length() > 5) {
-                            ChatUtil.sendMessage(player, PREFIX + "Название банды не может превышать 5 символов &8&o(& не учитывается)");
+                        if (args[1].contains("&")) {
+                            ChatUtil.sendMessage(player, PREFIX + "Цветовые символы временно запрещены");
                             return;
                         }
 
@@ -290,7 +399,7 @@ public class GangCommand extends BukkitCommand<Player> {
         ChatUtil.sendMessage(player, "   &b/gangchat (/gc) <Сообщение> &f- написать сообщение в чат банды");
         ChatUtil.sendMessage(player, "");
         ChatUtil.sendMessage(player, "   &b/gang invite <Ник игрока> &f- отправить игроку запрос в банду &8&o(от Старейшины)");
-        ChatUtil.sendMessage(player, "   &b/gang kick <Ник игрока> &f-  выгнать игрока из банды &8&o(от Соруководителя)");
+        ChatUtil.sendMessage(player, "   &b/gang kick <Ник игрока> &f- исключить игрока из банды &8&o(от Соруководителя)");
         ChatUtil.sendMessage(player, "   &b/gang promote <Ник игрока> &f- повысить игрока в банде &8&o(от Соруководителя)");
         ChatUtil.sendMessage(player, "   &b/gang demote <Ник игрока> &f- понизить игрока в банде &8&o(от Соруководителя)");
         ChatUtil.sendMessage(player, "   &b/gang setleader <Ник игрока>> &f- передать Главу игроку");
