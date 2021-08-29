@@ -241,9 +241,8 @@ public class Items {
 
                                     Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
 
-                                    if (!achievements.hasAchievement(Achievement.OP_ANY_GROUP)) {
-                                        achievements.addAchievement(Achievement.OP_ANY_GROUP);
-                                    }
+                                    achievements.addAchievement(Achievement.OP_ANY_GROUP);
+
 
                                     playerDataMap.get(player.getName()).setGroup(group);
                                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новую группу %s", group.getName());

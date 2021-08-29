@@ -264,7 +264,13 @@ public class OpPrison extends CorePlugin {
                     resetTime,
                     blocks.stream().map(b -> {
                         String[] split = b.split(" ");
-                        return new ResourceBlock(Material.valueOf(split[0].toUpperCase()), Integer.parseInt(split[1]));
+
+                        return
+                                new ResourceBlock(
+                                    Material.valueOf(!split[0].contains(":") ? split[0] : split[0].split(":")[0]),
+                                    Integer.parseInt(split[1]),
+                                        !split[0].contains(":") ? 0 : Integer.parseInt(split[0].split(":")[1])
+                                );
                     })
                             .collect(Collectors.toList())
             );
@@ -311,11 +317,19 @@ public class OpPrison extends CorePlugin {
 
         simpleHolographic.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
         simpleHolographic.addEmptyLine();
-        simpleHolographic.addTextLine("§fВсю полезную информацию Вы можете узнать через §b/help");
-        simpleHolographic.addTextLine("§fВаша основная цель - прокачать свою кирку как можно лучше");
+        simpleHolographic.addTextLine("§bВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
+        simpleHolographic.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|p max)");
+        simpleHolographic.addTextLine("§fА остальную информацию Вы можете узнать через §b/help");
         simpleHolographic.addEmptyLine();
         simpleHolographic.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
         LeaderBoard.holograms.add(simpleHolographic);
+
+        SimpleHolographic caseHere = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("caseHere")));
+
+        caseHere.addTextLine("   §b^^^   ");
+        caseHere.addTextLine("§fКейсы");
+
+        LeaderBoard.holograms.add(caseHere);
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (Bukkit.getOnlinePlayers().size() == 0)

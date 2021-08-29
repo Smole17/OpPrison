@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
 import ru.smole.OpPrison;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
@@ -54,16 +55,19 @@ public class Mine {
         if (region == null) {
             return;
         }
+
         long current = System.currentTimeMillis();
         if (current - lastUpdate < respawn) {
             return;
         }
+
         lastUpdate = current;
         Bukkit.getOnlinePlayers().forEach(player -> {
             if (zone.contains(player)) {
                 player.teleport(region.getSpawnLocation());
             }
         });
+
         blocks.sort(Comparator.comparingInt(ResourceBlock::getChance));
         ThreadLocalRandom random = ThreadLocalRandom.current();
         zone.forEach(block -> {
@@ -76,9 +80,11 @@ public class Mine {
                     }
                 }
             }
+
             Location location = block.getLocation();
             Block blockAt = location.getWorld().getBlockAt(location);
             blockAt.setType(resource.getType());
+            blockAt.setData((byte) resource.getData());
         });
     }
 }

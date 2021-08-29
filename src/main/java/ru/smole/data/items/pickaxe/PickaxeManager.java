@@ -41,11 +41,10 @@ public class PickaxeManager {
         pickaxes.put(name, pickaxe);
     }
 
-    public void load() {
+    public void load(String statsSQL) {
         upgradeMap = new HashMap<>();
 
         OpPlayer opPlayer = new OpPlayer(player);
-        String statsSQL = (String) PlayerDataSQL.get(name, "pickaxe");
         String pickaxeName = "null";
         double exp = 0.0;
         double level = 0.0;

@@ -19,7 +19,11 @@ import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.scoreboard.ScoreboardManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.smole.utils.server.BungeeUtil;
+import ru.smole.utils.server.ServerUtil;
+import ru.xfenilafs.core.util.ChatUtil;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class PlayerDataManager {
@@ -44,29 +48,48 @@ public class PlayerDataManager {
 
         opPlayer.getBoosterManager().load();
 
-        double blocks = (double) PlayerDataSQL.get(name, "blocks");
-        double money = (double) PlayerDataSQL.get(name, "money");
-        double token = (double) PlayerDataSQL.get(name, "token");
-        double multiplier = (double) PlayerDataSQL.get(name, "multiplier");
-        GroupsManager.Group group = GroupsManager.Group.valueOf((String) PlayerDataSQL.get(name, "rank"));
-        double prestige = (double) PlayerDataSQL.get(name, "prestige");
-        boolean fly = ((int) PlayerDataSQL.get(name, "fly")) == 1;
-        Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
-        String access = (String) PlayerDataSQL.get(name, "access");
-        Map<String, Question> questions = getQuestionsFromString((String) PlayerDataSQL.get(name, "questions"));
+        PlayerDataSQL.get(name, resultSet -> {
+            try {
+                if (!resultSet.next())
+                    return;
 
-        playerDataMap.put(
-                name,
-                new PlayerData(
-                        name, blocks, money, token, multiplier,
-                        group, prestige, fly, getListFromString(access),
-                        questions
-                )
-        );
-        PickaxeManager.getPickaxes().put(name, pickaxe);
+                double blocks = resultSet.getDouble("blocks");
+                double money = resultSet.getDouble("money");
+                double token = resultSet.getDouble("token");
+                double multiplier = resultSet.getDouble("multiplier");
+                GroupsManager.Group group = GroupsManager.Group.valueOf(resultSet.getString("rank"));
+                double prestige = resultSet.getDouble("prestige");
+                boolean fly = resultSet.getInt("fly") == 1;
+                Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
+                String access = resultSet.getString("access");
+                Map<String, Question> questions = getQuestionsFromString(resultSet.getString("questions"));
 
-        pickaxeManager.load();
-        KitCommand.KitsGui.load(name);
+                playerDataMap.put(
+                        name,
+                        new PlayerData(
+                                name, blocks, money, token, multiplier,
+                                group, prestige, fly, getListFromString(access),
+                                questions
+                        )
+                );
+
+                PickaxeManager.getPickaxes().put(name, pickaxe);
+
+                pickaxeManager.load(resultSet.getString("pickaxe"));
+                KitCommand.KitsGui.load(name, resultSet.getString("kit"));
+            } catch (SQLException ex) {
+                ChatUtil.sendMessage(player, "§c§lВаши данные не были загружены,сообщите об этом Smole17#7425 | https://vk.com/smole17");
+                player.sendTitle("§c§lВаши данные не были загружены,", "сообщите об этом Smole17#7425 | https://vk.com/smole17", 20, 20, 20);
+
+                Bukkit.getOnlinePlayers().forEach(player1 -> {
+                    if (player1.hasPermission("opprison.admin")) {
+                        ChatUtil.sendMessage(player, "&c&lCould not load PlayerData with " + name);
+                        ChatUtil.sendMessage(player,"&c&lError: &f&o" + ex);
+                    }
+                });
+            }
+        });
+
         ScoreboardManager.loadScoreboard(player);
         GangCommand.invitedList.put(name, new ArrayList<>());
 

@@ -56,9 +56,7 @@ public class PlayerDataSQL {
                 });
     }
 
-    public static Object get(String name, String table) {
-        Object[] obj = {null};
-
+    public static void get(String name, Consumer<ResultSet> resultSetConsumer) {
         OpPrison.getInstance().getPlayers()
                 .newDatabaseQuery()
                 .selectQuery()
@@ -66,12 +64,7 @@ public class PlayerDataSQL {
                 .queryRow(new ValueQueryRow("name", name))
 
                 .executeQueryAsync(base)
-                .thenAccept(result -> {
-                    if (result.next())
-                        obj[0] = result.getObject(table);
-                });
-
-        return obj[0];
+                .thenAccept(resultSetConsumer);
     }
 
     public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits, String access, String questions) {

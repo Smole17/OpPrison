@@ -130,7 +130,7 @@ public class WarpGui extends BaseSimpleInventory {
                 addItem(slot,
                         ApiManager.newItemBuilder(material)
                                 .setName("§a" + name + " §fпрестижей шахта")
-                                .setLore("§7Нажмите, для телепортации")
+                                .setLore(is ? "§7Нажмите, для телепортации" : null)
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {
                             if (is) {
@@ -165,7 +165,7 @@ public class WarpGui extends BaseSimpleInventory {
 
     public static class DonateWarpGui extends BaseSimpleInventory {
 
-        private ConfigManager configManager;
+        private final ConfigManager configManager;
 
         public DonateWarpGui(ConfigManager configManager) {
             super(6, "Точки телепортации (Группы)");
@@ -197,7 +197,7 @@ public class WarpGui extends BaseSimpleInventory {
                 addItem(slot,
                         ApiManager.newItemBuilder(material)
                                 .setName(name + " §fшахта")
-                                .setLore("§7Нажмите, для телепортации")
+                                .setLore(is ? "§7Нажмите, для телепортации" : null)
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {
                             if (is) {

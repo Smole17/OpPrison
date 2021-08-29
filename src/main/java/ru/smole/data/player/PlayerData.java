@@ -51,23 +51,14 @@ import java.util.Map;
 
         Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
 
-        if (blocks >= 10000) {
-            if (!achievements.hasAchievement(Achievement.OP_NEW_MINER)) {
-                achievements.addAchievement(Achievement.OP_NEW_MINER);
-            }
-        }
+        if (blocks >= 10000)
+            achievements.addAchievement(Achievement.OP_NEW_MINER);
 
-        if (blocks >= 100000) {
-            if (!achievements.hasAchievement(Achievement.OP_MIDDLE_MINER)) {
-                achievements.addAchievement(Achievement.OP_MIDDLE_MINER);
-            }
-        }
+        if (blocks >= 100000)
+            achievements.addAchievement(Achievement.OP_MIDDLE_MINER);
 
-        if (blocks >= 1000000) {
-            if (!achievements.hasAchievement(Achievement.OP_MASTER_MINER)) {
-                achievements.addAchievement(Achievement.OP_MASTER_MINER);
-            }
-        }
+        if (blocks >= 1000000)
+            achievements.addAchievement(Achievement.OP_MASTER_MINER);
 
         return added;
     }
@@ -85,9 +76,7 @@ import java.util.Map;
         if (token >= 1000000000000D) {
             Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
 
-            if (!achievements.hasAchievement(Achievement.OP_1T_TOKENS)) {
-                achievements.addAchievement(Achievement.OP_1T_TOKENS);
-            }
+            achievements.addAchievement(Achievement.OP_1T_TOKENS);
         }
 
         return added;

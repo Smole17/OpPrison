@@ -47,6 +47,7 @@ public class BoosterManager {
             case 90:
                 addBooster(1.0);
                 break;
+            case 100:
             case 901:
                 addBooster(2.0);
                 break;

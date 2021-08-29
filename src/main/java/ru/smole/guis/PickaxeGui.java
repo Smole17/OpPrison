@@ -117,7 +117,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                     lore.add(String.format("§b§l+ §f1 уровень: §e⛃%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
                     lore.add(String.format("§b§l+ §f10 уровней: §e⛃%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
                     lore.add(String.format("§b§l+ §f%s уровней: §e⛃%s §8(( Q ))",
-                            StringUtils.formatDouble(2, maxUpgrades),
+                            StringUtils.replaceComma(maxUpgrades),
                             // maxUpgrades > upgrade.getMax_level() ? upgrade.getMax_level() : maxUpgrades
                             StringUtils.formatDouble(2, maxTokens)));
                     lore.add("");
@@ -148,7 +148,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                     (baseInventory, inventoryClickEvent) -> {
                         ClickType clickType = inventoryClickEvent.getClick();
 
-                        if (upgrade.isNeedMessage())
+                        if (upgrade.isNeedMessage()) {
                             if (clickType == ClickType.CONTROL_DROP) {
                                 upgrades.get(upgrade).setMessage(!isMessage);
 
@@ -157,12 +157,12 @@ public class PickaxeGui extends BaseSimpleInventory {
                                 opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
                                 return;
                             }
+                        }
 
                         if (clickType == ClickType.MIDDLE) {
                             upgrades.get(upgrade).setIs(!isIs);
 
                             player.closeInventory();
-
                             opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
 
                             return;
@@ -178,18 +178,18 @@ public class PickaxeGui extends BaseSimpleInventory {
                         switch (clickType) {
                             case LEFT:
                                 if (playerToken >= needToken)
-                                    updatePickaxe(playerData, player, needToken, upgrade, upgrades);
+                                    updatePickaxe(playerData, player, needToken, upgrade, upgrades, 1);
 
                                 return;
 
                             case RIGHT:
                                 if (playerToken >= tenTokens) {
-                                    double up = count + 10;
+                                    double up = 10;
 
-                                    if (up > upgrade.getMax_level())
-                                        return;
+                                    if (count + up > upgrade.getMax_level())
+                                        up = maxUpgrades;
 
-                                    updatePickaxe(playerData, player, tenTokens, upgrade, upgrades);
+                                    updatePickaxe(playerData, player, tenTokens, upgrade, upgrades, up);
                                     return;
                                 }
 
@@ -197,7 +197,7 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                             case DROP:
                                 if (playerToken >= maxTokens)
-                                    updatePickaxe(playerData, player, maxTokens, upgrade, upgrades);
+                                    updatePickaxe(playerData, player, maxTokens, upgrade, upgrades, maxUpgrades);
 
                         }
                     });
@@ -210,9 +210,10 @@ public class PickaxeGui extends BaseSimpleInventory {
     }
 
 
-    protected void updatePickaxe(PlayerData playerData, Player player, double tokens, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap) {
+    protected void updatePickaxe(PlayerData playerData, Player player, double tokens, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap, double upgrades) {
         playerData.setToken(playerData.getToken() - tokens);
         Upgrade.UpgradeStat up = upgradeMap.get(upgrade);
+        up.setCount(up.getCount() + upgrades);
 
         OpPlayer opPlayer = new OpPlayer(player);
         opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
@@ -221,23 +222,19 @@ public class PickaxeGui extends BaseSimpleInventory {
 
         switch (upgrade) {
             case BLESSINGS:
-                if (!achievements.hasAchievement(Achievement.OP_BLESSINGS_LEVEL)) {
-                    achievements.addAchievement(Achievement.OP_BLESSINGS_LEVEL);
-                }
+                achievements.addAchievement(Achievement.OP_BLESSINGS_LEVEL);
 
                 break;
 
             case EFFICIENCY:
-                if (upgrade.isMaxLevel(up.getCount()) && !achievements.hasAchievement(Achievement.OP_MAX_EFFICIENCY_LEVEL)) {
+                if (upgrade.isMaxLevel(up.getCount()))
                     achievements.addAchievement(Achievement.OP_MAX_EFFICIENCY_LEVEL);
-                }
 
                 break;
 
             case FORTUNE:
-                if (upgrade.isMaxLevel(up.getCount()) && !achievements.hasAchievement(Achievement.OP_MAX_FORTUNE_LEVEL)) {
+                if (upgrade.isMaxLevel(up.getCount()))
                     achievements.addAchievement(Achievement.OP_MAX_FORTUNE_LEVEL);
-                }
 
                 break;
         }

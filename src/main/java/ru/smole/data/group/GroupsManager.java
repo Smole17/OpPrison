@@ -41,7 +41,7 @@ public class GroupsManager {
         private @Getter String color;
         private @Getter long kitTime;
 
-        public String getName() {
+        public String  getName() {
             return color + name();
         }
 

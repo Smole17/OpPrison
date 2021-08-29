@@ -240,7 +240,7 @@ public class PlayerListener implements Listener {
 
         List<String> lore = Lists.newArrayList(
                 String.format("&fНик: &b%s %s", prefix, name),
-                "&fПрестижи: &a" + StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
+                "&fПрестиж: &a" + StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
                 "&fДобыто блоков: &e" + StringUtils._fixDouble(0, playerData.getBlocks()),
                 "&fГруппа: &b" + playerData.getGroup().getName(),
                 "",

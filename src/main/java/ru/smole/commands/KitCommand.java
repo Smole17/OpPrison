@@ -211,16 +211,8 @@ public class KitCommand extends BukkitCommand<Player> {
             return items;
         }
 
-        public static void load(String playerName) {
-            String kitsSQL;
-
-            try {
-                kitsSQL = (String) PlayerDataSQL.get(playerName, "kit");
-            } catch (Exception e) {
-                return;
-            }
-
-            if (kitsSQL == null || kitsSQL.equals(null))
+        public static void load(String playerName, String kitsSQL) {
+            if (kitsSQL == null)
                 return;
 
             kitsList.addAll(Arrays.asList(kitsSQL.split(",")));

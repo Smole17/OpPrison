@@ -43,17 +43,18 @@ public class HelpCommand extends BukkitCommand<Player> {
         BOOSTER(
                 "\n" + " " +
                 "\n   Бустеры в зависимости от процента, " +
-                "\n   дают бонус к выпадению §eтокенов §fи §aмонет." +
+                "\n   дают бонус к выпадению §eтокенов §fи §aденег §fвсем на сервере." +
                 "\n" + " " +
                 "\n   Вечный множитель от привилегий StarFarm:" +
-                "\n    §fVIP - §a5%" +
-                "\n    §fVIP+ - §a10%" +
-                "\n    §fPREMIUM - §a15%" +
-                "\n    §fPREMIUM+ - §a20%" +
-                "\n    §fELITE - §a30%" +
-                "\n    §fELITE+ - §a40%" +
-                "\n    §fSPONSOR - §a70%" +
-                "\n    §fSPONSOR+ - §a100%" +
+                "\n    §fVIP - §a0.05%" +
+                "\n    §fVIP+ - §a0.10%" +
+                "\n    §fPREMIUM - §a0.15%" +
+                "\n    §fPREMIUM+ - §a0.2%" +
+                "\n    §fELITE - §a0.3%" +
+                "\n    §fELITE+ - §a0.4%" +
+                "\n    §fSPONSOR - §a0.7%" +
+                "\n    §fSPONSOR+ - §a1%" +
+                "\n    §fUNIQUE/Разработчик - §a2%" +
                 "\n" + " "
         ),
 
