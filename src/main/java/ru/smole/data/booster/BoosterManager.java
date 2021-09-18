@@ -50,7 +50,7 @@ public class BoosterManager {
             case 100:
             case 901:
                 addBooster(2.0);
-                break;
+                break;  
         }
 
         BAR.setTitle(String.format("§fБустер сервера: §b+%s §8§o(/help booster)",

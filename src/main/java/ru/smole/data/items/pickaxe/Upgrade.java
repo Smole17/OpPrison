@@ -98,14 +98,14 @@ import ru.xfenilafs.core.util.ChatUtil;
             Material.PAPER, GroupsManager.Group.COSMOS, true);
 
     private @Getter @Setter String name;
-    private @Getter String describe;
-    private @Getter double need_level_pickaxe;
-    private @Getter double start_level;
-    private @Getter double max_level;
-    private @Getter double start_cost;
-    private @Getter Material material;
-    private @Getter GroupsManager.Group group;
-    private @Getter boolean needMessage;
+    private final @Getter String describe;
+    private final @Getter double need_level_pickaxe;
+    private final @Getter double start_level;
+    private final @Getter double max_level;
+    private final @Getter double start_cost;
+    private final @Getter Material material;
+    private final @Getter GroupsManager.Group group;
+    private final @Getter boolean needMessage;
 
     public Object[] getMaxUpgrades(PlayerData playerData, double level) {
         Object[] obj = {null, null};
@@ -168,10 +168,6 @@ import ru.xfenilafs.core.util.ChatUtil;
 
         double form = start_cost * 0.05 * level;
         return start_cost + form;
-    }
-
-    public boolean isUnlock(double level) {
-        return level >= need_level_pickaxe;
     }
 
     public boolean isMaxLevel(double level) {

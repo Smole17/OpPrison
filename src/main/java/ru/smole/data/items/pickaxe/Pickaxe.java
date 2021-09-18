@@ -216,7 +216,7 @@ import static ru.smole.OpPrison.MINES;
         double ig_moneyLevel = upgrades.get(Upgrade.IG_MONEY).getCount();
 
         double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 800.5 * fortuneLevel : 800.5) * (multiplier == 0 ? 1 : multiplier);
-        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 250 * token_minerLevel : 250;
+        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 750 * token_minerLevel : 750;
 
         if (OpPrison.BOOSTER > 0) {
             cost = cost + (cost * OpPrison.BOOSTER / 100);
