@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class GangDataSQL {
 
@@ -22,9 +23,7 @@ public class GangDataSQL {
                 .executeSync(OpPrison.getInstance().getBase());
     }
 
-    public static Object get(String name, String table) {
-        AtomicReference<Object> obj = null;
-
+    public static void get(String name, Consumer<ResultSet> resultSetConsumer) {
         OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
@@ -32,22 +31,16 @@ public class GangDataSQL {
                 .queryRow(new ValueQueryRow("name", name))
 
                 .executeQueryAsync(OpPrison.getInstance().getBase())
-                .thenAccept(result -> obj.set(result.getObject(table)));
-
-        return obj;
+                .thenAccept(resultSetConsumer);
     }
 
-    public static Object get(String table) {
-        Object[] obj = {null};
-
+    public static void get(Consumer<ResultSet> resultSetConsumer) {
         OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
 
                 .executeQueryAsync(OpPrison.getInstance().getBase())
-                .thenAccept(result -> obj[0] = result.getObject(table));
-
-        return obj[0];
+                .thenAccept(resultSetConsumer);
     }
 
     public static void save(String name, String members, double score) {

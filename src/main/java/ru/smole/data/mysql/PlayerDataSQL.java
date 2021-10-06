@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 
 public class PlayerDataSQL {
 
-    private static RemoteDatabaseConnectionHandler base = OpPrison.getInstance().getBase();
+    private static final RemoteDatabaseConnectionHandler base = OpPrison.getInstance().getBase();
 
     public static void tryLoad(String name, PickaxeManager pickaxe) {
         OpPrison.getInstance().getPlayers()

@@ -78,7 +78,7 @@ public class PlayerDataManager {
                 pickaxeManager.load(resultSet.getString("pickaxe"));
                 KitCommand.KitsGui.load(name, resultSet.getString("kit"));
             } catch (SQLException ex) {
-                ChatUtil.sendMessage(player, "§c§lВаши данные не были загружены,сообщите об этом Smole17#7425 | https://vk.com/smole17");
+                ChatUtil.sendMessage(player, "§c§lВаши данные не были загружены, сообщите об этом Smole17#7425 | https://vk.com/smole17");
                 player.sendTitle("§c§lВаши данные не были загружены,", "сообщите об этом Smole17#7425 | https://vk.com/smole17", 20, 20, 20);
 
                 Bukkit.getOnlinePlayers().forEach(player1 -> {
