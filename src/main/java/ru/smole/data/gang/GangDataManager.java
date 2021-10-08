@@ -30,9 +30,11 @@ public class GangDataManager {
 
     public void load() {
         GangDataSQL.get(resultSet -> {
-            String[] name;
             try {
-                name = (String[]) resultSet.getObject("name");
+                if (!resultSet.next())
+                    return;
+
+            String[] name = (String[]) resultSet.getObject("name");
 
             if (name == null)
                 return;
@@ -49,9 +51,9 @@ public class GangDataManager {
                 });
             }
 
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         });
     }
 

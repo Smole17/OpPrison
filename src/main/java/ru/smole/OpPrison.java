@@ -89,9 +89,6 @@ public class OpPrison extends CorePlugin {
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
-    private BukkitTask pickaxeTask;
-    private BukkitTask eventTask;
-
     @SneakyThrows
     public void onPluginEnable() {
         instance = this;
@@ -343,7 +340,7 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadEffects() {
-        pickaxeTask = Bukkit.getScheduler().runTaskTimer(this, () ->
+        BukkitTask pickaxeTask = Bukkit.getScheduler().runTaskTimer(this, () ->
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     String item = Items.getItemName(player.getInventory().getItemInMainHand());
 
@@ -413,68 +410,67 @@ public class OpPrison extends CorePlugin {
             blocks.put(playerName, blocks.get(playerName) + 1);
         });
 
-        eventTask =
-                Bukkit.getScheduler().runTaskTimer(
-                        this,
-                        () -> {
-                            if (Bukkit.getOnlinePlayers().size() < 5) {
-                                return;
-                            }
+        BukkitTask eventTask = Bukkit.getScheduler().runTaskTimer(
+                this,
+                () -> {
+                    Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 1500000;
 
-                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 1500000;
+                    if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
+                        ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fне началось из-за недостатка участников");
+                        ChatUtil.broadcast("");
 
-                            if (Bukkit.getOnlinePlayers().stream().noneMatch(predicate))
-                                return;
+                        return;
+                    }
 
-                            ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fначалось");
-                            ChatUtil.broadcast("");
-                            ChatUtil.broadcast("   Суть события в том, чтобы телепортироваться на шахту 150.000.000 &8&o(150M) &fпрестижей");
-                            ChatUtil.broadcast("   и накопать больше всех блоков за 20 минут");
-                            ChatUtil.broadcast("");
+                    ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fначалось");
+                    ChatUtil.broadcast("");
+                    ChatUtil.broadcast("   Суть события в том, чтобы телепортироваться на шахту 150.000.000 &8&o(150M) &fпрестижей");
+                    ChatUtil.broadcast("   и накопать больше всех блоков за 20 минут");
+                    ChatUtil.broadcast("");
 
-                            Bukkit.getOnlinePlayers().forEach(player -> blocks.put(player.getName(), 0.0));
-                            opEvent.start(name);
+                    Bukkit.getOnlinePlayers().forEach(player -> blocks.put(player.getName(), 0.0));
+                    opEvent.start(name);
 
-                            Bukkit.getScheduler().runTaskLater(
-                                    this,
-                                    () -> {
-                                        ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fзавершилось");
-                                        ChatUtil.broadcast("");
+                    Bukkit.getScheduler().runTaskLater(
+                            this,
+                            () -> {
+                                ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fзавершилось");
+                                ChatUtil.broadcast("");
 
-                                        int[] i = {1};
+                                int[] i = {1};
 
-                                        blocks.entrySet()
-                                                .stream()
-                                                .sorted(Map.Entry.comparingByValue())
-                                                .limit(3)
-                                                .forEachOrdered(x -> {
-                                                    ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
+                                blocks.entrySet()
+                                        .stream()
+                                        .sorted(Map.Entry.comparingByValue())
+                                        .limit(3)
+                                        .forEachOrdered(x -> {
+                                            ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
 
-                                                    PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
-                                                    double added = playerData.getToken() * 0.15 / i[0];
+                                            PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
+                                            double added = playerData.getToken() * 0.15 / i[0];
 
-                                                    playerData.addToken(added);
-                                                    i[0]++;
+                                            playerData.addToken(added);
+                                            i[0]++;
 
-                                                    Question question = playerData.getQuestions().get("SOFOS");
-                                                    Question.QuestionStep step = question.getStep();
+                                            Question question = playerData.getQuestions().get("SOFOS");
+                                            Question.QuestionStep step = question.getStep();
 
-                                                    if (step == Question.QuestionStep.COMPLETING) {
-                                                        question.setStep(Question.QuestionStep.ALR_COMPLETED);
-                                                    }
-                                                });
+                                            if (step == Question.QuestionStep.COMPLETING) {
+                                                question.setStep(Question.QuestionStep.ALR_COMPLETED);
+                                            }
+                                        });
 
-                                        ChatUtil.broadcast("");
+                                ChatUtil.broadcast("");
 
 
-                                        blocks.clear();
-                                        opEvent.stop(name);
-                                    },
-                                    20 * 60 * 20
-                            );
-                        },
-                        20 * 60 * 40,
-                        20 * 60 * 40
-                        );
+                                blocks.clear();
+                                opEvent.stop(name);
+                            },
+                            20 * 60 * 20
+                    );
+                },
+                20 * 60 * 40,
+                20 * 60 * 40
+        );
     }
 }
