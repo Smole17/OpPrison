@@ -19,6 +19,7 @@ import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class KitCommand extends BukkitCommand<Player> {
     public KitCommand() {
@@ -181,8 +182,6 @@ public class KitCommand extends BukkitCommand<Player> {
 
                 List<String> kitsList = playerKits.get(playerName);
                 kitsList.add(kit);
-                playerKits.remove(playerName);
-                playerKits.put(playerName, kitsList);
 
                 items.forEach(itemStack -> {
                     opPlayer.add(itemStack);
@@ -216,12 +215,7 @@ public class KitCommand extends BukkitCommand<Player> {
             if (kitsSQL == null)
                 return;
 
-            playerKits.put(playerName, new ArrayList<>());
-
-            List<String> kitsList = playerKits.get(playerName);
-            kitsList.addAll(Arrays.asList(kitsSQL.split(",")));
-
-            playerKits.put(playerName, kitsList);
+            playerKits.put(playerName, Arrays.stream(kitsSQL.split(",")).collect(Collectors.toList()));
         }
 
         public static String save(String playerName) {
