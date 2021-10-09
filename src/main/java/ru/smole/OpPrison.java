@@ -289,7 +289,7 @@ public class OpPrison extends CorePlugin {
         });
         log.info("Loaded {} mines!", MINES.size());
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
+        Bukkit.getScheduler().runTaskTimer(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
 
         FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
         ConfigurationSection pads = misc.getConfigurationSection("pads");
