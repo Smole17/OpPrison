@@ -1,5 +1,6 @@
 package ru.smole.commands;
 
+import lombok.var;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -7,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.event.OpEvent;
@@ -18,7 +20,9 @@ import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
 
 @CommandPermission(permission = "opprison.admin")
 public class EventCommand extends BukkitCommand<CommandSender> {
@@ -77,7 +81,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
 
     public void number(CommandSender sender, String name, int i, ItemStack itemMain) {
         OpEvent opEvent = new OpEvents();
-        var events = opEvent.getChatEvents();
+        Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
 
         int random = new Random().nextInt(i) + 1;
         final boolean[][] is = {{false}};
@@ -164,7 +168,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
 
     public void chat(CommandSender sender, String name, boolean is) {
         OpEvent opEvent = new OpEvents();
-        var events = opEvent.getChatEvents();
+        Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
 
         opEvent.getActiveEvents().remove(name);
         events.remove(name);

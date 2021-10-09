@@ -15,6 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -56,6 +57,7 @@ import ru.xfenilafs.core.regions.ResourceBlock;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -399,7 +401,7 @@ public class OpPrison extends CorePlugin {
     private void loadEvents() {
         OpEvent opEvent = new OpEvents();
         Map<String, Double> blocks = new HashMap<>();
-        var events = opEvent.getBreakEvents();
+        Map<String, Consumer<BlockBreakEvent>> events = opEvent.getBreakEvents();
 
         String name = "sofos";
         events.put(name, event -> {
