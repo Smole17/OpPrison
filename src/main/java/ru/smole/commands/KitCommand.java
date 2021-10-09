@@ -215,7 +215,8 @@ public class KitCommand extends BukkitCommand<Player> {
             if (kitsSQL == null)
                 return;
 
-            playerKits.put(playerName, Arrays.stream(kitsSQL.split(",")).collect(Collectors.toList()));
+            List<String> kits = new ArrayList<>();
+            playerKits.put(playerName, kits);
         }
 
         public static String save(String playerName) {
