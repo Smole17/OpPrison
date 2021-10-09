@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import lombok.var;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -422,8 +423,12 @@ public class OpPrison extends CorePlugin {
 
                             Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 1500000;
 
-                            if (Bukkit.getOnlinePlayers().stream().noneMatch(predicate))
+                            if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
+                                ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fне началось из-за недостатка участников");
+                                ChatUtil.broadcast("");
+
                                 return;
+                            }
 
                             ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fначалось");
                             ChatUtil.broadcast("");
