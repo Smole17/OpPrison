@@ -14,7 +14,7 @@ public class TrashCommand extends BukkitCommand<Player> {
 
     @Override
     protected void onExecute(Player player, String[] strings) {
-        Inventory inv = Bukkit.createInventory(null, 54, "§7Мусорка");
+        Inventory inv = Bukkit.createInventory(null, 54, "Мусорка");
 
         player.openInventory(inv);
     }

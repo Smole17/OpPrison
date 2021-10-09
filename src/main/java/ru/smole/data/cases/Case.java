@@ -44,7 +44,6 @@ public class Case {
         simpleHolographic.addTextLine(name);
         simpleHolographic.addTextLine("§bЛКМ §f- Просмотр информации о кейсе");
         simpleHolographic.addTextLine("§bПКМ §f- Открыть кейс на ВСЕ ключи");
-        simpleHolographic.addTextLine("§8§o(сообщений о выпавших предметов нет)");
 
         LeaderBoard.holograms.add(simpleHolographic);
         this.caseItems = new ArrayList<>();

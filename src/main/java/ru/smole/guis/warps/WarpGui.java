@@ -24,7 +24,7 @@ public class WarpGui extends BaseSimpleInventory {
     private final ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
-        super(6, "Точки телепортации (Основные)");
+        super(5, "Точки телепортации (Основные)");
         this.configManager = configManager;
     }
 
@@ -76,7 +76,7 @@ public class WarpGui extends BaseSimpleInventory {
 
 
         for (int i = 1; i <= inventory.getSize(); i++) {
-            if (i == 46 || i == 47 || i == 49 || i == 50 || i == 51 || i == 53 || i == 54)
+            if (i !=25 && i != 21 && i !=41)
                 addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
@@ -84,13 +84,13 @@ public class WarpGui extends BaseSimpleInventory {
                                 .build());
         }
 
-        addItem(48,
+        addItem(21,
                 ApiManager.newItemBuilder(Material.DIAMOND)
                         .setName("§fШахты для групп")
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui(configManager).openInventory(player));
 
-        addItem(52,
+        addItem(25,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
                         .setName("§fШахты престижей")
                         .build(), (baseInventory, inventoryClickEvent)
@@ -102,7 +102,7 @@ public class WarpGui extends BaseSimpleInventory {
         private ConfigManager configManager;
 
         public PrestigeWarpGui(ConfigManager configManager) {
-            super(6, "Точки телепортации (Престиж)");
+            super(5, "Точки телепортации (Престиж)");
             this.configManager = configManager;
         }
 
@@ -141,7 +141,7 @@ public class WarpGui extends BaseSimpleInventory {
             });
 
             for (int i = 1; i <= inventory.getSize(); i++) {
-                if (i == 46 || i == 47 || i == 49 || i == 51 || i == 52 || i == 53 || i == 54)
+                if (i !=21 && i !=22 && i !=23 && i !=24 && i !=25 && i != 40 && i != 42)
                     addItem(i,
                             ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                     .setName(" ")
@@ -149,15 +149,15 @@ public class WarpGui extends BaseSimpleInventory {
                                     .build());
             }
 
-            addItem(48,
+            addItem(42,
                     ApiManager.newItemBuilder(Material.DIAMOND)
-                            .setName("§fШахты для групп")
+                            .setName("§aШахты для групп")
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new DonateWarpGui(configManager).openInventory(player));
 
-            addItem(50,
+            addItem(40,
                     ApiManager.newItemBuilder(Material.BOOK)
-                            .setName("§fОсновные локации")
+                            .setName("§aОсновные локации")
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new WarpGui(configManager).openInventory(player));
         }
@@ -168,7 +168,7 @@ public class WarpGui extends BaseSimpleInventory {
         private final ConfigManager configManager;
 
         public DonateWarpGui(ConfigManager configManager) {
-            super(6, "Точки телепортации (Группы)");
+            super(5, "Точки телепортации (Группы)");
             this.configManager = configManager;
         }
 
@@ -208,7 +208,7 @@ public class WarpGui extends BaseSimpleInventory {
             });
 
             for (int i = 1; i <= inventory.getSize(); i++) {
-                if (i == 46 || i == 47 || i == 48 || i == 49 || i == 51 || i == 53 || i == 54)
+                if (i !=21 && i !=22 && i !=23 && i !=24 && i !=25 && i !=40 && i !=42)
                     addItem(i,
                             ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                     .setName(" ")
@@ -216,13 +216,13 @@ public class WarpGui extends BaseSimpleInventory {
                                     .build());
             }
 
-            addItem(50,
+            addItem(40,
                     ApiManager.newItemBuilder(Material.BOOK)
                             .setName("§fОсновные локации")
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new WarpGui(configManager).openInventory(player));
 
-            addItem(52,
+            addItem(42,
                     ApiManager.newItemBuilder(Material.NETHER_STAR)
                             .setName("§fШахты престижей")
                             .build(), (baseInventory, inventoryClickEvent)

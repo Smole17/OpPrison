@@ -36,7 +36,7 @@ public class PrestigeManager {
         double cost = prestige == 0 ? c : upped * 1.01F * c;
 
         if (cost > money) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вам не хватает: &a$%s", StringUtils.replaceComma(cost - money));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВам не хватает: &a$%s", StringUtils.replaceComma(cost - money));
             return;
         }
 
@@ -45,7 +45,7 @@ public class PrestigeManager {
                 playerData.setMoney(money - cost);
                 playerData.setPrestige(upped);
 
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: &b%s", StringUtils._fixDouble(0, upped));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, upped));
                 return;
             case 2:
                 double cost2 = 0;
@@ -67,7 +67,7 @@ public class PrestigeManager {
                 playerData.setMoney(money - cost2);
                 playerData.setPrestige(upped);
 
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
         }
     }
 }

@@ -20,7 +20,7 @@ public class HelpCommand extends BukkitCommand<Player> {
     @Override
     protected void onExecute(Player player, String[] args) {
 
-        description = "§fИспользуйте §a/help [Аргумент]. §fСписок аргументов: §a" + Arrays.toString(Guide.values());
+        description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
 
         if (args.length >= 1) {
             try {
@@ -31,7 +31,7 @@ public class HelpCommand extends BukkitCommand<Player> {
                                 description = guide.getDesc()
                         );
             } catch (Exception e) {
-                description = "§fИспользуйте §a/help [Аргумент]. §fСписок аргументов: §a" + Arrays.toString(Guide.values());
+                description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
             }
         }
 

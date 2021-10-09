@@ -7,7 +7,7 @@ import ru.xfenilafs.core.command.BukkitCommand;
 
 public class WarpCommand extends BukkitCommand<Player> {
     public WarpCommand() {
-        super("warp");
+        super("warp", "mine", "menu");
     }
 
     @Override

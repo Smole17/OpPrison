@@ -37,7 +37,7 @@ public class KitCommand extends BukkitCommand<Player> {
         private static List<String> kitsList = new ArrayList<>();
 
         public KitsGui(ConfigurationSection section) {
-            super(5, "§fНаборы");
+            super(5, "Наборы");
             this.section = section;
         }
 

@@ -70,20 +70,20 @@ public class PickaxeGui extends BaseSimpleInventory {
                 if (upgrade == Upgrade.BLESSINGS)
                     iBuilder = ApiManager.newItemBuilder(upgrade.getMaterial())
                             .setName(upgrade.getName())
-                            .setLore("§8" + upgrade.getDescribe(), "");
+                            .setLore("§7" + upgrade.getDescribe(), "");
 
                 if (pickaxe_level <= need_level)
-                    iBuilder.addLore(String.format("§b§l* §fДоступно с §b%s §fуровня", StringUtils._fixDouble(0, need_level)));
+                    iBuilder.addLore(String.format("§c∗ §fДоступно с §b%s §fуровня", StringUtils._fixDouble(0, need_level)));
 
                 if (!isCanGroup)
-                    iBuilder.addLore(String.format("§b§l* §fДоступно с %s §fгруппы", group.getName()));
+                    iBuilder.addLore(String.format("§c∗ §fДоступно с %s §fгруппы", group.getName()));
 
                 if (!isCompleteQ)
-                    iBuilder.addLore("§b§l* §fНеобходимо прохождение задания");
+                    iBuilder.addLore("§c∗ §fНеобходимо прохождение задания");
 
                 if (upgrade == Upgrade.BLESSINGS) {
                     iBuilder.addLore("");
-                    iBuilder.addLore(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
+                    iBuilder.addLore(String.format("§a∗ §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
                 }
 
                 addItem(
@@ -105,28 +105,28 @@ public class PickaxeGui extends BaseSimpleInventory {
                 continue;
             }
 
-            lore.add("§8§o" + upgrade.getDescribe());
+            lore.add("§7" + upgrade.getDescribe());
             lore.add("");
 
             if (pickaxe_level >= need_level) {
-                lore.add(String.format("§b§l* §fТекущий уровень: §b%s", (int) count));
-                lore.add(String.format("§b§l* §fМаксимальный уровень: §b%s", (int) upgrade.getMax_level()));
+                lore.add(String.format("§fТекущий уровень: §b%s", (int) count));
+                lore.add(String.format("§fМаксимальный уровень: §b%s", (int) upgrade.getMax_level()));
                 lore.add("");
 
                 if (!upgrade.isMaxLevel(count)) {
-                    lore.add(String.format("§b§l+ §f1 уровень: §e⛃%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
-                    lore.add(String.format("§b§l+ §f10 уровней: §e⛃%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
-                    lore.add(String.format("§b§l+ §f%s уровней: §e⛃%s §8(( Q ))",
+                    lore.add(String.format("§a+ §f1 уровень: §e⛃%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
+                    lore.add(String.format("§a+ §f10 уровней: §e⛃%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
+                    lore.add(String.format("§a+ §f%s уровней: §e⛃%s §8(( Q ))",
                             StringUtils.replaceComma(maxUpgrades),
                             // maxUpgrades > upgrade.getMax_level() ? upgrade.getMax_level() : maxUpgrades
                             StringUtils.formatDouble(2, maxTokens)));
                     lore.add("");
                 }
 
-                lore.add(String.format("§b§l* §fСтатус: %s §8(( СКМ ))", isIs ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
+                lore.add(String.format("§a∗ §fСтатус: %s §8(( СКМ ))", isIs ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
 
                 if (upgrade.isNeedMessage())
-                    lore.add(String.format("§b§l* §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
+                    lore.add(String.format("§a∗ §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
             }
 
             ItemUtil.ItemBuilder itemBuilder =
