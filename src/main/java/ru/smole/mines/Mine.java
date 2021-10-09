@@ -71,7 +71,6 @@ public class Mine {
                 .filter(zone::contains)
                 .forEach(player -> player.teleport(region.getSpawnLocation()));
 
-
         AtomicReference<Map<Block, ResourceBlock>> fillMap = new AtomicReference<>(new HashMap<>());
         AtomicInteger counter = new AtomicInteger();
         zone.forEach(block -> {

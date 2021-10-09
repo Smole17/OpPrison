@@ -1,6 +1,5 @@
 package ru.smole.commands;
 
-import lombok.var;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
