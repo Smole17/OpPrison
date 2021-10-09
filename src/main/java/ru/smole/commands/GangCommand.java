@@ -27,7 +27,7 @@ import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 @CommandPermission(permission = "opprison.admin")
 public class GangCommand extends BukkitCommand<Player> {
     public GangCommand() {
-        super("gang", "g");
+        super("gang");
     }
 
     public static final Map<String, List<String>> invitedList = new HashMap<>();

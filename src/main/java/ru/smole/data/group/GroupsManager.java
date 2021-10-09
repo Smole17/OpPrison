@@ -29,7 +29,7 @@ public class GroupsManager {
 
         MANTLE("§7", 0),
         EARTH("§8", 259200000),
-        AQUA("§9", 345600000),
+            AQUA("§9", 345600000),
         AIR("§f", 432000000),
         SKY("§b", 518400000),
         COSMOS("§5", 604800000),

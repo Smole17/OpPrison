@@ -6,6 +6,8 @@ import ru.smole.OpPrison;
 import ru.smole.data.player.PlayerDataManager;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.Random;
+
 public class ServerUtil {
 
     public static void load() {
@@ -23,17 +25,16 @@ public class ServerUtil {
     }
 
     public static void restart() {
+        Random random = new Random();
         Bukkit.getOnlinePlayers().forEach((player) -> {
+            int randomI = random.nextInt(2);
             ChatUtil.sendMessage(player, "§fСервер перезагрузится через §c10 §fсекунд. Рекомендуем покинуть его и войти через минуту.");
+
+            BungeeUtil.sendToServer(player, "hub" + randomI +1);
             PlayerDataManager playerData = OpPrison.getInstance().getPlayerDataManager();
             playerData.unload(player);
         });
-        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-            Bukkit.getOnlinePlayers().forEach((p) -> {
-                ChatUtil.sendMessage(p, "§cСервер перезагружается! Перемещаю в хаб проекта...");
-                BungeeUtil.sendToServer(p, "hub");
-            });
-        }, 200L);
+
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);
     }
 }

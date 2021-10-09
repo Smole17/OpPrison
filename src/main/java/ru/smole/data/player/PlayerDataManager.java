@@ -94,7 +94,7 @@ public class PlayerDataManager {
         GangCommand.invitedList.put(name, new ArrayList<>());
 
         OpPrison.BAR.removeAll();
-        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
 
         LeaderBoard.holograms.forEach(simpleHolographic -> {
             if (!simpleHolographic.getLocation().getWorld().equals(player.getWorld()))
@@ -107,6 +107,8 @@ public class PlayerDataManager {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
+
+
     }
 
     public void unload(Player player) {
@@ -140,7 +142,8 @@ public class PlayerDataManager {
         playerDataMap.remove(name);
 
         OpPrison.BAR.removeAll();
-        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(player));
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
+        OpPrison.getInstance().getWorldStatistic().save(player);
     }
 
     public void updateTop(Player player) {

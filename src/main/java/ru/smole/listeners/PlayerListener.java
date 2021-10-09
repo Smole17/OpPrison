@@ -35,6 +35,7 @@ import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.player.world.WorldStatisticPostLoadEvent;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -46,7 +47,7 @@ public class PlayerListener implements Listener {
     private final PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
+    public void onJoin(WorldStatisticPostLoadEvent event) {
         Player player = event.getPlayer();
 
         dataManager.load(player);

@@ -51,6 +51,8 @@ import ru.xfenilafs.core.database.RemoteDatabaseTable;
 import ru.xfenilafs.core.database.RemoteDatabasesApi;
 import ru.xfenilafs.core.database.query.row.TypedQueryRow;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
+import ru.xfenilafs.core.player.world.TypeStats;
+import ru.xfenilafs.core.player.world.WorldStatistic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
 import ru.xfenilafs.core.util.ChatUtil;
@@ -80,6 +82,8 @@ public class OpPrison extends CorePlugin {
     RemoteDatabaseTable players;
     private @Getter
     RemoteDatabaseTable gangs;
+    private @Getter
+    WorldStatistic worldStatistic;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
@@ -142,7 +146,7 @@ public class OpPrison extends CorePlugin {
         registerCommands(
                 new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
                 new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
-                new FlyCommand(), new HelpCommand(), new KitCommand(), new EventCommand(),
+                new FlyCommand(), new InfoCommand(), new KitCommand(), new EventCommand(),
                 new TrashCommand(), new RestartCommand(), new GangCommand(), new GangChatCommand(),
                 new SpawnCommand(), new EnderChestCommand()
         );
@@ -155,6 +159,7 @@ public class OpPrison extends CorePlugin {
         PickaxeManager.pickaxes = new HashMap<>();
         Items.init();
 
+        loadSaveWorld();
         loadCrates();
         loadRegionsAndMines();
         loadCases();
@@ -170,6 +175,10 @@ public class OpPrison extends CorePlugin {
         base.handleDisconnect();
         BAR.removeAll();
         gangDataManager.unload();
+    }
+
+    public void loadSaveWorld() {
+        worldStatistic = WorldStatistic.init(this, base, TypeStats.values());
     }
 
     public void loadCrates() {
@@ -268,8 +277,8 @@ public class OpPrison extends CorePlugin {
 
                         return
                                 new ResourceBlock(
-                                    Material.valueOf(!split[0].contains(":") ? split[0] : split[0].split(":")[0]),
-                                    Integer.parseInt(split[1]),
+                                        Material.valueOf(!split[0].contains(":") ? split[0] : split[0].split(":")[0]),
+                                        Integer.parseInt(split[1]),
                                         !split[0].contains(":") ? 0 : Integer.parseInt(split[0].split(":")[1])
                                 );
                     })
@@ -480,6 +489,6 @@ public class OpPrison extends CorePlugin {
                         },
                         20 * 60 * 40,
                         20 * 60 * 40
-                        );
+                );
     }
 }

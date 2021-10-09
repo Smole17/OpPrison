@@ -9,10 +9,10 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.Arrays;
 
-public class HelpCommand extends BukkitCommand<Player> {
+public class InfoCommand extends BukkitCommand<Player> {
 
-    public HelpCommand() {
-        super("help");
+    public InfoCommand() {
+        super("opprison");
     }
 
     public static String description;
@@ -20,7 +20,7 @@ public class HelpCommand extends BukkitCommand<Player> {
     @Override
     protected void onExecute(Player player, String[] args) {
 
-        description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
+        description = "§fИспользуйте: §a/opprison " + Arrays.toString(Guide.values());
 
         if (args.length >= 1) {
             try {
@@ -31,7 +31,7 @@ public class HelpCommand extends BukkitCommand<Player> {
                                 description = guide.getDesc()
                         );
             } catch (Exception e) {
-                description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
+                description = "§fИспользуйте: §a/opprison " + Arrays.toString(Guide.values());
             }
         }
 

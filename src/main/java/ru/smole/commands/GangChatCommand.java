@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class GangChatCommand extends BukkitCommand<Player> {
     public GangChatCommand() {
-        super("gangchat", "gc");
+        super("gangchat");
     }
 
     @Override

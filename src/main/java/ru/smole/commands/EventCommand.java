@@ -20,6 +20,7 @@ import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -30,57 +31,88 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         super("event");
     }
 
+    private final OpEvent opEvent = new OpEvents();
+
     @Override
     protected void onExecute(CommandSender sender, String[] args) {
-        if (args.length == 2) {
-            String name = args[0].toLowerCase();
-            if (name.equalsIgnoreCase("chat"))
-                chat(sender, name, args[1].equals("on"));
-        }
+        switch (args.length) {
+            case 2: {
+                String name = args[0].toLowerCase();
+                switch (name.toLowerCase()) {
+                    case "chat": {
+                        chat(sender, name, args[1].equals("on"));
+                        break;
+                    }
 
-        if (args.length == 3) {
-            String name = args[0].toLowerCase();
-
-            if (name.equalsIgnoreCase("number")) {
-                String[] item = args[1].split(":");
-                ItemStack itemMain = Items.getItem(item[0], Double.parseDouble(item[1]));
-
-                int i;
-
-                try {
-                    i = Integer.parseInt(args[2]);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Could not load range of number event");
+                    case "giveall": {
+                        String[] item = args[1].split(":");
+                        ItemStack itemMain = Items.getItem(item[0], Double.parseDouble(item[1]));
+                        all(sender, name, itemMain);
+                        break;
+                    }
                 }
+                break;
+            }
 
-                if (sender instanceof ConsoleCommandSender) {
+            case 3: {
+                String name = args[0].toLowerCase();
+
+                if (name.equalsIgnoreCase("number")) {
+                    String[] item = args[1].split(":");
+                    ItemStack itemMain = Items.getItem(item[0], Double.parseDouble(item[1]));
+
+                    int i;
+
+                    try {
+                        i = Integer.parseInt(args[2]);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("Could not load range of number event");
+                    }
+
+                    if (sender instanceof ConsoleCommandSender) {
+                        number(sender, name, i, itemMain);
+                        return;
+                    }
+
+                    Player player = (Player) sender;
+                    String playerName = player.getName();
+
+                    if (itemMain == null) {
+                        return;
+                    }
+
+                    if (!itemMain.hasItemMeta()) {
+                        return;
+                    }
+
+                    if (Items.isSomePickaxe(itemMain, playerName)) {
+                        return;
+                    }
+
+
                     number(sender, name, i, itemMain);
-                    return;
                 }
 
-                Player player = (Player) sender;
-                String playerName = player.getName();
-
-                if (itemMain == null) {
-                    return;
-                }
-
-                if (!itemMain.hasItemMeta()) {
-                    return;
-                }
-
-                if (Items.isSomePickaxe(itemMain, playerName)) {
-                    return;
-                }
-
-
-                number(sender, name, i, itemMain);
+                break;
             }
         }
     }
+    public void all(CommandSender sender, String name, ItemStack itemMain) {
+        opEvent.getActiveEvents().add(name);
+
+        ChatUtil.broadcast("");
+        ChatUtil.broadcast("    §b%s §fподарил всем на сервере %s §fx%s", sender.getName(), itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
+        ChatUtil.broadcast("");
+
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            OpPlayer.add(player, itemMain);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§fВы получили %s §fx%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
+        });
+
+        opEvent.getActiveEvents().remove(name);
+    }
 
     public void number(CommandSender sender, String name, int i, ItemStack itemMain) {
-        OpEvent opEvent = new OpEvents();
         Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
 
         int random = new Random().nextInt(i) + 1;
@@ -92,6 +124,11 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             Player target = event.getPlayer();
             String msg = event.getMessage();
             int num;
+
+            if (event.isCancelled()) {
+                event.setCancelled(true);
+                return;
+            }
 
             if (is[0][0]) {
                 event.setCancelled(true);
@@ -114,6 +151,13 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 return;
             }
 
+            if (num > i) {
+                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы превысили диапозон события. §8(%s)", i);
+
+                event.setCancelled(true);
+                return;
+            }
+
             if (num == random) {
                 is[0][0] = true;
 
@@ -122,7 +166,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 ChatUtil.broadcast("    §fПобедителем события стал: §b%s", target.getName());
                 ChatUtil.broadcast("");
 
-                new OpPlayer(target).add(itemMain);
+                OpPlayer.add(target, itemMain);
 
                 ChatUtil.broadcast("");
                 ChatUtil.broadcast("    Событие %s §fбудет завершено через 3 секунды...", name.replaceAll("number", "§bотгадай число"));
@@ -167,7 +211,6 @@ public class EventCommand extends BukkitCommand<CommandSender> {
     }
 
     public void chat(CommandSender sender, String name, boolean is) {
-        OpEvent opEvent = new OpEvents();
         Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
 
         opEvent.getActiveEvents().remove(name);

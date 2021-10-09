@@ -34,7 +34,6 @@ public class KitCommand extends BukkitCommand<Player> {
 
         private ConfigurationSection section;
         private static Map<String, List<String>> playerKits = new HashMap<>();
-        private static List<String> kitsList = new ArrayList<>();
 
         public KitsGui(ConfigurationSection section) {
             super(5, "Наборы");
@@ -179,6 +178,8 @@ public class KitCommand extends BukkitCommand<Player> {
                         }
                 } catch (Exception ignored) {}
 
+
+                List<String> kitsList = playerKits.get(playerName);
                 kitsList.add(kit);
                 playerKits.remove(playerName);
                 playerKits.put(playerName, kitsList);
@@ -215,6 +216,9 @@ public class KitCommand extends BukkitCommand<Player> {
             if (kitsSQL == null)
                 return;
 
+            playerKits.put(playerName, new ArrayList<>());
+
+            List<String> kitsList = playerKits.get(playerName);
             kitsList.addAll(Arrays.asList(kitsSQL.split(",")));
 
             playerKits.put(playerName, kitsList);
@@ -244,8 +248,9 @@ public class KitCommand extends BukkitCommand<Player> {
                 i += 1;
             }
 
-            playerKits.remove(playerName);
+            List<String> kitsList = playerKits.get(playerName);
             kitsList.clear();
+            playerKits.remove(playerName);
 
             return builder.toString();
         }

@@ -37,6 +37,15 @@ public class OpPlayer {
         player.getInventory().addItem(stack);
     }
 
+    public static void add(Player player, ItemStack stack) {
+        if (isFull(player)) {
+            player.getWorld().dropItem(player.getLocation(), stack);
+            return;
+        }
+
+        player.getInventory().addItem(stack);
+    }
+
     public void set(ItemStack stack, int slot) {
         PlayerInventory playerInventory = player.getInventory();
 
@@ -49,6 +58,10 @@ public class OpPlayer {
     }
 
     public boolean isFull() {
+        return player.getInventory().firstEmpty() == -1;
+    }
+
+    public static boolean isFull(Player player) {
         return player.getInventory().firstEmpty() == -1;
     }
 }
