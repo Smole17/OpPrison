@@ -151,7 +151,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             }
 
             if (num > i) {
-                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы превысили диапозон события. §8(%s)", i);
+                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы превысили диапозон события §8(%s)", i);
 
                 event.setCancelled(true);
                 return;

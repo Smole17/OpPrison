@@ -18,7 +18,6 @@ public class ServerUtil {
                 Bukkit.getOnlinePlayers().forEach(p -> p.setPlayerTime(1200L, false));
                 if (LagMeter.getLastMinuteTPS() < 5.0D) {
                     Bukkit.getOnlinePlayers().forEach(player -> ChatUtil.sendMessage(player, "&4&lСожалеем, но сервер крайне перегружен. Попробуйте вернуться через несколько минут."));
-                    Bukkit.getOnlinePlayers().forEach(player -> BungeeUtil.sendToServer(player, "hub"));
                 }
             }
         }, 0L, 20L);

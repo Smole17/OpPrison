@@ -215,8 +215,8 @@ import static ru.smole.OpPrison.MINES;
         double blessingsLevel = upgrades.get(Upgrade.BLESSINGS).getCount();
         double ig_moneyLevel = upgrades.get(Upgrade.IG_MONEY).getCount();
 
-        double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 800.5 * fortuneLevel : 800.5) * (multiplier == 0 ? 1 : multiplier);
-        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 750 * token_minerLevel : 750;
+        double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 1500 * fortuneLevel : 1500) * (multiplier == 0 ? 1 : multiplier);
+        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 375 * token_minerLevel : 375;
 
         if (OpPrison.BOOSTER > 0) {
             cost = cost + (cost * OpPrison.BOOSTER / 100);
@@ -224,7 +224,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (prestige_finderLevel > 0 && upgrades.get(Upgrade.PRESTIGE_FINDER).isIs()) {
-            double chance = prestige_finderLevel / 65000;
+            double chance = prestige_finderLevel / 50000;
             Random random = new Random();
 
             if (random.nextFloat() <= chance) {
@@ -241,9 +241,9 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (blessingsLevel > 0 && upgrades.get(Upgrade.BLESSINGS).isIs()) {
-            double chance = blessingsLevel / 60000;
+            double chance = blessingsLevel / 80000;
             if (new Random().nextFloat() <= chance) {
-                double bless = token * blessingsLevel / 100;
+                double bless = token * blessingsLevel / 50;
                 Upgrade.BLESSINGS.setName("§bБлагославление");
                 Bukkit.getOnlinePlayers().forEach(onPlayer -> {
                     Upgrade.BLESSINGS.sendProcMessagePlayer(onPlayer, name, String.format("§e⛃%s", StringUtils.replaceComma(bless)));
@@ -299,7 +299,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (ig_moneyLevel > 0 && upgrades.get(Upgrade.IG_MONEY).isIs()) {
-            double chance = (ig_moneyLevel / 10) / 25000;
+            double chance = (ig_moneyLevel / 10) / 30000;
             if (new Random().nextFloat() <= chance) {
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");
@@ -324,7 +324,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (jack_hammerLevel > 0 && upgrades.get(Upgrade.JACK_HAMMER).isIs()) {
-            double chance = (jack_hammerLevel / 10) / 4750;
+            double chance = (jack_hammerLevel / 10) / 6300;
             if (new Random().nextFloat() <= chance) {
                 int blocks = breakLayer(block);
 

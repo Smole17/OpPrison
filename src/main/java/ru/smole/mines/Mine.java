@@ -1,5 +1,9 @@
 package ru.smole.mines;
 
+import com.boydti.fawe.Fawe;
+import com.boydti.fawe.FaweAPI;
+import com.boydti.fawe.FaweVersion;
+import com.sk89q.worldedit.EditSession;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

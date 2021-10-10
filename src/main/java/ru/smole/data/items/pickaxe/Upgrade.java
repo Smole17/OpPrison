@@ -19,12 +19,12 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
-            0,100, 500000, 15000,
+            0,100, 1000000, 50000,
             Material.DIAMOND, GroupsManager.Group.MANTLE, false),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 50000, 1000000,
+            0, 20, 50000, 2000000,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",
@@ -69,32 +69,32 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     TOKEN_MERCHANT("§eМножитель токенов",
             "Выдаёт умноженное количество токенов",
-            20, 0, 5000, 40000000,
+            20, 0, 5000, 80000000,
             Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true),
 
     MULTI_FINDER("§dНахождение множителя",
             "Выдаёт от 1-го до 3-ёх множителей",
-            25, 0, 1000, 1000000000,
+            25, 0, 1000, 2000000000,
             Material.BOOK, GroupsManager.Group.MANTLE, true),
 
     JACK_HAMMER("§cРазрушитель",
             "Увеличивает шанс на ломание целого слоя в шахте",
-            25, 0, 500, 2300000000D,
+            25, 0, 750, 3500000000D,
             Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_FINDER("§5Добыча престижей",
             "Увеличивает шанс при копание найти престижи. Количество зависит от уровня",
-            50, 0, 1000, 500000000,
+            50, 0, 2500, 1000000000,
             Material.BEACON, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_MERCHANT("§2Множитель престижей",
             "Умножает добываемые престижей от прокачки \"Добыча престижей\"",
-            55, 0, 5000, 150000000,
+            55, 0, 10000, 300000000,
             Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false),
 
     IG_MONEY("§4Мистер Крабс",
             "С ОЧЕНЬ маленьким шансом выдаст Вам чек, при активации которого вы получите донат валюту",
-            70, 0, 10, 12500000000000D,
+            70, 0, 10, 25000000000000D,
             Material.PAPER, GroupsManager.Group.COSMOS, true);
 
     private @Getter @Setter String name;
@@ -166,7 +166,7 @@ import ru.xfenilafs.core.util.ChatUtil;
         if (isMaxLevel(level - 1))
             return 0.0;
 
-        double form = start_cost * 0.05 * level;
+        double form = start_cost * 0.1 * level;
         return start_cost + form;
     }
 
