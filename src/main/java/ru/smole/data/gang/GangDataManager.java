@@ -24,8 +24,8 @@ public class GangDataManager {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
         gangPlayerMap.put(leader, new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
 
-        gangDataMap.put(name.toLowerCase(), new GangData(name, gangPlayerMap, 0.0));
-        GangDataSQL.create(name.toLowerCase(), leader);
+        gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
+        GangDataSQL.create(name, leader);
     }
 
     public void load() {

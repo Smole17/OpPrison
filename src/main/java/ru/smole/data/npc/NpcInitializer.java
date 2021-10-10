@@ -54,7 +54,8 @@ public class NpcInitializer {
                         "§8[&eСофос§8] §fЖелаю тебе удачи, мой юный друг!"
                 );
 
-                questions.put("SOFOS", new Question(Question.QuestionStep.COMPLETING));
+                if (!questions.containsKey("SOFOS") || questions.get("SOFOS") != null)
+                    questions.put("SOFOS", new Question(Question.QuestionStep.COMPLETING));
             }
 
             if (!Bukkit.getScheduler().getPendingTasks().contains(ChatUtil.task)) {

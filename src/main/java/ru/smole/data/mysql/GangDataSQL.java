@@ -56,4 +56,10 @@ public class GangDataSQL {
                 input, name
         );
     }
+
+    public static void remove(String name) {
+        OpPrison.getInstance().getGangs().newDatabaseQuery().deleteQuery()
+                .queryRow(new ValueQueryRow("name", name))
+                .executeAsync(OpPrison.getInstance().getBase());
+    }
 }

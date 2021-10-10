@@ -19,12 +19,12 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
-            0,100, 1000000, 50000,
+            0,100, 1500000, 50000,
             Material.DIAMOND, GroupsManager.Group.MANTLE, false),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 50000, 850000,
+            0, 20, 75000, 650000,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",
@@ -74,13 +74,18 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     MULTI_FINDER("§dНахождение множителя",
             "Выдаёт от 1-го до 3-ёх множителей",
-            25, 0, 1000, 2000000000,
+            25, 0, 2500, 2000000000,
             Material.BOOK, GroupsManager.Group.MANTLE, true),
 
     JACK_HAMMER("§cРазрушитель",
             "Увеличивает шанс на ломание целого слоя в шахте",
             25, 0, 750, 3500000000D,
             Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
+
+    LEPRECHAUN("§aЛепрекон",
+            "Выдаёт деньги всем на сервере. Количество зависит от уровня",
+            35, 0, 1500, 500000000,
+            Material.EMERALD, GroupsManager.Group.MANTLE, true),
 
     JACKPOT("§3Джекпот",
             "Выдаёт случайно токены, деньги, ключи",

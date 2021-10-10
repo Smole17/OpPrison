@@ -448,7 +448,7 @@ public class OpPrison extends CorePlugin {
                             ChatUtil.broadcast("   и накопать больше всех блоков за 20 минут");
                             ChatUtil.broadcast("");
 
-                            Bukkit.getOnlinePlayers().forEach(player -> blocks.put(player.getName(), 0.0));
+                            Bukkit.getOnlinePlayers().stream().filter(predicate).forEach(player -> blocks.put(player.getName(), 0.0));
                             opEvent.start(name);
 
                             Bukkit.getScheduler().runTaskLater(

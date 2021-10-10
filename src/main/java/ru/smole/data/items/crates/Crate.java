@@ -104,7 +104,8 @@ public class Crate {
         LOOT_BOX("§6ЛУТБОКС"),
         MONTHLY("§aКЕЙС МЕСЯЦА");
 
-        private @Getter String name;
+        private @Getter
+        final String name;
 
         public ItemStack getStack() {
             List<String> lore = new ArrayList<>();

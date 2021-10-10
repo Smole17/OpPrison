@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
+import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
@@ -83,6 +84,7 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             gangData.sendMessage("Банда была удалена главой &b" + playerName);
                             gangDataMap.remove(gangName);
+                            GangDataSQL.remove(gangName);
 
                             return;
 
@@ -281,12 +283,17 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
+                            if (invitedList.get(playerName).contains(gangData.getName())) {
+                                ChatUtil.sendMessage(player, PREFIX + "Этот игрок уже приглашён в банду");
+                                return;
+                            }
+
                             invitedList.get(invitedName).add(gangData.getName());
                             ChatUtil.sendMessage(player, PREFIX + "Вы пригласили &b%s &fв банду. У него есть &b1 минута&f, чтобы принять", invitedName);
 
                             BaseComponent[] component = ChatUtil
                                     .newBuilder(
-                                            String.format("Вас пригласили в %s&f банду. У Вас есть §b1 минута§f, чтобы принять &8&o(/gang accept %s)",
+                                            String.format("Вас пригласили в %s§f банду. У Вас есть §b1 минута§f, чтобы принять §8§o(/gang accept %s)",
                                                     gangData.getName().replace("&", "§"), gangData.getName())
                                     )
                                     .setHoverEvent(HoverEvent.Action.SHOW_TEXT, "§7Нажмите, чтобы вывести команду")

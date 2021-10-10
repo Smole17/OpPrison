@@ -33,7 +33,7 @@ public class PrestigeManager {
         double money = playerData.getMoney();
 
         double c = 20000D;
-        double cost = prestige == 0 ? c : upped * 1.01F * c;
+        double cost = prestige == 0 ? c : upped * 1.025F * c;
 
         if (cost > money) {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВам не хватает: &a$%s", StringUtils.replaceComma(cost - money));
@@ -55,7 +55,7 @@ public class PrestigeManager {
                     if (need >= money)
                         break;
 
-                    need = need + (upped * 1.05F * c);
+                    need = need + (upped * 1.025F * c);
 
                     if (need >= money)
                         break;
