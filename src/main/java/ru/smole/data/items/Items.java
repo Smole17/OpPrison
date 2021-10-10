@@ -188,7 +188,7 @@ public class Items {
 
                         item.setAmount(item.getAmount() - 1);
 
-                        CorePlayer.getCorePlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
+                        MainClass.getInstance().getCorePlayer().getPlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
                     }
                 });
 
