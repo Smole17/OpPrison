@@ -3,6 +3,7 @@ package ru.smole.commands;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import ru.luvas.rmcs.MainClass;
 import ru.smole.OpPrison;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.command.sexy.Parameter;
@@ -10,6 +11,9 @@ import ru.xfenilafs.core.command.sexy.SexyCommand;
 import ru.xfenilafs.core.command.sexy.context.CommandContext;
 import ru.xfenilafs.core.command.sexy.require.Require;
 import ru.xfenilafs.core.command.sexy.type.TypeString;
+import sexy.kostya.mineos.network.client.SexyClient;
+import sexy.kostya.mineos.network.packets.Packet36RankChange;
+import sexy.kostya.mineos.perms.PermissionGroup;
 
 import java.util.stream.Collectors;
 

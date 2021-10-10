@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.spigotmc.AsyncCatcher;
 import ru.smole.commands.*;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.OpEvent;
@@ -289,7 +290,11 @@ public class OpPrison extends CorePlugin {
         });
         log.info("Loaded {} mines!", MINES.size());
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            AsyncCatcher.enabled = false;
+            MINES.values().forEach(Mine::reset);
+            AsyncCatcher.enabled = true;
+        }, 20L, 20L);
 
         FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
         ConfigurationSection pads = misc.getConfigurationSection("pads");

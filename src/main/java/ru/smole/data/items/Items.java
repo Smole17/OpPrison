@@ -188,7 +188,7 @@ public class Items {
 
                         item.setAmount(item.getAmount() - 1);
 
-                        MainClass.getInstance().getCorePlayer().getPlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
+                        CorePlayer.getCorePlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
                     }
                 });
 
@@ -199,8 +199,8 @@ public class Items {
                                 objects -> ApiManager.newItemBuilder(key.getStack()).setAmount(((Double) objects[0]).intValue()).build(),
                                 (event, itemStack) -> {
                                     Player player = event.getPlayer();
-                                    Action action = event.getAction();
                                     Block block = event.getClickedBlock();
+                                    Action action = event.getAction();
                                     if (action == Action.RIGHT_CLICK_BLOCK && event.hasBlock()) {
                                         Case customCase = Case.getCustomCaseByLocation(block);
 
