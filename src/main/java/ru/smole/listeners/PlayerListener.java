@@ -27,6 +27,7 @@ import ru.smole.data.event.OpEvents;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
+import ru.smole.data.npc.NpcInitializer;
 import ru.smole.data.pads.LaunchPad;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
@@ -35,7 +36,10 @@ import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.player.world.WorldStatisticPostLoadEvent;
+import ru.xfenilafs.core.protocollib.entity.FakeBaseEntity;
+import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -83,6 +87,40 @@ public class PlayerListener implements Listener {
 
             simpleHolographic.spawn();
         });
+    }
+
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+
+        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
+            LeaderBoard.holograms.forEach(holographic -> {
+
+                boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
+                boolean hasViewer = holographic.hasViewer(player);
+
+                if (!hasViewer && equalWorld) {
+                    holographic.addViewers(player);
+                }
+
+                if (hasViewer && !equalWorld) {
+                    holographic.removeViewers(player);
+                }
+            });
+
+            NpcInitializer.npcList.forEach(fakePlayer -> {
+                boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
+                boolean hasViewer = fakePlayer.hasViewer(player);
+
+                if (!hasViewer && equalWorld) {
+                    fakePlayer.addViewers(player);
+                }
+
+                if (hasViewer && !equalWorld) {
+                    fakePlayer.removeViewers(player);
+                }
+            });
+        }, 10L);
     }
 
     @EventHandler
