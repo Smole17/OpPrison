@@ -104,7 +104,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         ChatUtil.broadcast("");
 
         Bukkit.getOnlinePlayers().forEach(player -> {
-            OpPlayer.add(player, itemMain);
+            OpPlayer.add(player, itemMain.clone());
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "§fВы получили %s §fx%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
         });
 
@@ -165,7 +165,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 ChatUtil.broadcast("    §fПобедителем события стал: §b%s", target.getName());
                 ChatUtil.broadcast("");
 
-                OpPlayer.add(target, itemMain);
+                OpPlayer.add(target, itemMain.clone());
 
                 ChatUtil.broadcast("");
                 ChatUtil.broadcast("    Событие %s §fбудет завершено через 3 секунды...", name.replaceAll("number", "§bотгадай число"));

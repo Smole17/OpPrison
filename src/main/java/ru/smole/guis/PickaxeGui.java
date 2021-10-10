@@ -44,6 +44,10 @@ public class PickaxeGui extends BaseSimpleInventory {
 
             int slot = 28 + upgrade.ordinal();
 
+            if (upgrades.get(upgrade) == null) {
+                upgrades.put(upgrade, new Upgrade.UpgradeStat(0, true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
+            }
+
             double count = upgrades.get(upgrade).getCount();
             Material type = upgrade.getMaterial();
             double need_level = upgrade.getNeed_level_pickaxe();

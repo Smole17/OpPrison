@@ -72,6 +72,7 @@ public class Items {
         lore.add("");
         lore.add("§b§lЗачарования");
         for (Upgrade upgrade : Upgrade.values()) {
+
             double count = pickaxe
                     .getUpgrades()
                     .get(upgrade)

@@ -24,7 +24,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 50000, 2000000,
+            0, 20, 50000, 850000,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",

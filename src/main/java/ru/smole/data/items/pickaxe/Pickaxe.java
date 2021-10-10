@@ -65,9 +65,7 @@ import static ru.smole.OpPrison.MINES;
             Achievement ach = Achievement.OP_PICKAXE_LEVEL;
             Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
 
-            if (!achievements.hasAchievement(ach)) {
-                achievements.addAchievement(ach);
-            }
+            achievements.addAchievement(ach);
         }
     }
 
@@ -193,18 +191,17 @@ import static ru.smole.OpPrison.MINES;
 
         switch (random.nextInt(i)) {
             case 0:
-                double money = 25000000000000D;
+                double money = 250000000000000D;
 
                 playerData.addMoney(money);
                 return "§a$" + StringUtils.replaceComma(money);
             case 1:
-            case 2:
-                double token = 500000000D;
+                double token = 50000000000D;
 
                 playerData.addToken(token);
                 return "§e⛃" + StringUtils.replaceComma(token);
-            case 3:
-                double count = 2;
+            case 2:
+                double count = 12;
                 ItemStack mineKey = Items.getItem("legendary_key", count);
 
                 if (mineKey == null)
@@ -328,7 +325,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (jackPotLevel > 0 && upgrades.get(Upgrade.JACKPOT).isIs()) {
-            double chance = (jackPotLevel / 3) / 12500;
+            double chance = (jackPotLevel / 3) / 7500;
             if (random.nextFloat() <= chance) {
                 Upgrade.JACKPOT.sendProcMessage(player, getRandomRewardJackPot(opPlayer, jackPotLevel, random));
             }

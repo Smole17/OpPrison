@@ -431,12 +431,9 @@ public class OpPrison extends CorePlugin {
                                 return;
                             }
 
-                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 1500000;
+                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 150000000;
 
                             if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
-                                ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fне началось из-за недостатка участников");
-                                ChatUtil.broadcast("");
-
                                 return;
                             }
 

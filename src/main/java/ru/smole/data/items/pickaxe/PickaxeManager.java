@@ -77,6 +77,12 @@ public class PickaxeManager {
             upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, upgrade.isNeedMessage(), Boolean.parseBoolean(args[2])));
         }
 
+        for (Upgrade upgrade : Upgrade.values()) {
+            if (upgradeMap.get(upgrade) == null) {
+                upgradeMap.put(upgrade, new Upgrade.UpgradeStat(0, true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
+            }
+        }
+
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
         pickaxes.put(name, pickaxe);
         opPlayer.set(Items.getItem("pickaxe", name), 1);

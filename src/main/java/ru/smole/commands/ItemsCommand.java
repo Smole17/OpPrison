@@ -122,7 +122,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                         return;
                     }
 
-                    opPlayer.add(itemStack);
+                    opPlayer.add(itemStack.clone());
                     ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
 
                     break;
