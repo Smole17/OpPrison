@@ -148,7 +148,7 @@ public class OpPrison extends CorePlugin {
                 new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
                 new FlyCommand(), new InfoCommand(), new KitCommand(), new EventCommand(),
                 new TrashCommand(), new RestartCommand(), new GangCommand(), new GangChatCommand(),
-                new SpawnCommand(), new EnderChestCommand()
+                new SpawnCommand(), new EnderChestCommand(), new MineCommand()
         );
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -289,7 +289,7 @@ public class OpPrison extends CorePlugin {
         });
         log.info("Loaded {} mines!", MINES.size());
 
-        Bukkit.getScheduler().runTaskTimer(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> MINES.values().forEach(Mine::reset), 20L, 20L);
 
         FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
         ConfigurationSection pads = misc.getConfigurationSection("pads");

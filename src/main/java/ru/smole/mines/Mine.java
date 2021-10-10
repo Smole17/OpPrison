@@ -3,6 +3,7 @@ package ru.smole.mines;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import ru.smole.OpPrison;
 import ru.xfenilafs.core.regions.Region;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Getter
 public class Mine {
 
-    protected static final MineFillExecutor fillExecutor = new MineFillExecutor(OpPrison.getInstance(), 2);
+    protected static final MineFillExecutor fillExecutor = new MineFillExecutor(OpPrison.getInstance(), 1);
     protected static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     private final int blocksForFill;
@@ -62,10 +63,12 @@ public class Mine {
     public void reset() {
         if (region == null) return;
 
-        long current = System.currentTimeMillis();
-        if (current - lastUpdate < respawn)
-            return;
-        lastUpdate = current;
+        if (System.currentTimeMillis() - lastUpdate > respawn)
+            fill();
+    }
+
+    public void fill() {
+        lastUpdate = System.currentTimeMillis();
 
         Bukkit.getOnlinePlayers().parallelStream()
                 .filter(zone::contains)
@@ -73,19 +76,28 @@ public class Mine {
 
         AtomicReference<Map<Block, ResourceBlock>> fillMap = new AtomicReference<>(new HashMap<>());
         AtomicInteger counter = new AtomicInteger();
-        zone.forEach(block -> {
-            if (counter.getAndIncrement() >= blocksForFill) {
-                fillExecutor.post(fillMap.get());
-                counter.set(0);
-                fillMap.set(new HashMap<>());
-            }
 
-            if (block.getType() != Material.AIR) return;
+        BlockVector3 max = zone.getMaxPoint();
+        BlockVector3 min = zone.getMinPoint();
+        World world = zone.getWorld();
 
-            for (int i = 0; i < blocks.size(); i++)
-                if (random.nextInt(101) <= blocks.get(i).getChance() || i == blocks.size() - 1)
-                    fillMap.get().put(block, blocks.get(i));
-        });
+        Block block;
+        for (int y = max.getY(); y >= min.getY(); y--)
+            for (int x = min.getX(); x <= max.getX(); x++)
+                for (int z = min.getZ(); z <= max.getZ(); z++) {
+                    block = world.getBlockAt(x, y, z);
+                    if (counter.getAndIncrement() >= blocksForFill) {
+                        fillExecutor.post(fillMap.get());
+                        counter.set(0);
+                        fillMap.set(new HashMap<>());
+                    }
+
+                    if (block.getType() != Material.AIR) return;
+
+                    for (int i = 0; i < blocks.size(); i++)
+                        if (random.nextInt(101) <= blocks.get(i).getChance() || i == blocks.size() - 1)
+                            fillMap.get().put(block, blocks.get(i));
+                }
         fillExecutor.post(fillMap.get());
     }
 }
