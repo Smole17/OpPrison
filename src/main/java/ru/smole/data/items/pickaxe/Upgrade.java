@@ -82,19 +82,24 @@ import ru.xfenilafs.core.util.ChatUtil;
             25, 0, 750, 3500000000D,
             Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
 
+    JACKPOT("§3Джекпот",
+            "Выдаёт случайно токены, деньги, ключи",
+            40, 0, 3, 75000000000000D,
+            Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true),
+
     PRESTIGE_FINDER("§5Добыча престижей",
             "Увеличивает шанс при копание найти престижи. Количество зависит от уровня",
-            50, 0, 2500, 1000000000,
+            50, 0, 2500, 3000000000D,
             Material.BEACON, GroupsManager.Group.MANTLE, false),
 
     PRESTIGE_MERCHANT("§2Множитель престижей",
             "Умножает добываемые престижей от прокачки \"Добыча престижей\"",
-            55, 0, 10000, 300000000,
+            55, 0, 10000, 500000000,
             Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false),
 
     IG_MONEY("§4Мистер Крабс",
             "С ОЧЕНЬ маленьким шансом выдаст Вам чек, при активации которого вы получите донат валюту",
-            70, 0, 10, 25000000000000D,
+            75, 0, 10, 35000000000000D,
             Material.PAPER, GroupsManager.Group.COSMOS, true);
 
     private @Getter @Setter String name;
