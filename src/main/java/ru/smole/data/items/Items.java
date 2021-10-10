@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import ru.luvas.rmcs.MainClass;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.player.OpPlayer;
@@ -186,7 +187,7 @@ public class Items {
 
                         item.setAmount(item.getAmount() - 1);
 
-                        CorePlayer.getCorePlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
+                        MainClass.getInstance().getCorePlayer().getPlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
                     }
                 });
 
