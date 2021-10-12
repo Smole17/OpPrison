@@ -127,8 +127,8 @@ public class RegionListener implements Listener {
         Player player = event.getPlayer();
         String name = player.getName();
 
-        OpEvents.blockBreak(event);
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event);
+        OpEvents.blockBreak(event);
     }
 }

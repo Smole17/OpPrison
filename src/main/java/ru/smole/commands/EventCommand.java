@@ -125,11 +125,19 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             int num;
 
             if (event.isCancelled()) {
+                event.setMessage("");
                 event.setCancelled(true);
                 return;
             }
 
             if (is[0][0]) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (msg.contains("-")) {
+                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Число не может быть отрицательным");
+
                 event.setCancelled(true);
                 return;
             }

@@ -2,25 +2,18 @@ package ru.smole.data.player;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.GangCommand;
 import ru.smole.commands.HideCommand;
 import ru.smole.commands.KitCommand;
 import ru.smole.data.group.GroupsManager;
-import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.npc.NpcInitializer;
 import ru.smole.data.npc.question.Question;
-import ru.smole.data.player.OpPlayer;
-import ru.smole.data.player.PlayerData;
 import ru.smole.scoreboard.ScoreboardManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
-import ru.smole.utils.server.BungeeUtil;
-import ru.smole.utils.server.ServerUtil;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.sql.SQLException;

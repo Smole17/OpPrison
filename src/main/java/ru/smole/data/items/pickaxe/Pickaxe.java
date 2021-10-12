@@ -187,16 +187,16 @@ import static ru.smole.OpPrison.MINES;
     protected String getRandomRewardJackPot(OpPlayer opPlayer, double jackPotLevel, Random random) {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
-        int i = jackPotLevel > 1 ? 2 : 4;
+        int i = jackPotLevel >= 3 ? 4 : 2;
 
         switch (random.nextInt(i)) {
             case 0:
-                double money = 1000000000000000D;
+                double money = 10000000000000000000D;
 
                 playerData.addMoney(money);
                 return "§a$" + StringUtils.replaceComma(money);
             case 1:
-                double token = 250000000000D;
+                double token = 1500000000000D;
 
                 playerData.addToken(token);
                 return "§e⛃" + StringUtils.replaceComma(token);
@@ -263,12 +263,12 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (prestige_finderLevel > 0 && upgrades.get(Upgrade.PRESTIGE_FINDER).isIs()) {
-            double chance = prestige_finderLevel / 50000;
+            double chance = prestige_finderLevel / 30000;
 
             if (random.nextFloat() <= chance) {
                 double prestige = prestige_finderLevel;
                 if (prestige_merchantLevel > 0 && upgrades.get(Upgrade.PRESTIGE_MERCHANT).isIs()) {
-                    double mer_chance = prestige_merchantLevel / 80000;
+                    double mer_chance = prestige_merchantLevel / 250000;
                     if (random.nextFloat() <= mer_chance)
                         prestige = prestige_finderLevel + (prestige_finderLevel + prestige_merchantLevel / 2);
                 }
@@ -285,7 +285,7 @@ import static ru.smole.OpPrison.MINES;
                 Upgrade.LEPRECHAUN.setName("§aЛепрекон");
                 Bukkit.getOnlinePlayers().forEach(onPlayer -> {
                     Upgrade.LEPRECHAUN.sendProcMessagePlayer(onPlayer, name, String.format("§a$%s", StringUtils.replaceComma(costt)));
-                    OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(onPlayer.getName()).addMoney(chance);
+                    OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(onPlayer.getName()).addMoney(costt);
                 });
             }
         }
@@ -325,9 +325,9 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (token_merchantLevel > 0 && upgrades.get(Upgrade.TOKEN_MERCHANT).isIs()) {
-            double chance = (token_merchantLevel / 5) / 40000;
+            double chance = (token_merchantLevel / 10) / 40000;
             if (new Random().nextFloat() <= chance) {
-                double t_merchant = token * token_merchantLevel / 10;
+                double t_merchant = token * token_merchantLevel / 3.5;
                 token = token + t_merchant;
                 playerData.addToken(token);
                 Upgrade.TOKEN_MERCHANT.sendProcMessage(player, String.format("§e⛃%s", StringUtils.replaceComma(t_merchant)));
@@ -347,14 +347,14 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (jackPotLevel > 0 && upgrades.get(Upgrade.JACKPOT).isIs()) {
-            double chance = (jackPotLevel / 3) / 10000;
+            double chance = (jackPotLevel / 5) / 10000;
             if (random.nextFloat() <= chance) {
                 Upgrade.JACKPOT.sendProcMessage(player, getRandomRewardJackPot(opPlayer, jackPotLevel, random));
             }
         }
 
         if (ig_moneyLevel > 0 && upgrades.get(Upgrade.IG_MONEY).isIs()) {
-            double chance = (ig_moneyLevel / 10) / 30000;
+            double chance = (ig_moneyLevel / 10) / 825000;
             if (new Random().nextFloat() <= chance) {
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");

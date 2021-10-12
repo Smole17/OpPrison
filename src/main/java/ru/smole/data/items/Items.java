@@ -137,7 +137,7 @@ public class Items {
         registerItem("fly", objects ->
                 ApiManager
                         .newItemBuilder(Material.FEATHER)
-                        .setName("§fДоступ к полёту §8/fly)")
+                        .setName("§fДоступ к полёту §8(/fly)")
                         .addLore("§7Нажмите для активации")
                         .setAmount(((Double) objects[0]).intValue())
                         .build(),
@@ -177,19 +177,13 @@ public class Items {
         registerItem("ign",
                 ApiManager
                         .newItemBuilder(Material.PAPER)
-                        .setName("Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)")
-                        .setLore("§7Нажмите для активации")
+                        .setName("Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ) §8(" + new Date() + "§8)")
+                        .setLore("§7Напишите в тикет дискорд сервера",
+                                "§7(приложите полный скриншот инвентаря с предметом)"
+                        )
                         .build(),
                 (playerInteractEvent, itemStack) -> {
-                    Action action = playerInteractEvent.getAction();
-
-                    if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-                        ItemStack item = playerInteractEvent.getItem();
-
-                        item.setAmount(item.getAmount() - 1);
-
-                        MainClass.getInstance().getCorePlayer().getPlayer(playerInteractEvent.getPlayer().getName()).addBalance(50);
-                    }
+                    ChatUtil.sendMessage(playerInteractEvent.getPlayer(), OpPrison.PREFIX + "https://discord.io/starfarm");
                 });
 
         Arrays.stream(Key.values())

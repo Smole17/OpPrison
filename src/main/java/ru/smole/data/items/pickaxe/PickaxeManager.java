@@ -73,8 +73,12 @@ public class PickaxeManager {
                 continue;
 
             double count = Double.parseDouble(arg_1);
-
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count, true, upgrade.isNeedMessage(), Boolean.parseBoolean(args[2])));
+            boolean is = args.length <= 3 || Boolean.parseBoolean(args[3]);
+            boolean isMes = args.length <= 4 ? upgrade.isNeedMessage() : Boolean.parseBoolean(args[4]);
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count,
+                    is,
+                    isMes,
+                    Boolean.parseBoolean(args[2])));
         }
 
         for (Upgrade upgrade : Upgrade.values()) {
@@ -104,14 +108,14 @@ public class PickaxeManager {
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Upgrade.UpgradeStat> upgradesMap = pickaxes.get(name).getUpgrades();
 
-            String format = "%s-%s-%s,";
+            String format = "%s-%s-%s-%s-%s,";
 
             if (upgrade.ordinal() == Upgrade.values().length -1) {
                 format = format.replace(",", "");
             }
 
             Upgrade.UpgradeStat stat = upgradesMap.get(upgrade);
-            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, stat.getCount()), stat.isCompleteQ()));
+            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, stat.getCount()), stat.isCompleteQ(), stat.isIs(), stat.isMessage()));
         }
 
         return builder.toString();

@@ -270,10 +270,18 @@ public class PlayerListener implements Listener {
 
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
-        String prefix = RPlayer.checkAndGet(name).getLongPrefix();
+        RPlayer rPlayer = RPlayer.checkAndGet(name);
 
-        String format = String.format("§8[§a%s§8] %s%s§7: §f",
-                StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
+        String guildName = rPlayer.getGuild() == null || rPlayer.getGuild().getTag() == null ? "" : String.format("§7<%s§7> ", rPlayer.getGuild().getTag());
+        String prefix = rPlayer.getLongPrefix();
+
+        String format = String.format("%s§8[§a%s§8] %s%s§7: §f",
+                guildName,
+                StringUtils.formatDouble(
+                        StringUtils._fixDouble(0,
+                        playerData.getPrestige()).length() <= 3 ? 0 : 2,
+                        playerData.getPrestige()
+                ),
                 prefix.replace('&', '§'), player.getName()
         );
 

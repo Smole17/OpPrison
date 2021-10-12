@@ -7,7 +7,7 @@ import ru.xfenilafs.core.command.BukkitCommand;
 
 public class PrestigeCommand extends BukkitCommand<Player> {
     public PrestigeCommand() {
-        super("prestige", "p", "pres");
+        super("prestige", "pr", "pres");
     }
 
     @Override

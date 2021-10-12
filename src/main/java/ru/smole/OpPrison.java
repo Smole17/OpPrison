@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +45,6 @@ import ru.smole.utils.WorldBorderUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.smole.utils.config.ConfigUtils;
 import ru.smole.utils.leaderboard.LeaderBoard;
-import ru.smole.utils.server.BungeeUtil;
 import ru.smole.utils.server.ServerUtil;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.CorePlugin;
@@ -94,9 +95,6 @@ public class OpPrison extends CorePlugin {
     public static String BAR_FORMAT;
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
-
-    private BukkitTask pickaxeTask;
-    private BukkitTask eventTask;
 
     @SneakyThrows
     public void onPluginEnable() {
@@ -151,9 +149,6 @@ public class OpPrison extends CorePlugin {
                 new TrashCommand(), new RestartCommand(), new GangCommand(), new GangChatCommand(),
                 new SpawnCommand(), new EnderChestCommand(), new MineCommand()
         );
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new BungeeUtil());
 
         gangDataManager.load();
         ServerUtil.load();
@@ -333,8 +328,8 @@ public class OpPrison extends CorePlugin {
         simpleHolographic.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
         simpleHolographic.addEmptyLine();
         simpleHolographic.addTextLine("§fВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
-        simpleHolographic.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|p max)");
-        simpleHolographic.addTextLine("§fА остальную информацию Вы можете узнать через §b/help");
+        simpleHolographic.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|pr max)");
+        simpleHolographic.addTextLine("§fА остальную информацию Вы можете узнать через §b/opprison");
         simpleHolographic.addEmptyLine();
         simpleHolographic.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
         LeaderBoard.holograms.add(simpleHolographic);
@@ -358,7 +353,7 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadEffects() {
-        pickaxeTask = Bukkit.getScheduler().runTaskTimer(this, () ->
+        BukkitTask pickaxeTask = Bukkit.getScheduler().runTaskTimer( this, () ->
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     String item = Items.getItemName(player.getInventory().getItemInMainHand());
 
@@ -408,6 +403,7 @@ public class OpPrison extends CorePlugin {
                             player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 400, night_visionLevel));
                         }
                     }
+
                 }), 20, 20);
     }
 
@@ -424,21 +420,23 @@ public class OpPrison extends CorePlugin {
             if (MINES.get(-1).getBlocks().stream().noneMatch(resourceBlock -> resourceBlock.getType() == event.getBlock().getType()))
                 return;
 
-            blocks.remove(playerName);
-            blocks.put(playerName, blocks.get(playerName) + 1);
+            if (blocks.isEmpty() || !blocks.containsKey(playerName))
+                return;
+
+            blocks.replace(playerName, blocks.get(playerName) + 1);
         });
 
-        eventTask =
+        BukkitTask eventTask =
                 Bukkit.getScheduler().runTaskTimer(
                         this,
                         () -> {
-                            if (Bukkit.getOnlinePlayers().size() < 5) {
-                                return;
-                            }
-
                             Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 150000000;
 
                             if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
+                                return;
+                            }
+
+                            if (opEvent.getActiveEvents().contains(name)) {
                                 return;
                             }
 
@@ -461,12 +459,16 @@ public class OpPrison extends CorePlugin {
 
                                         blocks.entrySet()
                                                 .stream()
-                                                .sorted(Map.Entry.comparingByValue())
+                                                .sorted((o1, o2) -> -o1.getValue().compareTo(o2.getValue()))
                                                 .limit(3)
                                                 .forEachOrdered(x -> {
                                                     ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
 
                                                     PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
+
+                                                    if (playerData == null)
+                                                        return;
+
                                                     double added = playerData.getToken() * 0.15 / i[0];
 
                                                     playerData.addToken(added);
@@ -474,6 +476,9 @@ public class OpPrison extends CorePlugin {
 
                                                     Question question = playerData.getQuestions().get("SOFOS");
                                                     Question.QuestionStep step = question.getStep();
+
+                                                    if (step == null)
+                                                        return;
 
                                                     if (step == Question.QuestionStep.COMPLETING) {
                                                         question.setStep(Question.QuestionStep.ALR_COMPLETED);
@@ -489,8 +494,32 @@ public class OpPrison extends CorePlugin {
                                     20 * 60 * 20
                             );
                         },
-                        20 * 60 * 40,
-                        20 * 60 * 40
+                        20 * 60 * 60,
+                        20 * 60 * 60
                 );
+
+        BukkitTask barTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                String item = Items.getItemName(player.getInventory().getItemInMainHand());
+
+                if (item.length() < 1 || !item.equals("pickaxe"))
+                    return;
+
+                String playerName = player.getName();
+
+                Pickaxe pickaxe = PickaxeManager.pickaxes.get(playerName);
+
+                player.spigot().sendMessage(
+                        ChatMessageType.ACTION_BAR,
+                        new TextComponent(String.format("§f%s: §b%s §8| §f%s: §b%s/%s %s",
+                                "Уровень кирки", StringUtils._fixDouble(0, pickaxe.getLevel()),
+                                "Прогресс", StringUtils._fixDouble(0, pickaxe.getExp()), StringUtils._fixDouble(0, pickaxe.getNeedExp()),
+                                blocks.isEmpty() || !blocks.containsKey(playerName) ? ""
+                                        :
+                                        String.format("§8| §fСостязание: §b%s", StringUtils._fixDouble(0, blocks.get(playerName)))
+                        ))
+                );
+            });
+        }, 20, 20);
     }
 }

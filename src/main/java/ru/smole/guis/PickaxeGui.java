@@ -71,7 +71,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                                 ""
                         );
 
-                if (upgrade == Upgrade.BLESSINGS)
+                if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN)
                     iBuilder = ApiManager.newItemBuilder(upgrade.getMaterial())
                             .setName(upgrade.getName())
                             .setLore("§7" + upgrade.getDescribe(), "");
@@ -85,7 +85,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                 if (!isCompleteQ)
                     iBuilder.addLore("§c∗ §fНеобходимо прохождение задания");
 
-                if (upgrade == Upgrade.BLESSINGS) {
+                if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN) {
                     iBuilder.addLore("");
                     iBuilder.addLore(String.format("§a∗ §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
                 }
@@ -94,7 +94,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                         slot,
                         iBuilder.build(),
                         (baseInventory, inventoryClickEvent) -> {
-                            if (upgrade == Upgrade.BLESSINGS) {
+                            if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN) {
                                 if (inventoryClickEvent.getClick() == ClickType.CONTROL_DROP) {
                                     upgrades.get(upgrade).setMessage(!isMessage);
 

@@ -69,12 +69,12 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     TOKEN_MERCHANT("§eМножитель токенов",
             "Выдаёт умноженное количество токенов",
-            20, 0, 5000, 80000000,
+            20, 0, 10000, 80000000,
             Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true),
 
     MULTI_FINDER("§dНахождение множителя",
             "Выдаёт от 1-го до 3-ёх множителей",
-            25, 0, 2500, 2000000000,
+            25, 0, 2500, 1000000000,
             Material.BOOK, GroupsManager.Group.MANTLE, true),
 
     JACK_HAMMER("§cРазрушитель",
@@ -84,12 +84,12 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     LEPRECHAUN("§aЛепрекон",
             "Выдаёт деньги всем на сервере. Количество зависит от уровня",
-            35, 0, 1500, 500000000,
+            35, 0, 2500, 500000000,
             Material.EMERALD, GroupsManager.Group.MANTLE, true),
 
     JACKPOT("§3Джекпот",
-            "Выдаёт случайно токены, деньги, ключи",
-            40, 0, 3, 75000000000000D,
+            "Выдаёт случайно токены, деньги. С 3 уровня - ключи",
+            40, 0, 5, 45000000000000D,
             Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true),
 
     PRESTIGE_FINDER("§5Добыча престижей",
@@ -104,7 +104,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
     IG_MONEY("§4Мистер Крабс",
             "С ОЧЕНЬ маленьким шансом выдаст Вам чек, при активации которого вы получите донат валюту",
-            75, 0, 10, 35000000000000D,
+            75, 0, 10, 75000000000000D,
             Material.PAPER, GroupsManager.Group.COSMOS, true);
 
     private @Getter @Setter String name;
