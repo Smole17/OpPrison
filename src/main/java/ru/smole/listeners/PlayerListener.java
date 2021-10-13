@@ -56,6 +56,30 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         dataManager.load(player);
+        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
+            LeaderBoard.holograms.forEach(holographic -> {
+
+                boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
+
+                if (equalWorld) {
+                    holographic.addViewers(player);
+                    return;
+                }
+
+                holographic.removeViewers(player);
+            });
+
+            NpcInitializer.npcList.forEach(fakePlayer -> {
+                boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
+
+                if (equalWorld) {
+                    fakePlayer.addViewers(player);
+                    return;
+                }
+
+                fakePlayer.removeViewers(player);
+            });
+        }, 10L);
     }
 
     @EventHandler
@@ -102,28 +126,24 @@ public class PlayerListener implements Listener {
             LeaderBoard.holograms.forEach(holographic -> {
 
                 boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
-                boolean hasViewer = holographic.hasViewer(player);
 
-                if (!hasViewer && equalWorld) {
+                if (equalWorld) {
                     holographic.addViewers(player);
+                    return;
                 }
 
-                if (hasViewer && !equalWorld) {
-                    holographic.removeViewers(player);
-                }
+                holographic.removeViewers(player);
             });
 
             NpcInitializer.npcList.forEach(fakePlayer -> {
                 boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
-                boolean hasViewer = fakePlayer.hasViewer(player);
 
-                if (!hasViewer && equalWorld) {
+                if (equalWorld) {
                     fakePlayer.addViewers(player);
+                    return;
                 }
 
-                if (hasViewer && !equalWorld) {
-                    fakePlayer.removeViewers(player);
-                }
+                fakePlayer.removeViewers(player);
             });
         }, 10L);
     }

@@ -359,9 +359,8 @@ import static ru.smole.OpPrison.MINES;
             if (new Random().nextFloat() <= chance) {
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");
+                System.out.println(new Date() + ": " + player.getName() + " ПОЛУЧИЛ ЧЕК НА 50 РУБЛЕЙ");
             }
-
-            System.out.println(new Date() + ": " + player.getName() + " ПОЛУЧИЛ ЧЕК НА 50 РУБЛЕЙ");
         }
 
         if (explosiveLevel > 0 && upgrades.get(Upgrade.EXPLOSIVE).isIs()) {

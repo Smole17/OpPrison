@@ -10,8 +10,6 @@ import static ru.smole.OpPrison.*;
 
 public class BoosterManager {
 
-    public static String BAR_FORMAT = String.format("§fБустер сервера: §a+%s",
-            StringUtils._fixDouble(1, BOOSTER) + "%");
     private final Player player;
 
     public BoosterManager(Player player) {
@@ -55,7 +53,8 @@ public class BoosterManager {
                 break;
         }
 
-        BAR.setTitle(BAR_FORMAT);
+        BAR.setTitle(String.format("§fБустер сервера: §a+%s",
+                StringUtils._fixDouble(1, BOOSTER) + "%"));
 
         Player neSmole = Bukkit.getPlayer("NeSmole");
         if (neSmole != null)

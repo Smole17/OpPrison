@@ -96,7 +96,6 @@ public class OpPrison extends CorePlugin {
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static final List<LaunchPad> PADS = new ArrayList<>();
     public static String PREFIX = "§f";
-    public static String BAR_FORMAT;
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
@@ -137,7 +136,7 @@ public class OpPrison extends CorePlugin {
         players = base.getTable("players");
         gangs = base.getTable("gangs");
 
-        BAR = Bukkit.createBossBar(BAR_FORMAT, BarColor.BLUE, BarStyle.SOLID);
+        BAR = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SOLID);
 
         registerListeners(
                 new PlayerListener(), new RegionListener()
