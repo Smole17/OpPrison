@@ -5,6 +5,7 @@ import ru.xfenilafs.core.database.query.row.ValueQueryRow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -17,7 +18,7 @@ public class GangDataSQL {
                 .insertQuery()
 
                 .queryRow(new ValueQueryRow("name", name))
-                .queryRow(new ValueQueryRow("members", owner))
+                .queryRow(new ValueQueryRow("members", Base64.getEncoder().encodeToString(owner.getBytes())))
                 .queryRow(new ValueQueryRow("score", 0.0))
 
                 .executeSync(OpPrison.getInstance().getBase());
@@ -38,14 +39,14 @@ public class GangDataSQL {
         OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
-
+                .setSelectedRows("name")
                 .executeQueryAsync(OpPrison.getInstance().getBase())
                 .thenAccept(resultSetConsumer);
     }
 
     public static void save(String name, String members, double score) {
         OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE gangs SET `name` = ?, `members` = ?, `income` = ?, `score` = ?  WHERE `name` = ?",
+                "UPDATE gangs SET `name` = ?, `members` = ?, `score` = ?  WHERE `name` = ?",
                 name, members, score, name
         );
     }

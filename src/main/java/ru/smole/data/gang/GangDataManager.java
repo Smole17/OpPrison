@@ -6,15 +6,15 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import ru.smole.commands.GangCommand;
 import ru.smole.data.mysql.GangDataSQL;
 
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 
 public class GangDataManager {
 
-    private @Getter Map<String, GangData> gangDataMap;
+    private final @Getter Map<String, GangData> gangDataMap;
 
     public GangDataManager() {
         gangDataMap = new HashMap<>();
@@ -22,38 +22,48 @@ public class GangDataManager {
 
     public void create(String name, String leader) {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
-        gangPlayerMap.put(leader, new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
+        gangPlayerMap.put(leader.toLowerCase(), new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
 
         gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
-        GangDataSQL.create(name, leader);
+        GangDataSQL.create(
+                name,
+                getGangPlayers(gangPlayerMap)
+        );
     }
 
     public void load() {
+        List<String> name = new ArrayList<>();
+
         GangDataSQL.get(resultSet -> {
             try {
                 if (!resultSet.next())
                     return;
 
-            String[] name = (String[]) resultSet.getObject("name");
+                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+                    name.add(resultSet.getString(i));
+                }
 
-            if (name == null)
-                return;
+                if (name.isEmpty())
+                    return;
 
-            for (String s : name) {
-                GangDataSQL.get(s, resultSet1 -> {
-                    val gangPlayersList = getGangPlayers(s);
+                for (String s : name) {
+                    GangDataSQL.get(s, resultSet1 -> {
+                        try {
+                        if (!resultSet1.next())
+                            return;
 
-                    try {
-                        gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet1.getDouble("")));
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
-                });
+                        val gangPlayersList = getGangPlayers(s);
+
+                            gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet1.getDouble("score")));
+                        } catch (SQLException throwables) {
+                            throwables.printStackTrace();
+                        }
+                    });
+                }
+
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
         });
     }
 
@@ -64,7 +74,7 @@ public class GangDataManager {
         gangDataMap.forEach((s, gangData) ->
                 GangDataSQL.save(
                         s,
-                        Base64Coder.encodeString(getGangPlayers(gangData.getGangPlayerMap())),
+                        Base64.getEncoder().encodeToString(getGangPlayers(gangData.getGangPlayerMap()).getBytes()),
                         gangData.getScore()
                 )
         );
@@ -73,11 +83,11 @@ public class GangDataManager {
     }
 
     public boolean playerHasGang(String playerName) {
-        return getGangFromPlayer(playerName) != null;
+        return getGangFromPlayer(playerName.toLowerCase()) != null;
     }
 
     public boolean playerInGang(GangData gangData, String playerName) {
-        return gangData.getGangPlayerMap().containsKey(playerName);
+        return gangData.getGangPlayerMap().containsKey(playerName.toLowerCase());
     }
 
     public GangData getGangFromPlayer(String playerName) {
@@ -87,7 +97,7 @@ public class GangDataManager {
         GangData gangData = null;
 
         for (GangData value : gangDataMap.values()) {
-            if (value.getGangPlayerMap().containsKey(playerName)) {
+            if (value.getGangPlayerMap().containsKey(playerName.toLowerCase())) {
                 gangData = value;
                 break;
             }
@@ -99,37 +109,36 @@ public class GangDataManager {
     protected Map<String, GangData.GangPlayer> getGangPlayers(String name) {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
 
-       GangDataSQL.get(name, resultSet -> {
-           String members = null;
-           try {
-               members = Base64Coder.decodeString(resultSet.getString("members"));
-           } catch (SQLException throwables) {
-               throwables.printStackTrace();
-           }
+        GangDataSQL.get(name, resultSet -> {
+            try {
+                if (!resultSet.next())
+                    return;
 
-           if (members == null)
-               return;
+                String members = new String(Base64.getDecoder().decode(resultSet.getString("members")));
 
-           for (String s : members.split(",")) {
-               String[] data = s.split("-");
+                for (String s : members.split(",")) {
+                    String[] data = s.split("-");
 
-               String playerName = data[0];
-               GangPlayerType type;
+                    String playerName = data[0];
+                    GangPlayerType type;
 
-               try {
-                   type = GangPlayerType.valueOf(data[1]);
-               } catch (Exception ex) {
-                   throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
-               }
+                    try {
+                        type = GangPlayerType.valueOf(data[1]);
+                    } catch (Exception ex) {
+                        throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
+                    }
 
-               gangPlayerMap.put(playerName, new GangData.GangPlayer(playerName, type));
-           }
-       });
+                    gangPlayerMap.put(playerName.toLowerCase(), new GangData.GangPlayer(playerName, type));
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        });
 
         return gangPlayerMap;
     }
 
-    protected String getGangPlayers(Map<String, GangData.GangPlayer> gangPlayerMap) {
+    public String getGangPlayers(Map<String, GangData.GangPlayer> gangPlayerMap) {
         StringBuilder builder = new StringBuilder();
 
         int i = 1;

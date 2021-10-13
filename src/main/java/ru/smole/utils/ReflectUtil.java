@@ -1,5 +1,10 @@
 package ru.smole.utils;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.SimpleCommandMap;
+import ru.luvas.rmcs.MainClass;
+import ru.luvas.rmcs.commands.SpigotCommand;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;

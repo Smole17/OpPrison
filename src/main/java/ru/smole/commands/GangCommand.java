@@ -25,7 +25,6 @@ import static ru.smole.OpPrison.PREFIX;
 import static ru.smole.data.gang.GangData.GangPlayer;
 import static ru.smole.data.gang.GangData.GangPlayer.GangPlayerType;
 
-@CommandPermission(permission = "opprison.admin")
 public class GangCommand extends BukkitCommand<Player> {
     public GangCommand() {
         super("gang");
@@ -46,7 +45,7 @@ public class GangCommand extends BukkitCommand<Player> {
             String gangName = gangData.getName();
             Map<String, GangPlayer> gangPlayersMap = gangData.getGangPlayerMap();
 
-            GangPlayer gangPlayer = gangPlayersMap.get(playerName);
+            GangPlayer gangPlayer = gangPlayersMap.get(playerName.toLowerCase());
 
             GangPlayerType gangPlayerType = gangPlayer.getType();
             String typeName = gangPlayerType.getName();
@@ -63,13 +62,13 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             gangPlayers.forEach(tempGangPlayer -> {
                                 GangPlayerType tempType = tempGangPlayer.getType();
-                                String format = "%s &7%s &7,";
+                                String format = "%s &7%s&7, ";
 
                                 if (gangPlayers.get(gangPlayers.size() - 1).equals(tempGangPlayer))
                                     format = format.replace(",", "");
 
                                 builder.append(String.format(format,
-                                        tempType.getName(), gangPlayer.getPlayerName()));
+                                        tempType.getName(), tempGangPlayer.getPlayerName()));
                             });
 
                             ChatUtil.sendMessage(player, "   &fУчастники:");
@@ -94,8 +93,8 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            gangData.sendMessage("%s &7%s вышел из банды", typeName, playerName);
-                            gangPlayersMap.remove(playerName);
+                            gangData.sendMessage(String.format("%s &7%s вышел из банды", typeName, playerName));
+                            gangData.removeGangPlayer(playerName);
 
                             return;
                     }
@@ -114,13 +113,18 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            gangDataMap.remove(gangName);
-                            gangData.setName(args[1]);
+                            if (gangDataMap.containsKey(args[1])) {
+                                ChatUtil.sendMessage(player, PREFIX + "Придумайте уникальное название");
+                                return;
+                            }
 
+                            gangDataMap.remove(gangData.getName());
+                            gangData.setName(args[1]);
                             gangDataMap.put(gangData.getName(), gangData);
+
                             gangData.sendMessage(
-                                    "%s %s &fпереименовал банду в %s",
-                                    gangPlayerType.getName(), gangPlayer.getPlayerName(), ChatUtil.color(args[1])
+                                    String.format("%s %s &fпереименовал банду в %s",
+                                    gangPlayerType.getName(), gangPlayer.getPlayerName(), ChatUtil.color(args[1]))
                             );
 
                             return;
@@ -143,12 +147,12 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            gangData.sendMessage("%s %s &fбыл выгнан из банды %s %s",
+                            gangData.sendMessage(String.format("%s %s &fбыл выгнан из банды %s %s",
                                     kickedGangPlayer.getType().getName(), kickedGangPlayer.getPlayerName(),
-                                    gangPlayerType.getName(), gangPlayer.getPlayerName()
+                                    gangPlayerType.getName(), gangPlayer.getPlayerName())
                             );
 
-                            gangPlayersMap.remove(playerName);
+                            gangData.removeGangPlayer(kickedGangPlayer.getPlayerName().toLowerCase());
 
                             return;
 
@@ -165,11 +169,11 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             GangPlayer newLeader = gangPlayersMap.get(args[1].toLowerCase());
 
-                            gangData.sendMessage(
-                                    "%s %s &fпередал главу % %",
+                            gangData.sendMessage(String.format(
+                                    "%s %s &fпередал главу %s %s",
                                     gangPlayerType.getName(), gangPlayer.getPlayerName(),
                                     newLeader.getType().getName(), newLeader.getPlayerName()
-                                    );
+                                    ));
 
                             newLeader.setType(GangPlayerType.LEADER);
                             gangPlayer.setType(GangPlayerType.MANAGER);
@@ -182,6 +186,11 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
+                            if (args[1].equalsIgnoreCase(playerName)) {
+                                ChatUtil.sendMessage(player, PREFIX + "Вы не можете повысить себя");
+                                return;
+                            }
+
                             GangPlayer promotedGangPlayer = gangData.getGangPlayer(args[1].toLowerCase());
 
                             if (promotedGangPlayer == null) {
@@ -190,21 +199,26 @@ public class GangCommand extends BukkitCommand<Player> {
                             }
 
                             if (promotedGangPlayer.getType().equals(GangPlayerType.getTypeFromOrdinal(gangPlayerType.ordinal() -1))) {
-                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен.");
-                            }
-
-                            if (promotedGangPlayer.upType()) {
-                                gangData.sendMessage("Игрок %s &fбыл повышен до %s", promotedGangPlayer.getPlayerName(), promotedGangPlayer.getType().getName());
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен");
                                 return;
                             }
 
-                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен.");
+                            if (promotedGangPlayer.upType()) {
+                                gangData.sendMessage(String.format("Игрок %s &fбыл повышен до %s", promotedGangPlayer.getPlayerName(), promotedGangPlayer.getType().getName()));
+                                return;
+                            }
 
+                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть повышен");
                             return;
 
                         case "demote":
                             if (gangPlayerType.ordinal() < GangPlayerType.MANAGER.ordinal()) {
                                 ChatUtil.sendMessage(player, PREFIX + "Ваша роль в банде слишком мала для этого действия");
+                                return;
+                            }
+
+                            if (args[1].equalsIgnoreCase(playerName)) {
+                                ChatUtil.sendMessage(player, PREFIX + "Вы не можете понизить себя");
                                 return;
                             }
 
@@ -216,16 +230,16 @@ public class GangCommand extends BukkitCommand<Player> {
                             }
 
                             if (demotedGangPlayer.getType().ordinal() >= gangPlayerType.ordinal()) {
-                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен.");
-                            }
-
-                            if (demotedGangPlayer.deUpType()) {
-                                gangData.sendMessage("Игрок %s &fбыл понижен до %s", demotedGangPlayer.getPlayerName(), demotedGangPlayer.getType().getName());
+                                ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен");
                                 return;
                             }
 
-                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен.");
+                            if (demotedGangPlayer.deUpType()) {
+                                gangData.sendMessage(String.format("Игрок %s &fбыл понижен до %s", demotedGangPlayer.getPlayerName(), demotedGangPlayer.getType().getName()));
+                                return;
+                            }
 
+                            ChatUtil.sendMessage(player, PREFIX + "Игрок не может быть понижен");
                             return;
 
                         case "info":
@@ -283,12 +297,12 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            if (invitedList.get(playerName).contains(gangData.getName())) {
+                            if (invitedList.get(invitedName.toLowerCase()).contains(gangData.getName())) {
                                 ChatUtil.sendMessage(player, PREFIX + "Этот игрок уже приглашён в банду");
                                 return;
                             }
 
-                            invitedList.get(invitedName).add(gangData.getName());
+                            invitedList.get(invitedName.toLowerCase()).add(gangData.getName());
                             ChatUtil.sendMessage(player, PREFIX + "Вы пригласили &b%s &fв банду. У него есть &b1 минута&f, чтобы принять", invitedName);
 
                             BaseComponent[] component = ChatUtil
@@ -304,29 +318,8 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             Bukkit.getScheduler().runTaskLater(
                                     OpPrison.getInstance(),
-                                    () -> invitedList.get(invitedName).remove(gangData.getName()),
+                                    () -> invitedList.get(invitedName.toLowerCase()).remove(gangData.getName()),
                                     20 * 60);
-
-                            return;
-
-                        case "accept":
-                            List<String> invitedGangs = invitedList.get(playerName);
-
-                            if (invitedGangs.isEmpty()) {
-                                ChatUtil.sendMessage(player, PREFIX + "У вас нет активных приглашений");
-                                return;
-                            }
-
-                            GangData acceptedGang = gangDataMap.get(args[1]);
-
-                            if (acceptedGang == null || !invitedGangs.contains(acceptedGang.getName())) {
-                                ChatUtil.sendMessage(player, PREFIX + "Банда не найдена");
-                                return;
-                            }
-
-                            invitedList.get(playerName).remove(acceptedGang.getName());
-                            acceptedGang.getGangPlayerMap().put(playerName.toLowerCase(), new GangPlayer(playerName, GangPlayerType.DEFAULT));
-                            acceptedGang.sendMessage("Игрок &b%s &fвступил в банду", playerName);
 
                             return;
                     }
@@ -351,6 +344,11 @@ public class GangCommand extends BukkitCommand<Player> {
 
                         if (args[1].contains("&")) {
                             ChatUtil.sendMessage(player, PREFIX + "Цветовые символы временно запрещены");
+                            return;
+                        }
+
+                        if (gangDataMap.containsKey(args[1])) {
+                            ChatUtil.sendMessage(player, PREFIX + "Придумайте уникальное название");
                             return;
                         }
 
@@ -388,6 +386,27 @@ public class GangCommand extends BukkitCommand<Player> {
                         ChatUtil.sendMessage(player, builder.toString());
 
                         return;
+
+                    case "accept":
+                        List<String> invitedGangs = invitedList.get(playerName.toLowerCase());
+
+                        if (invitedGangs.isEmpty()) {
+                            ChatUtil.sendMessage(player, PREFIX + "У вас нет активных приглашений");
+                            return;
+                        }
+
+                        GangData acceptedGang = gangDataMap.get(args[1]);
+
+                        if (acceptedGang == null || !invitedGangs.contains(acceptedGang.getName())) {
+                            ChatUtil.sendMessage(player, PREFIX + "Банда не найдена");
+                            return;
+                        }
+
+                        invitedList.get(playerName.toLowerCase()).remove(acceptedGang.getName());
+                        acceptedGang.addGangPlayer(new GangPlayer(playerName, GangPlayerType.DEFAULT));
+                        acceptedGang.sendMessage(String.format("Игрок &b%s &fвступил в банду", playerName));
+
+                        return;
                 }
 
                 break;
@@ -403,7 +422,7 @@ public class GangCommand extends BukkitCommand<Player> {
         ChatUtil.sendMessage(player, "   &b/gang leave &f- покинуть банду");
         ChatUtil.sendMessage(player, "   &b/gang info <Имя банды> &f- посмотреть информацию о банде");
         ChatUtil.sendMessage(player, "   &b/gang rename <Новое имя банды> &f- сменить название банды");
-        ChatUtil.sendMessage(player, "   &b/gangchat (/gc) <Сообщение> &f- написать сообщение в чат банды");
+        ChatUtil.sendMessage(player, "   &b/gangchat (/gac) <Сообщение> &f- написать сообщение в чат банды");
         ChatUtil.sendMessage(player, "");
         ChatUtil.sendMessage(player, "   &b/gang invite <Ник игрока> &f- отправить игроку запрос в банду &8&o(от Старейшины)");
         ChatUtil.sendMessage(player, "   &b/gang kick <Ник игрока> &f- исключить игрока из банды &8&o(от Соруководителя)");

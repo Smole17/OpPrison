@@ -21,6 +21,7 @@ import ru.xfenilafs.core.util.cuboid.Cuboid;
 import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.achievements.Achievements;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -359,6 +360,8 @@ import static ru.smole.OpPrison.MINES;
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");
             }
+
+            System.out.println(new Date() + ": " + player.getName() + " ПОЛУЧИЛ ЧЕК НА 50 РУБЛЕЙ");
         }
 
         if (explosiveLevel > 0 && upgrades.get(Upgrade.EXPLOSIVE).isIs()) {

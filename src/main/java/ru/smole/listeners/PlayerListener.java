@@ -36,6 +36,7 @@ import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.player.world.WorldStatisticPostLoadEvent;
 import ru.xfenilafs.core.protocollib.entity.FakeBaseEntity;
@@ -75,6 +76,7 @@ public class PlayerListener implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         event.setKeepInventory(true);
         event.setDroppedExp(0);
+        event.setDeathMessage("");
     }
 
     @EventHandler
@@ -92,6 +94,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
+        ApiManager.HOLOGRAPHIC_MANAGER.getProtocolHolographics(player).forEach(protocolHolographic -> {
+            ChatUtil.sendMessage(player, protocolHolographic.getViewers().toString());
+        });
 
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
             LeaderBoard.holograms.forEach(holographic -> {
@@ -282,7 +287,8 @@ public class PlayerListener implements Listener {
                         playerData.getPrestige()).length() <= 3 ? 0 : 2,
                         playerData.getPrestige()
                 ),
-                prefix.replace('&', '§'), player.getName()
+                prefix.replace('&', '§'),
+                rPlayer.getVisibleName()
         );
 
         List<String> lore = Lists.newArrayList(

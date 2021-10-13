@@ -7,6 +7,7 @@ import org.apache.logging.log4j.util.BiConsumer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -18,6 +19,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import ru.luvas.rmcs.MainClass;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
+import ru.smole.data.gang.GangData;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.cases.Case;
@@ -32,6 +35,7 @@ import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.player.CorePlayer;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.ItemUtil;
+import ru.xfenilafs.core.util.NumberUtil;
 import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.achievements.Achievements;
 
@@ -177,9 +181,9 @@ public class Items {
         registerItem("ign",
                 ApiManager
                         .newItemBuilder(Material.PAPER)
-                        .setName("Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ) §8(" + new Date() + "§8)")
-                        .setLore("§7Напишите в тикет дискорд сервера",
-                                "§7(приложите полный скриншот инвентаря с предметом)"
+                        .setName("Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)")
+                        .setLore("§7Нажмите пкм и напишите в тикет дискорд сервера",
+                                "§7(приложите полный скриншот инвентаря с предметом со временем)"
                         )
                         .build(),
                 (playerInteractEvent, itemStack) -> {
@@ -239,10 +243,41 @@ public class Items {
 
                                     achievements.addAchievement(Achievement.OP_ANY_GROUP);
 
-
                                     playerDataMap.get(player.getName()).setGroup(group);
                                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новую группу %s", group.getName());
                                 })
+                );
+
+        registerItem("sponge",
+                objects -> ApiManager
+                        .newItemBuilder(Material.SPONGE)
+                        .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0])  + " §fочков")
+                        .setLore("§7Нажмите ШИФТ+ПКМ, чтобы добавить " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
+                        .build(),
+                (event, itemStack) -> {
+                    Player player = event.getPlayer();
+                    String playerName = player.getName();
+
+                    GangDataManager gangDataManager = OpPrison.getInstance().getGangDataManager();
+                    Action action = event.getAction();
+
+                    if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)
+                        return;
+
+                    if (!player.isSneaking())
+                        return;
+
+                    if (!gangDataManager.playerHasGang(playerName)) {
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет банды");
+                        return;
+                    }
+
+                    double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" очков")[0]);
+
+                    gangDataManager.getGangFromPlayer(playerName).addScore(count);
+                    itemStack.setAmount(itemStack.getAmount() - 1);
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "+§e" + StringUtils._fixDouble(0, count) + " §fочков");
+                }
                 );
     }
 

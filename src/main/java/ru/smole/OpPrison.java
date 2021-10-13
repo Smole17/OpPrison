@@ -22,6 +22,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.AsyncCatcher;
+import ru.luvas.rmcs.commands.Kit;
+import ru.luvas.rmcs.commands.SpigotCommandsLoader;
 import ru.smole.commands.*;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.OpEvent;
@@ -32,6 +34,7 @@ import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
+import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.npc.NpcInitializer;
 import ru.smole.data.npc.question.Question;
 import ru.smole.data.pads.LaunchPad;
@@ -40,6 +43,7 @@ import ru.smole.data.player.PlayerDataManager;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
+import ru.smole.utils.ReflectUtil;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.WorldBorderUtils;
 import ru.smole.utils.config.ConfigManager;
@@ -133,9 +137,6 @@ public class OpPrison extends CorePlugin {
         players = base.getTable("players");
         gangs = base.getTable("gangs");
 
-        BAR_FORMAT = String.format("§fБустер сервера: §b+%s §8§o(/help booster)",
-                StringUtils._fixDouble(1, BOOSTER) + "%");
-
         BAR = Bukkit.createBossBar(BAR_FORMAT, BarColor.BLUE, BarStyle.SOLID);
 
         registerListeners(
@@ -143,11 +144,11 @@ public class OpPrison extends CorePlugin {
         );
 
         registerCommands(
-                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new HideCommand(),
-                new BuildCommand(), new StatsCommand(), new WarpCommand(), new PrestigeCommand(),
-                new FlyCommand(), new InfoCommand(), new KitCommand(), new EventCommand(),
-                new TrashCommand(), new RestartCommand(), new GangCommand(), new GangChatCommand(),
-                new SpawnCommand(), new EnderChestCommand(), new MineCommand()
+                new MoneyCommand(), new TokenCommand(), new ItemsCommand(), new BuildCommand(),
+                new StatsCommand(), new WarpCommand(), new PrestigeCommand(), new FlyCommand(),
+                new InfoCommand(), new KitCommand(), new EventCommand(), new TrashCommand(),
+                new RestartCommand(), new GangCommand(), new GangChatCommand(), new SpawnCommand(),
+                new EnderChestCommand(), new MineCommand()
         );
 
         gangDataManager.load();
@@ -349,6 +350,16 @@ public class OpPrison extends CorePlugin {
 
             blocks.update();
             prestige.update();
+
+            if (getGangDataManager().getGangDataMap().isEmpty()) return;
+
+            getGangDataManager().getGangDataMap().forEach((s, gangData) ->
+                    GangDataSQL.save(
+                            s,
+                            Base64.getEncoder().encodeToString(getGangDataManager().getGangPlayers(gangData.getGangPlayerMap()).getBytes()),
+                            gangData.getScore()
+                    )
+            );
         }, 20 * 300, 20 * 300);
     }
 
@@ -426,7 +437,7 @@ public class OpPrison extends CorePlugin {
             blocks.replace(playerName, blocks.get(playerName) + 1);
         });
 
-        BukkitTask eventTask =
+        BukkitTask event1Task =
                 Bukkit.getScheduler().runTaskTimer(
                         this,
                         () -> {
@@ -497,6 +508,8 @@ public class OpPrison extends CorePlugin {
                         20 * 60 * 60,
                         20 * 60 * 60
                 );
+
+
 
         BukkitTask barTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             Bukkit.getOnlinePlayers().forEach(player -> {

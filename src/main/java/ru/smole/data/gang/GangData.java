@@ -32,22 +32,33 @@ public class GangData {
         );
     }
 
-    public void sendMessage(String message, Object... objects) {
-        gangPlayerMap.values().forEach(gangPlayer ->
-                ChatUtil.sendMessage(gangPlayer.getPlayerName(), "&8[%s&8] &f" + message, name, objects)
-        );
-    }
-
-    public double addScore(double count) {
+    public void addScore(double count) {
         double added = score + count;
         setScore(added);
-        return added;
+    }
+
+    public void addGangPlayer(GangPlayer gangPlayer) {
+        if (isFull())
+            return;
+
+        gangPlayerMap.put(gangPlayer.getName().toLowerCase(), gangPlayer);
+    }
+
+    public void removeGangPlayer(String playerName) {
+        if (!gangPlayerMap.containsKey(playerName))
+            return;
+
+        gangPlayerMap.remove(playerName.toLowerCase());
+    }
+
+    public boolean isFull() {
+        return gangPlayerMap.size() >= 10;
     }
 
 
 
     public GangPlayer getGangPlayer(String playerName) {
-        return gangPlayerMap.get(playerName);
+        return gangPlayerMap.get(playerName.toLowerCase());
     }
 
     public List<GangPlayer> findGangPlayers(GangPlayer.GangPlayerType type) {
@@ -101,7 +112,7 @@ public class GangData {
             int ordinal = type.ordinal();
             GangPlayerType upped = GangPlayerType.getTypeFromOrdinal(ordinal + 1);
 
-            if (upped == null)
+            if (upped == null || upped == GangPlayerType.LEADER)
                 return false;
 
             setType(upped);
@@ -112,7 +123,7 @@ public class GangData {
             int ordinal = type.ordinal();
             GangPlayerType deUpped = GangPlayerType.getTypeFromOrdinal(ordinal - 1);
 
-            if (deUpped == null)
+            if (deUpped == null || deUpped == GangPlayerType.LEADER)
                 return false;
 
             setType(deUpped);

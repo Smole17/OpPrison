@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
 import ru.smole.commands.GangCommand;
-import ru.smole.commands.HideCommand;
 import ru.smole.commands.KitCommand;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -31,11 +30,6 @@ public class PlayerDataManager {
         OpPlayer opPlayer = new OpPlayer(player);
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
-
-        HideCommand.hide.forEach(hiders -> {
-            if (!hiders.isEmpty())
-                hiders.hidePlayer(OpPrison.getInstance(), player);
-        });
 
         PlayerDataSQL.tryLoad(name, pickaxeManager);
 
@@ -84,7 +78,7 @@ public class PlayerDataManager {
         });
 
         ScoreboardManager.loadScoreboard(player);
-        GangCommand.invitedList.put(name, new ArrayList<>());
+        GangCommand.invitedList.put(name.toLowerCase(), new ArrayList<>());
 
         OpPrison.BAR.removeAll();
         Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
@@ -125,7 +119,6 @@ public class PlayerDataManager {
         List<String> access = data.getAccess();
         Map<String, Question> questions = data.getQuestions();
 
-        HideCommand.hide.remove(player);
         PlayerDataSQL.save(
                 name, blocks, money, token, multiplier, group, prestige, fly, pickaxe,
                 KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions)
