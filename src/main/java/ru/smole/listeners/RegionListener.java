@@ -2,22 +2,23 @@ package ru.smole.listeners;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
+import org.bukkit.inventory.ItemStack;
 import ru.smole.data.event.OpEvents;
+import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
 import java.util.Collection;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 import static ru.smole.OpPrison.*;
@@ -126,6 +127,30 @@ public class RegionListener implements Listener {
     public void add(BlockBreakEvent event) {
         Player player = event.getPlayer();
         String name = player.getName();
+        Block block = event.getBlock();
+
+        if (block.getType() == Material.SPONGE) {
+            ItemStack itemStack = null;
+            switch (ThreadLocalRandom.current().nextInt(0, 6)) {
+                case 0:
+                case 1:
+                case 2:
+                    itemStack = Items.getItem("sponge", 50.0);
+                    break;
+                case 3:
+                case 4:
+                    itemStack = Items.getItem("sponge", 100.0);
+                    break;
+                case 5:
+                    itemStack = Items.getItem("sponge", 150.0);
+                    break;
+            }
+
+            OpPlayer.add(player, itemStack);
+            event.setDropItems(false);
+            event.setExpToDrop(0);
+            return;
+        }
 
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event);

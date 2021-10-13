@@ -15,9 +15,11 @@ public class LeaderBoard {
 
     private final String criteria;
     private final SimpleHolographic simpleHolographic;
+    private final String table;
 
-    public LeaderBoard(String topName, Location location, String criteria) {
+    public LeaderBoard(String topName, Location location, String criteria, String table) {
         this.criteria = criteria;
+        this.table = table;
         simpleHolographic = new SimpleHolographic(location);
 
         simpleHolographic.addTextLine(ChatUtil.text(topName));
@@ -33,7 +35,7 @@ public class LeaderBoard {
 
     public void update() {
         OpPrison.getInstance().getBase().getExecuteHandler()
-                .executeQuery(true, "SELECT * FROM players ORDER BY " + criteria + " DESC LIMIT 10")
+                .executeQuery(true, "SELECT * FROM " + table + " ORDER BY " + criteria + " DESC LIMIT 10")
                 .thenAccept(resultSet -> {
                     for (int i = 1; resultSet.next(); i++)
                         simpleHolographic.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));

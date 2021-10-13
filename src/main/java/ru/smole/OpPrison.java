@@ -314,13 +314,22 @@ public class OpPrison extends CorePlugin {
         LeaderBoard blocks = new LeaderBoard(
                 "&bТоп по блокам",
                 ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-block")),
-                "blocks"
+                "blocks",
+                "players"
         );
 
         LeaderBoard prestige = new LeaderBoard(
                 "&bТоп по престижам",
                 ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-prestige")),
-                "prestige"
+                "prestige",
+                "players"
+        );
+
+        LeaderBoard gang = new LeaderBoard(
+                "&bТоп по бандам",
+                ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-gang")),
+                "score",
+                "gangs"
         );
 
         SimpleHolographic simpleHolographic = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("info")));
@@ -349,6 +358,7 @@ public class OpPrison extends CorePlugin {
 
             blocks.update();
             prestige.update();
+            gang.update();
 
             if (getGangDataManager().getGangDataMap().isEmpty()) return;
 

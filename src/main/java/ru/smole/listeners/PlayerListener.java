@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -56,30 +57,6 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
 
         dataManager.load(player);
-        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-            LeaderBoard.holograms.forEach(holographic -> {
-
-                boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
-
-                if (equalWorld) {
-                    holographic.addViewers(player);
-                    return;
-                }
-
-                holographic.removeViewers(player);
-            });
-
-            NpcInitializer.npcList.forEach(fakePlayer -> {
-                boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
-
-                if (equalWorld) {
-                    fakePlayer.addViewers(player);
-                    return;
-                }
-
-                fakePlayer.removeViewers(player);
-            });
-        }, 10L);
     }
 
     @EventHandler
@@ -115,7 +92,7 @@ public class PlayerListener implements Listener {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         ApiManager.HOLOGRAPHIC_MANAGER.getProtocolHolographics(player).forEach(protocolHolographic -> {

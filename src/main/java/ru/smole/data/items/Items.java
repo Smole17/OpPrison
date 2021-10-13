@@ -3,6 +3,7 @@ package ru.smole.data.items;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.NBTTagString;
+import net.minecraft.server.v1_12_R1.PlayerAbilities;
 import org.apache.logging.log4j.util.BiConsumer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -277,8 +278,43 @@ public class Items {
                     gangDataManager.getGangFromPlayer(playerName).addScore(count);
                     itemStack.setAmount(itemStack.getAmount() - 1);
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "+§e" + StringUtils._fixDouble(0, count) + " §fочков");
-                }
-                );
+                });
+
+        Arrays.stream(Material.values())
+                .filter(material ->
+                        material == Material.IRON_BOOTS || material == Material.IRON_LEGGINGS
+                                || material == Material.IRON_CHESTPLATE || material == Material.IRON_HELMET
+                                || material == Material.DIAMOND_BOOTS || material == Material.DIAMOND_LEGGINGS
+                                || material == Material.DIAMOND_CHESTPLATE || material == Material.DIAMOND_HELMET
+                )
+                .forEach(material -> {
+                    registerItem(material.name().toLowerCase(),
+                            objects -> ApiManager
+                                    .newItemBuilder(material)
+                                    .setName(
+                                            material.name().contains("BOOTS") ? "Ботинки" :
+                                                    material.name().contains("LEGGINGS") ? "Поножи" :
+                                                            material.name().contains("CHESTPLATE") ? "Нагрудник" : "Шлем"
+                                            + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
+                                    )
+                                    .addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, ((Double) objects[0]).intValue())
+                                    .build());
+                });
+
+        Arrays.stream(Material.values())
+                .filter(material ->
+                        material == Material.IRON_SWORD || material == Material.DIAMOND_SWORD
+                )
+                .forEach(material -> {
+                    registerItem(material.name().toLowerCase(),
+                            objects -> ApiManager
+                                    .newItemBuilder(material)
+                                    .setName(
+                                            "Меч" + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНЫЙ§8)" : " §8(§bАЛМАЗНЫЙ§8)")
+                                    )
+                                    .addEnchantment(Enchantment.DAMAGE_ALL, ((Double) objects[0]).intValue())
+                                    .build());
+                });
     }
 
     public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
@@ -291,9 +327,9 @@ public class Items {
         registerItem(name, (o) -> item.clone(), interact);
     }
 
-//    protected static void registerItem(String name, ItemStack item) {
-//        registerItem(name, item, null);
-//    }
+    public static void registerItem(String name, Function<Object[], ItemStack> creator) {
+        registerItem(name, creator, null);
+    }
 
     protected static ItemStack setTagName(ItemStack item, String name) {
         return ItemStackUtils.setTag(ApiManager.newItemBuilder(item), "op_item", new NBTTagString(name.toLowerCase())).build();
