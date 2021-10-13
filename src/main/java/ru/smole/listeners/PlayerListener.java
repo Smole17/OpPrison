@@ -95,10 +95,6 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        ApiManager.HOLOGRAPHIC_MANAGER.getProtocolHolographics(player).forEach(protocolHolographic -> {
-            ChatUtil.sendMessage(player, protocolHolographic.getViewers().toString());
-        });
-
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
             LeaderBoard.holograms.forEach(holographic -> {
 
