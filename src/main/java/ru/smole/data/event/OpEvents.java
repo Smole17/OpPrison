@@ -101,7 +101,7 @@ public class OpEvents {
                 OpPrison.getInstance(),
                 () -> {
                     ChatUtil.broadcast("");
-                    ChatUtil.broadcast("   Событие " + name + " &fзавершилось");
+                    ChatUtil.broadcast("   Событие &b" + name + " &fзавершилось");
                     ChatUtil.broadcast("");
 
                     int[] i = {1};
@@ -141,6 +141,7 @@ public class OpEvents {
 
                     breakEvents.remove(name);
                     blocks.clear();
+                    BoosterManager.updateBar();
                 },
                 20 * 60 * 20
         );
@@ -159,7 +160,7 @@ public class OpEvents {
         BoosterManager.addBooster(10);
 
         ChatUtil.broadcast("");
-        ChatUtil.broadcast("   Событие §b" +  name + " &fначалось");
+        ChatUtil.broadcast("   Событие &b" +  name + " &fначалось");
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Суть события в том, что к бустеру сервера прибавляется 10%");
         ChatUtil.broadcast("");
@@ -168,11 +169,12 @@ public class OpEvents {
                 OpPrison.getInstance(),
                 () -> {
                     ChatUtil.broadcast("");
-                    ChatUtil.broadcast("   Событие " + name + " &fзавершилось");
+                    ChatUtil.broadcast("   Событие &b" + name + " &fзавершилось");
                     ChatUtil.broadcast("");
 
                     BoosterManager.delBooster(10);
                     breakEvents.remove(name);
+                    BoosterManager.updateBar();
                 },
                 20 * 60 * 20
         );
@@ -207,7 +209,7 @@ public class OpEvents {
         });
 
         ChatUtil.broadcast("");
-        ChatUtil.broadcast("   Событие §b" +  name + " &fначалось");
+        ChatUtil.broadcast("   Событие &b" +  name + " &fначалось");
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Суть события в том, нужно копать блоки и находить сокровища");
         ChatUtil.broadcast("");
@@ -216,11 +218,12 @@ public class OpEvents {
                 OpPrison.getInstance(),
                 () -> {
                     ChatUtil.broadcast("");
-                    ChatUtil.broadcast("   Событие " + name + " &fзавершилось");
+                    ChatUtil.broadcast("   Событие &b" + name + " &fзавершилось");
                     ChatUtil.broadcast("");
 
                     breakEvents.remove(name);
                     treasureMap.clear();
+                    BoosterManager.updateBar();
                 },
                 20 * 60 * 20
         );

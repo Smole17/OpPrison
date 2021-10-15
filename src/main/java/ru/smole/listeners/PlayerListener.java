@@ -170,30 +170,53 @@ public class PlayerListener implements Listener {
 
 
                     PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
-                    int random = ThreadLocalRandom.current().nextInt(4);
+                    int random = ThreadLocalRandom.current().nextInt(5);
 
                     switch (random) {
                         case 0:
+                            ItemStack mine_key = Items.getItem("mine_key", 4.0);
+
+                            if (mine_key == null)
+                                break;
+
+                            mine_key = mine_key.clone();
+
+                            OpPlayer.add(player, mine_key);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", mine_key.getItemMeta().getDisplayName());
+                            break;
+
                         case 1:
+                            ItemStack epic_key = Items.getItem("epic_key", 1.0);
+
+                            if (epic_key == null)
+                                break;
+
+                            epic_key = epic_key.clone();
+
+                            OpPlayer.add(player, epic_key);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", epic_key.getItemMeta().getDisplayName());
+                            break;
+
+                        case 2:
                             playerData.addMoney(100000000000000D);
                             ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+100T$");
                             break;
 
-                        case 2:
+                        case 3:
                             playerData.addToken(250000000000D);
                             ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+25B⛃");
                             break;
 
-                        case 3:
-                            ItemStack itemStack = Items.getItem("sponge", 50.0);
+                        case 4:
+                            ItemStack sponge = Items.getItem("sponge", 50.0);
 
-                            if (itemStack == null)
+                            if (sponge == null)
                                 break;
 
-                            itemStack = itemStack.clone();
+                            sponge = sponge.clone();
 
-                            OpPlayer.add(player, itemStack);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+                            OpPlayer.add(player, sponge);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", sponge.getItemMeta().getDisplayName());
                             break;
                     }
 
