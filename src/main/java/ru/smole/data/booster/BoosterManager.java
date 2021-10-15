@@ -59,6 +59,15 @@ public class BoosterManager {
         int id = RPlayer.checkAndGet(player.getName()).getMainPermissionGroup().getId();
 
         switch (id) {
+            case 10:
+                delBooster(0.05);
+                break;
+            case 20:
+                delBooster(0.1);
+                break;
+            case 30:
+                delBooster(0.15);
+                break;
             case 40:
                 delBooster(0.2);
                 break;

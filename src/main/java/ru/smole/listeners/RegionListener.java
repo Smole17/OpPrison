@@ -9,10 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
+import ru.smole.OpPrison;
 import ru.smole.data.event.OpEvents;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
@@ -83,7 +86,9 @@ public class RegionListener implements Listener {
             return;
         }
 
-        if (!region.isPvp()) {
+        String playerName = player.getName();
+        GangDataManager gManager = OpPrison.getInstance().getGangDataManager();
+        if (!region.isPvp() || (gManager.playerHasGang(playerName) && gManager.playerInGang(gManager.getGangFromPlayer(playerName), damager.getName()))) {
             event.setCancelled(true);
         }
     }

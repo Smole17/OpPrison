@@ -75,7 +75,7 @@ import static ru.xfenilafs.core.database.query.RemoteDatabaseRowType.*;
 @Slf4j
 public class OpPrison extends CorePlugin {
 
-    public @Getter static OpPrison instance;
+    private @Getter static OpPrison instance;
 
     private @Getter
     PlayerDataManager playerDataManager;
