@@ -2,6 +2,7 @@ package ru.smole.scoreboard;
 
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
@@ -15,10 +16,11 @@ public class ScoreboardManager {
         scoreboardBuilder.scoreboardDisplay("§b§lＯＰＰＲＩＳＯＮ");
         scoreboardBuilder.scoreboardScope(BaseScoreboardScope.PROTOTYPE);
 
-        scoreboardBuilder.scoreboardLine(11, "");
-        scoreboardBuilder.scoreboardLine(10, "§b" + player.getName());
-        scoreboardBuilder.scoreboardLine(8, "  §fДобыто блоков: §aЗагрузка...");
-        scoreboardBuilder.scoreboardLine(9, "  §fПрестиж: §bЗагрузка...");
+        scoreboardBuilder.scoreboardLine(12, "");
+        scoreboardBuilder.scoreboardLine(11, "§b" + player.getName());
+        scoreboardBuilder.scoreboardLine(10, "  §fДобыто блоков: §aЗагрузка...");
+        scoreboardBuilder.scoreboardLine(9, "  §fБанда: Загрузка...");
+        scoreboardBuilder.scoreboardLine(8, "  §fПрестиж: §bЗагрузка...");
         scoreboardBuilder.scoreboardLine(7, "  §fГруппа: §fЗагрузка...");
         scoreboardBuilder.scoreboardLine(6, "");
         scoreboardBuilder.scoreboardLine(5, "§bБаланс");
@@ -28,7 +30,14 @@ public class ScoreboardManager {
         scoreboardBuilder.scoreboardLine(1, "");
 
         scoreboardBuilder.scoreboardUpdater(((baseScoreboard, boardPlayer) -> {
-            PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+            String playerName = boardPlayer.getName();
+            OpPrison main = OpPrison.getInstance();
+
+            PlayerData playerData = main.getPlayerDataManager().getPlayerDataMap().get(playerName);
+            GangDataManager gManager = main.getGangDataManager();
+
+            baseScoreboard.updateScoreboardLine(9, boardPlayer,
+                    ChatUtil.text("  §fБанда: %s", gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "&c-"));
 
             baseScoreboard.updateScoreboardLine(8, boardPlayer,
                     ChatUtil.text("  §fПрестиж: §a%s", StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));
@@ -36,7 +45,7 @@ public class ScoreboardManager {
             baseScoreboard.updateScoreboardLine(7, boardPlayer,
                     ChatUtil.text("  §fГруппа: §f%s", playerData.getGroup().getName()));
 
-            baseScoreboard.updateScoreboardLine(9, boardPlayer,
+            baseScoreboard.updateScoreboardLine(10, boardPlayer,
                     ChatUtil.text("  §fДобыто блоков: §a%s", StringUtils._fixDouble(0, playerData.getBlocks())));
 
             baseScoreboard.updateScoreboardLine(4, boardPlayer,

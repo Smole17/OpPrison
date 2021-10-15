@@ -211,7 +211,7 @@ public class OpEvents {
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Событие &b" +  name + " &fначалось");
         ChatUtil.broadcast("");
-        ChatUtil.broadcast("   Суть события в том, нужно копать блоки и находить сокровища");
+        ChatUtil.broadcast("   Суть события в том, что нужно копать блоки и находить сокровища");
         ChatUtil.broadcast("");
 
         Bukkit.getScheduler().runTaskLater(

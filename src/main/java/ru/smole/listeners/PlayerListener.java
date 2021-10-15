@@ -26,6 +26,7 @@ import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.OpEvents;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
@@ -182,7 +183,7 @@ public class PlayerListener implements Listener {
                             mine_key = mine_key.clone();
 
                             OpPlayer.add(player, mine_key);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", mine_key.getItemMeta().getDisplayName());
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &fx4", mine_key.getItemMeta().getDisplayName());
                             break;
 
                         case 1:
@@ -194,7 +195,7 @@ public class PlayerListener implements Listener {
                             epic_key = epic_key.clone();
 
                             OpPlayer.add(player, epic_key);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", epic_key.getItemMeta().getDisplayName());
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &fx1", epic_key.getItemMeta().getDisplayName());
                             break;
 
                         case 2:
@@ -220,7 +221,7 @@ public class PlayerListener implements Listener {
                             break;
                     }
 
-                    block.getWorld().spawnParticle(Particle.CLOUD, loc, 5);
+                    block.getWorld().spawnParticle(Particle.CLOUD, loc, 7);
                     block.setType(Material.AIR);
                     event.setCancelled(true);
                     break;
@@ -239,14 +240,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onOpen(InventoryOpenEvent event) {
-        Player player = Bukkit.getPlayer(event.getPlayer().getName());
-        OpPlayer opPlayer = new OpPlayer(player);
-
-        opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
     }
 
     @EventHandler
@@ -361,11 +354,13 @@ public class PlayerListener implements Listener {
                 rPlayer.getVisibleName()
         );
 
+        GangDataManager gManager = OpPrison.getInstance().getGangDataManager();
         List<String> lore = Lists.newArrayList(
                 String.format("&fНик: &b%s %s", prefix, name),
                 "&fПрестиж: &a" + StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige()),
                 "&fДобыто блоков: &e" + StringUtils._fixDouble(0, playerData.getBlocks()),
                 "&fГруппа: &b" + playerData.getGroup().getName(),
+                "&fБанда: &f" + (gManager.playerHasGang(name) ? gManager.getGangFromPlayer(name).getName() : "&c-"),
                 "",
                 "&fДеньги: &a" + StringUtils.formatDouble(2, playerData.getMoney()),
                 "&fТокенов: &e" + StringUtils.formatDouble(2, playerData.getToken()),
