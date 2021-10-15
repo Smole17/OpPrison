@@ -38,6 +38,10 @@ public class NpcInitializer {
 
             String name = player.getName();
             PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(name);
+
+            if (playerData.getPrestige() < 75000000)
+                return;
+
             Map<String, Question> questions = playerData.getQuestions();
 
             if (!questions.containsKey("SOFOS") || PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(Upgrade.JACK_HAMMER).isCompleteQ()) {

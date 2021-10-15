@@ -23,7 +23,6 @@ import org.bukkit.inventory.ItemStack;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
-import ru.smole.data.event.OpEvent;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
@@ -47,6 +46,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerListener implements Listener {
 
@@ -133,22 +133,67 @@ public class PlayerListener implements Listener {
         Block block = event.getClickedBlock();
         Action action = event.getAction();
 
-        switch (action) {
-            case LEFT_CLICK_BLOCK:
-            if (event.hasBlock()) {
-                Case customCase = Case.getCustomCaseByLocation(block);
+        if (event.hasBlock()) {
+            Material type = block.getType();
 
-                if (block.getType() == Material.CHEST && event.getHand() == EquipmentSlot.HAND && customCase != null) {
-                    new CaseLootGui(customCase).openInventory(player);
+            switch (action) {
+                case LEFT_CLICK_BLOCK: {
+                    if (event.hasBlock()) {
+                        Case customCase = Case.getCustomCaseByLocation(block);
+
+                        if (type == Material.CHEST && event.getHand() == EquipmentSlot.HAND && customCase != null) {
+                            new CaseLootGui(customCase).openInventory(player);
+                            event.setCancelled(true);
+                        }
+                    }
+
+                    break;
+                }
+
+                case RIGHT_CLICK_BLOCK: {
+                    if (type != Material.CHEST)
+                        return;
+
+                    if (!OpEvents.getBreakEvents().containsKey("Искатель сокровищ"))
+                        return;
+
+                    OpPrison.MINES.forEach((integer, mine) -> {
+                        if (!mine.getZone().contains(block))
+                            return;
+
+                        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+                        int random = ThreadLocalRandom.current().nextInt(4);
+
+                        switch (random) {
+                            case 0:
+                            case 1:
+                                playerData.addMoney(100000000000000D);
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+100T$");
+                                break;
+
+                            case 2:
+                                playerData.addToken(250000000000D);
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+25B⛃");
+                                break;
+
+                            case 3:
+                                ItemStack itemStack = Items.getItem("sponge", 50);
+
+                                if (itemStack == null)
+                                    break;
+
+                                itemStack = itemStack.clone();
+
+                                OpPlayer.add(player, itemStack);
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+                                break;
+                        }
+                    });
+
                     event.setCancelled(true);
+                    break;
                 }
             }
-
-            break;
-            case RIGHT_CLICK_BLOCK:
-
-            event.setCancelled(true);
-            break;
         }
 
         Items.interact(event);

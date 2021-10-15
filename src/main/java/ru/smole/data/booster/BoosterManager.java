@@ -3,6 +3,7 @@ package ru.smole.data.booster;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
+import ru.smole.data.event.OpEvents;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -52,13 +53,6 @@ public class BoosterManager {
                 addBooster(2.0);
                 break;
         }
-
-        BAR.setTitle(String.format("§fБустер сервера: §a+%s",
-                StringUtils._fixDouble(1, BOOSTER) + "%"));
-
-        Player neSmole = Bukkit.getPlayer("NeSmole");
-        if (neSmole != null)
-            ChatUtil.sendMessage(neSmole, PREFIX + "&bBAR UPDATE: " + BOOSTER);
     }
 
     public void unload() {
@@ -83,16 +77,14 @@ public class BoosterManager {
             case 90:
                 delBooster(1.0);
                 break;
+            case 100:
             case 901:
                 delBooster(2.0);
                 break;
         }
-
-        BAR.setTitle(String.format("§fБустер сервера: §a+%s",
-                StringUtils._fixDouble(1, BOOSTER) + "%"));
     }
 
-    protected void addBooster(double count) {
+    public static void addBooster(double count) {
         if (BOOSTER < 0) {
             BOOSTER = 0.0;
             return;
@@ -103,9 +95,15 @@ public class BoosterManager {
         if (BOOSTER < 0) {
             BOOSTER = 0.0;
         }
+
+        Player neSmole = Bukkit.getPlayer("NeSmole");
+        if (neSmole != null)
+            ChatUtil.sendMessage(neSmole, PREFIX + "&bBAR UPDATE: " + BOOSTER);
+
+        updateBar();
     }
 
-    protected void delBooster(double count) {
+    public static void delBooster(double count) {
         if (BOOSTER < 0) {
             BOOSTER = 0.0;
             return;
@@ -116,5 +114,15 @@ public class BoosterManager {
         if (BOOSTER < 0) {
             BOOSTER = 0.0;
         }
+
+        updateBar();
+    }
+
+    public static void updateBar() {
+        String[] event = {null};
+        OpEvents.getBreakEvents().keySet().stream().findFirst().ifPresent(s -> event[0] = s);
+
+        BAR.setTitle(String.format("§fБустер сервера: §a+%s §8| §fАктивное событие: §b%s",
+                StringUtils._fixDouble(1, BOOSTER) + "%", event[0] == null ? "отсутсвует" : event[0]));
     }
 }

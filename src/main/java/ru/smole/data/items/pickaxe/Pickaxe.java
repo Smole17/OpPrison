@@ -264,14 +264,14 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (prestige_finderLevel > 0 && upgrades.get(Upgrade.PRESTIGE_FINDER).isIs()) {
-            double chance = prestige_finderLevel / 30000;
+            double chance = prestige_finderLevel / 60000;
 
             if (random.nextFloat() <= chance) {
                 double prestige = prestige_finderLevel;
                 if (prestige_merchantLevel > 0 && upgrades.get(Upgrade.PRESTIGE_MERCHANT).isIs()) {
                     double mer_chance = prestige_merchantLevel / 250000;
                     if (random.nextFloat() <= mer_chance)
-                        prestige = prestige_finderLevel + (prestige_finderLevel + prestige_merchantLevel / 2);
+                        prestige = prestige_finderLevel + ((prestige_finderLevel * prestige_merchantLevel) / 10000);
                 }
 
                 playerData.addPrestige(prestige);

@@ -2,6 +2,7 @@ package ru.smole.data.items.pickaxe;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import ru.smole.data.items.Items;
 import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.data.player.OpPlayer;
@@ -9,6 +10,7 @@ import ru.smole.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PickaxeManager {
 
@@ -89,7 +91,11 @@ public class PickaxeManager {
 
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
         pickaxes.put(name, pickaxe);
-        opPlayer.set(Items.getItem("pickaxe", name), 1);
+
+        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name)).clone();
+
+        player.getInventory().remove(itemStack);
+        opPlayer.add(itemStack);
     }
 
     public void unload() {

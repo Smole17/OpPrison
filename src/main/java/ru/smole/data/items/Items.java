@@ -30,6 +30,7 @@ import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.guis.PickaxeGui;
+import ru.smole.guis.warps.WarpGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
@@ -136,16 +137,16 @@ public class Items {
                     Action action = playerInteractEvent.getAction();
                     if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)
                         new PickaxeGui().openInventory(playerInteractEvent.getPlayer());
-                 }
+                }
         );
 
         registerItem("fly", objects ->
-                ApiManager
-                        .newItemBuilder(Material.FEATHER)
-                        .setName("§fДоступ к полёту §8(/fly)")
-                        .addLore("§7Нажмите для активации")
-                        .setAmount(((Double) objects[0]).intValue())
-                        .build(),
+                        ApiManager
+                                .newItemBuilder(Material.FEATHER)
+                                .setName("§fДоступ к полёту §8(/fly)")
+                                .addLore("§7Нажмите для активации")
+                                .setAmount(((Double) objects[0]).intValue())
+                                .build(),
                 (playerInteractEvent, itemStack) -> {
                     Player player = playerInteractEvent.getPlayer();
                     ItemStack item = playerInteractEvent.getItem();
@@ -187,9 +188,7 @@ public class Items {
                                 "§7(приложите полный скриншот инвентаря с предметом со временем)"
                         )
                         .build(),
-                (playerInteractEvent, itemStack) -> {
-                    ChatUtil.sendMessage(playerInteractEvent.getPlayer(), OpPrison.PREFIX + "https://discord.io/starfarm");
-                });
+                (playerInteractEvent, itemStack) -> ChatUtil.sendMessage(playerInteractEvent.getPlayer(), OpPrison.PREFIX + "https://discord.io/starfarm"));
 
         Arrays.stream(Key.values())
                 .forEach(key ->
@@ -252,7 +251,7 @@ public class Items {
         registerItem("sponge",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPONGE)
-                        .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0])  + " §fочков")
+                        .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0]) + " §fочков")
                         .setLore("§7Нажмите ШИФТ+ПКМ, чтобы добавить " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
                         .build(),
                 (event, itemStack) -> {
@@ -287,34 +286,53 @@ public class Items {
                                 || material == Material.DIAMOND_BOOTS || material == Material.DIAMOND_LEGGINGS
                                 || material == Material.DIAMOND_CHESTPLATE || material == Material.DIAMOND_HELMET
                 )
-                .forEach(material -> {
-                    registerItem(material.name().toLowerCase(),
-                            objects -> ApiManager
-                                    .newItemBuilder(material)
-                                    .setName(
-                                            material.name().contains("BOOTS") ? "Ботинки" :
-                                                    material.name().contains("LEGGINGS") ? "Поножи" :
-                                                            material.name().contains("CHESTPLATE") ? "Нагрудник" : "Шлем"
-                                            + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
-                                    )
-                                    .addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, ((Double) objects[0]).intValue())
-                                    .build());
-                });
+                .forEach(material ->
+                        registerItem(material.name().toLowerCase(),
+                                objects -> ApiManager
+                                        .newItemBuilder(material)
+                                        .setName(
+                                                (material.name().contains("BOOTS") ? "§fБотинки" :
+                                                        material.name().contains("LEGGINGS") ? "§fПоножи" :
+                                                                material.name().contains("CHESTPLATE") ? "§fНагрудник" : "§fШлем")
+                                                        + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
+                                        )
+                                        .addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, ((Double) objects[0]).intValue())
+                                        .build())
+                );
 
         Arrays.stream(Material.values())
                 .filter(material ->
                         material == Material.IRON_SWORD || material == Material.DIAMOND_SWORD
                 )
-                .forEach(material -> {
-                    registerItem(material.name().toLowerCase(),
-                            objects -> ApiManager
-                                    .newItemBuilder(material)
-                                    .setName(
-                                            "Меч" + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНЫЙ§8)" : " §8(§bАЛМАЗНЫЙ§8)")
-                                    )
-                                    .addEnchantment(Enchantment.DAMAGE_ALL, ((Double) objects[0]).intValue())
-                                    .build());
-                });
+                .forEach(material ->
+                        registerItem(material.name().toLowerCase(),
+                                objects -> ApiManager
+                                        .newItemBuilder(material)
+                                        .setName(
+                                                "§fМеч" + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНЫЙ§8)" : " §8(§bАЛМАЗНЫЙ§8)")
+                                        )
+                                        .addEnchantment(Enchantment.DAMAGE_ALL, ((Double) objects[0]).intValue())
+                                        .build())
+                );
+
+        registerItem("location_gui",
+                objects -> ApiManager
+                        .newItemBuilder(Material.NETHER_STAR)
+                        .setName("§fЛокации режима")
+                        .addItemFlags(
+                                ItemFlag.HIDE_ATTRIBUTES,
+                                ItemFlag.HIDE_DESTROYS,
+                                ItemFlag.HIDE_UNBREAKABLE
+                        )
+                        .setLore("§7Нажмите для активации")
+                        .build(),
+                (event, itemStack) -> new WarpGui(OpPrison.getInstance().getConfigManager()).openInventory(event.getPlayer()));
+
+        registerItem(Material.FISHING_ROD.name().toLowerCase(),
+                objects -> ApiManager
+                        .newItemBuilder(Material.FISHING_ROD)
+                        .setName("§fУдочка")
+                        .build());
     }
 
     public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {

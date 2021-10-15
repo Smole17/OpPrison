@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.event.OpEvent;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
@@ -30,8 +29,6 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         super("event");
     }
 
-    private final OpEvent opEvent = new OpEvents();
-
     @Override
     protected void onExecute(CommandSender sender, String[] args) {
         switch (args.length) {
@@ -46,6 +43,10 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                     case "giveall": {
                         String[] item = args[1].split(":");
                         ItemStack itemMain = Items.getItem(item[0], Double.parseDouble(item[1]));
+
+                        if (itemMain == null)
+                            break;
+
                         all(sender, name, itemMain);
                         break;
                     }
@@ -69,6 +70,9 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                     }
 
                     if (sender instanceof ConsoleCommandSender) {
+                        if (itemMain == null)
+                            break;
+
                         number(sender, name, i, itemMain);
                         return;
                     }
@@ -88,7 +92,6 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                         return;
                     }
 
-
                     number(sender, name, i, itemMain);
                 }
 
@@ -97,7 +100,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
         }
     }
     public void all(CommandSender sender, String name, ItemStack itemMain) {
-        opEvent.getActiveEvents().add(name);
+        OpEvents.getActiveEvents().add(name);
 
         ChatUtil.broadcast("");
         ChatUtil.broadcast("    §b%s §fподарил всем на сервере %s §fx%s", sender.getName(), itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
@@ -108,16 +111,16 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "§fВы получили %s §fx%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
         });
 
-        opEvent.getActiveEvents().remove(name);
+        OpEvents.getActiveEvents().remove(name);
     }
 
     public void number(CommandSender sender, String name, int i, ItemStack itemMain) {
-        Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
+        Map<String, Consumer<AsyncPlayerChatEvent>> events = OpEvents.getChatEvents();
 
         int random = new Random().nextInt(i) + 1;
         final boolean[][] is = {{false}};
 
-        opEvent.getActiveEvents().remove(name);
+        OpEvents.getActiveEvents().remove(name);
         events.remove(name);
         events.put(name, event -> {
             Player target = event.getPlayer();
@@ -180,7 +183,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 ChatUtil.broadcast("");
 
                 Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-                    opEvent.stop(name);
+                    OpEvents.stop(name);
                     is[0][0] = false;
 
                     ChatUtil.broadcast("");
@@ -191,7 +194,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             }
         });
 
-        opEvent.start(name);
+        OpEvents.start(name);
 
         BaseComponent text = new TextComponent("    §fНаграда: ");
         BaseComponent[] reward = ChatUtil.newBuilder(itemMain.getItemMeta().getDisplayName() + " §fx" + itemMain.getAmount()).setHoverEvent(HoverEvent.Action.SHOW_ITEM, ItemStackUtils.convertItemStackToJsonRegular(itemMain)).build();
@@ -218,9 +221,9 @@ public class EventCommand extends BukkitCommand<CommandSender> {
     }
 
     public void chat(CommandSender sender, String name, boolean is) {
-        Map<String, Consumer<AsyncPlayerChatEvent>> events = opEvent.getChatEvents();
+        Map<String, Consumer<AsyncPlayerChatEvent>> events = OpEvents.getChatEvents();
 
-        opEvent.getActiveEvents().remove(name);
+        OpEvents.getActiveEvents().remove(name);
         events.remove(name);
         events.put(name, event -> {
             Player player = event.getPlayer();
@@ -233,7 +236,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             }
         });
 
-        opEvent.start(name);
+        OpEvents.start(name);
 
         ChatUtil.broadcast("");
         ChatUtil.broadcast(OpPrison.PREFIX + "&b%s &f%s возможность писать в чат", sender.getName(), !is ? "включил" : "отключил");

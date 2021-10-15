@@ -25,8 +25,8 @@ import org.spigotmc.AsyncCatcher;
 import ru.luvas.rmcs.commands.Kit;
 import ru.luvas.rmcs.commands.SpigotCommandsLoader;
 import ru.smole.commands.*;
+import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.cases.Case;
-import ru.smole.data.event.OpEvent;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
@@ -64,6 +64,7 @@ import ru.xfenilafs.core.regions.ResourceBlock;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -147,7 +148,7 @@ public class OpPrison extends CorePlugin {
                 new StatsCommand(), new WarpCommand(), new PrestigeCommand(), new FlyCommand(),
                 new InfoCommand(), new KitCommand(), new EventCommand(), new TrashCommand(),
                 new RestartCommand(), new GangCommand(), new GangChatCommand(), new SpawnCommand(),
-                new EnderChestCommand(), new MineCommand()
+                new EnderChestCommand(), new MineCommand(), new RepairCommand()
         );
 
         gangDataManager.load();
@@ -428,94 +429,37 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadEvents() {
-        OpEvent opEvent = new OpEvents();
         Map<String, Double> blocks = new HashMap<>();
-        Map<String, Consumer<BlockBreakEvent>> events = opEvent.getBreakEvents();
-
-        String name = "sofos";
-        events.put(name, event -> {
-            Player player = event.getPlayer();
-            String playerName = player.getName();
-
-            if (MINES.get(-1).getBlocks().stream().noneMatch(resourceBlock -> resourceBlock.getType() == event.getBlock().getType()))
-                return;
-
-            if (blocks.isEmpty() || !blocks.containsKey(playerName))
-                return;
-
-            blocks.replace(playerName, blocks.get(playerName) + 1);
-        });
 
         BukkitTask event1Task =
                 Bukkit.getScheduler().runTaskTimer(
                         this,
                         () -> {
-                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 150000000;
-
-                            if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
+                            if (!OpEvents.getBreakEvents().isEmpty())
                                 return;
+
+                            int random = ThreadLocalRandom.current().nextInt(3);
+
+                            switch (random) {
+                                case 0: {
+                                    OpEvents.applyBlockContest(blocks);
+                                    break;
+                                }
+
+                                case 1: {
+                                    OpEvents.applyBoosterEvent();
+                                    break;
+                                }
+
+                                case 2: {
+                                    OpEvents.applyTreasureHunter();
+                                    break;
+                                }
+
                             }
-
-                            if (opEvent.getActiveEvents().contains(name)) {
-                                return;
-                            }
-
-                            ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fначалось");
-                            ChatUtil.broadcast("");
-                            ChatUtil.broadcast("   Суть события в том, чтобы телепортироваться на шахту 150.000.000 &8&o(150M) &fпрестижей");
-                            ChatUtil.broadcast("   и накопать больше всех блоков за 20 минут");
-                            ChatUtil.broadcast("");
-
-                            Bukkit.getOnlinePlayers().stream().filter(predicate).forEach(player -> blocks.put(player.getName(), 0.0));
-                            opEvent.start(name);
-
-                            Bukkit.getScheduler().runTaskLater(
-                                    this,
-                                    () -> {
-                                        ChatUtil.broadcast(PREFIX + "&fСобытие &bСостязания &fзавершилось");
-                                        ChatUtil.broadcast("");
-
-                                        int[] i = {1};
-
-                                        blocks.entrySet()
-                                                .stream()
-                                                .sorted((o1, o2) -> -o1.getValue().compareTo(o2.getValue()))
-                                                .limit(3)
-                                                .forEachOrdered(x -> {
-                                                    ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
-
-                                                    PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
-
-                                                    if (playerData == null)
-                                                        return;
-
-                                                    double added = playerData.getToken() * 0.15 / i[0];
-
-                                                    playerData.addToken(added);
-                                                    i[0]++;
-
-                                                    Question question = playerData.getQuestions().get("SOFOS");
-                                                    Question.QuestionStep step = question.getStep();
-
-                                                    if (step == null)
-                                                        return;
-
-                                                    if (step == Question.QuestionStep.COMPLETING) {
-                                                        question.setStep(Question.QuestionStep.ALR_COMPLETED);
-                                                    }
-                                                });
-
-                                        ChatUtil.broadcast("");
-
-
-                                        blocks.clear();
-                                        opEvent.stop(name);
-                                    },
-                                    20 * 60 * 20
-                            );
                         },
-                        20 * 60 * 60,
-                        20 * 60 * 60
+                        20 * 60 * 5,
+                        20 * 60 * 50
                 );
 
 
