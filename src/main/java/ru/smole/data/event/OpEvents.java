@@ -3,6 +3,7 @@ package ru.smole.data.event;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -16,10 +17,7 @@ import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -30,6 +28,7 @@ public class OpEvents {
     private final @Getter List<String> activeEvents = new ArrayList<>();
     private final @Getter Map<String, Consumer<AsyncPlayerChatEvent>> chatEvents = new HashMap<>();
     private final @Getter Map<String, Consumer<BlockBreakEvent>> breakEvents = new HashMap<>();
+    private final @Getter Map<String, List<Location>> treasureMap = new HashMap<>();
 
     public void start(String name) {
         activeEvents.add(name);
@@ -52,7 +51,7 @@ public class OpEvents {
     public void blockBreak(BlockBreakEvent event) {
         if (!breakEvents.isEmpty()) {
             breakEvents.forEach((s, blockBreakEventConsumer) -> {
-                if (activeEvents.contains(s)) {
+                if (breakEvents.containsKey(s)) {
                     blockBreakEventConsumer.accept(event);
                 }
             });
@@ -160,7 +159,7 @@ public class OpEvents {
         BoosterManager.addBooster(10);
 
         ChatUtil.broadcast("");
-        ChatUtil.broadcast("   Событие " +  name + " &fначалось");
+        ChatUtil.broadcast("   Событие §b" +  name + " &fначалось");
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Суть события в том, что к бустеру сервера прибавляется 10%");
         ChatUtil.broadcast("");
@@ -187,19 +186,28 @@ public class OpEvents {
         if (breakEvents.containsKey(name))
             return;
 
+        ThreadLocalRandom randomO = ThreadLocalRandom.current();
         breakEvents.put(name, event -> {
-            float random = ThreadLocalRandom.current().nextFloat();
+            Player player = event.getPlayer();
+            String playerName = player.getName();
+            if (!treasureMap.containsKey(playerName))
+                treasureMap.put(playerName, new ArrayList<>());
+
+            float random = randomO.nextFloat();
 
             if (random <= 0.01) {
+                event.setCancelled(true);
+
                 Block block = event.getBlock();
 
                 block.setType(Material.CHEST);
                 event.getPlayer().sendTitle("", "§aВы нашли сокровище", 5, 20, 5);
+                treasureMap.get(playerName).add(block.getLocation());
             }
         });
 
         ChatUtil.broadcast("");
-        ChatUtil.broadcast("   Событие " +  name + " &fначалось");
+        ChatUtil.broadcast("   Событие §b" +  name + " &fначалось");
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Суть события в том, нужно копать блоки и находить сокровища");
         ChatUtil.broadcast("");
@@ -212,8 +220,11 @@ public class OpEvents {
                     ChatUtil.broadcast("");
 
                     breakEvents.remove(name);
+                    treasureMap.clear();
                 },
                 20 * 60 * 20
         );
+
+        BoosterManager.updateBar();
     }
 }

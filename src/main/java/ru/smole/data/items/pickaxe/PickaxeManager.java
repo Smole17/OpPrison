@@ -92,10 +92,10 @@ public class PickaxeManager {
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
         pickaxes.put(name, pickaxe);
 
-        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name)).clone();
+        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name));
 
-        player.getInventory().remove(itemStack);
-        opPlayer.add(itemStack);
+        if (!player.getInventory().contains(itemStack))
+            opPlayer.add(itemStack);
     }
 
     public void unload() {

@@ -149,8 +149,6 @@ public class RegionListener implements Listener {
             if (itemStack == null) return;
 
             OpPlayer.add(player, itemStack.clone());
-            event.setDropItems(false);
-            event.setExpToDrop(0);
             return;
         }
 

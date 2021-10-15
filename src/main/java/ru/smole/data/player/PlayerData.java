@@ -85,7 +85,7 @@ import java.util.Map;
     public double addMultiplier(double count) {
         double added = multiplier + count;
 
-        if (added > 5000)
+        if (added > 8000)
             return 0.0;
 
         setMultiplier(added);

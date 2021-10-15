@@ -6,7 +6,9 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -152,44 +154,51 @@ public class PlayerListener implements Listener {
 
                 case RIGHT_CLICK_BLOCK: {
                     if (type != Material.CHEST)
-                        return;
+                        break;
 
-                    if (!OpEvents.getBreakEvents().containsKey("Искатель сокровищ"))
-                        return;
+                    if (!OpEvents.getBreakEvents().containsKey("Искатель сокровищ")) {
+                        event.setCancelled(true);
+                        break;
+                    }
 
-                    OpPrison.MINES.forEach((integer, mine) -> {
-                        if (!mine.getZone().contains(block))
-                            return;
+                    Location loc = block.getLocation();
+                    if (!OpEvents.getTreasureMap().get(player.getName()).contains(loc)) {
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Это не ваше сокровище!");
+                        event.setCancelled(true);
+                        break;
+                    }
 
-                        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
-                        int random = ThreadLocalRandom.current().nextInt(4);
 
-                        switch (random) {
-                            case 0:
-                            case 1:
-                                playerData.addMoney(100000000000000D);
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+100T$");
+                    PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+                    int random = ThreadLocalRandom.current().nextInt(4);
+
+                    switch (random) {
+                        case 0:
+                        case 1:
+                            playerData.addMoney(100000000000000D);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+100T$");
+                            break;
+
+                        case 2:
+                            playerData.addToken(250000000000D);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+25B⛃");
+                            break;
+
+                        case 3:
+                            ItemStack itemStack = Items.getItem("sponge", 50.0);
+
+                            if (itemStack == null)
                                 break;
 
-                            case 2:
-                                playerData.addToken(250000000000D);
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+25B⛃");
-                                break;
+                            itemStack = itemStack.clone();
 
-                            case 3:
-                                ItemStack itemStack = Items.getItem("sponge", 50);
+                            OpPlayer.add(player, itemStack);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+                            break;
+                    }
 
-                                if (itemStack == null)
-                                    break;
-
-                                itemStack = itemStack.clone();
-
-                                OpPlayer.add(player, itemStack);
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
-                                break;
-                        }
-                    });
-
+                    block.getWorld().spawnParticle(Particle.CLOUD, loc, 5);
+                    block.setType(Material.AIR);
                     event.setCancelled(true);
                     break;
                 }

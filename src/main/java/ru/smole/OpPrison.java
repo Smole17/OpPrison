@@ -458,7 +458,7 @@ public class OpPrison extends CorePlugin {
 
                             }
                         },
-                        20 * 60 * 5,
+                        20 * 60,
                         20 * 60 * 50
                 );
 
