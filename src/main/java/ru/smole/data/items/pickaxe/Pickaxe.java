@@ -355,7 +355,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (ig_moneyLevel > 0 && upgrades.get(Upgrade.IG_MONEY).isIs()) {
-            double chance = (ig_moneyLevel / 10) / 825000;
+            double chance = (ig_moneyLevel / 10) / 1700000;
             if (new Random().nextFloat() <= chance) {
                 opPlayer.add(Items.getItem("ign"));
                 Upgrade.IG_MONEY.sendProcMessage(player, "Чек на 50 рублей §8(ВНУТРИИГРОВЫЕ)");
