@@ -163,7 +163,7 @@ public class PlayerListener implements Listener {
                     }
 
                     Location loc = block.getLocation();
-                    if (!OpEvents.getTreasureMap().get(player.getName()).contains(loc)) {
+                    if (!OpEvents.getTreasureMap().containsKey(player.getName()) || !OpEvents.getTreasureMap().get(player.getName()).contains(loc)) {
                         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Это не ваше сокровище!");
                         event.setCancelled(true);
                         break;
@@ -200,12 +200,12 @@ public class PlayerListener implements Listener {
 
                         case 2:
                             playerData.addMoney(100000000000000D);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+100T$");
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+$100T");
                             break;
 
                         case 3:
                             playerData.addToken(250000000000D);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+25B⛃");
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+⛃25B");
                             break;
 
                         case 4:
