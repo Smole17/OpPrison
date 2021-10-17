@@ -162,6 +162,11 @@ public class PlayerListener implements Listener {
                         break;
                     }
 
+                    if (player.getWorld() == Bukkit.getWorld("spawn")) {
+                        event.setCancelled(true);
+                        break;
+                    }
+
                     Location loc = block.getLocation();
                     if (!OpEvents.getTreasureMap().containsKey(player.getName()) || !OpEvents.getTreasureMap().get(player.getName()).contains(loc)) {
                         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Это не ваше сокровище!");

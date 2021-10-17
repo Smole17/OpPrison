@@ -288,16 +288,23 @@ public class Items {
                 )
                 .forEach(material ->
                         registerItem(material.name().toLowerCase(),
-                                objects -> ApiManager
-                                        .newItemBuilder(material)
-                                        .setName(
-                                                (material.name().contains("BOOTS") ? "§fБотинки" :
-                                                        material.name().contains("LEGGINGS") ? "§fПоножи" :
-                                                                material.name().contains("CHESTPLATE") ? "§fНагрудник" : "§fШлем")
-                                                        + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
-                                        )
-                                        .addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, ((Double) objects[0]).intValue())
-                                        .build())
+                                objects -> {
+                                    ItemUtil.ItemBuilder itemBuilder = ApiManager
+                                            .newItemBuilder(material)
+                                            .setName(
+                                                    (material.name().contains("BOOTS") ? "§fБотинки" :
+                                                            material.name().contains("LEGGINGS") ? "§fПоножи" :
+                                                                    material.name().contains("CHESTPLATE") ? "§fНагрудник" : "§fШлем")
+                                                            + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
+                                            );
+
+                                    int protection = ((Double) objects[0]).intValue();
+
+                                    if (protection != 0)
+                                        itemBuilder.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, protection);
+
+                                    return itemBuilder.build();
+                                })
                 );
 
         Arrays.stream(Material.values())
@@ -306,13 +313,20 @@ public class Items {
                 )
                 .forEach(material ->
                         registerItem(material.name().toLowerCase(),
-                                objects -> ApiManager
-                                        .newItemBuilder(material)
-                                        .setName(
-                                                "§fМеч" + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНЫЙ§8)" : " §8(§bАЛМАЗНЫЙ§8)")
-                                        )
-                                        .addEnchantment(Enchantment.DAMAGE_ALL, ((Double) objects[0]).intValue())
-                                        .build())
+                                objects -> {
+                                    ItemUtil.ItemBuilder itemBuilder = ApiManager
+                                            .newItemBuilder(material)
+                                            .setName(
+                                                    "§fМеч" + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНЫЙ§8)" : " §8(§bАЛМАЗНЫЙ§8)")
+                                            );
+
+                                    int damageAll = ((Double) objects[0]).intValue();
+
+                                    if (damageAll != 0)
+                                        itemBuilder.addEnchantment(Enchantment.DAMAGE_ALL, damageAll);
+
+                                    return itemBuilder.build();
+                                })
                 );
 
         registerItem("location_gui",

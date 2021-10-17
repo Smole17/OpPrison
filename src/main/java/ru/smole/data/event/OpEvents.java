@@ -52,7 +52,7 @@ public class OpEvents {
         if (!breakEvents.isEmpty()) {
             breakEvents.forEach((s, blockBreakEventConsumer) -> {
                 if (breakEvents.containsKey(s)) {
-                    blockBreakEventConsumer.accept(event);
+                    if (blockBreakEventConsumer != null) blockBreakEventConsumer.accept(event);
                 }
             });
         }

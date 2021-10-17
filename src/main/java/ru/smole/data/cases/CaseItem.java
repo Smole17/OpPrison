@@ -30,7 +30,7 @@ import ru.xfenilafs.core.ApiManager;
         switch (type) {
             case ITEM:
                 name = op_item.getString("name");
-                value = op_item.getConfigurationSection("value") == null ? 1.0 : op_item.getDouble("value");
+                value = op_item.getDouble("value");
 
                 itemStack = Items.getItem(name, value);
                 if (itemStack == null)
@@ -39,7 +39,7 @@ import ru.xfenilafs.core.ApiManager;
                 break;
             case VAULT:
                 stat = StatsCommand.Stat.valueOf(op_item.getString("name").toUpperCase());
-                value = op_item.getConfigurationSection("value") == null ? 1.0 : op_item.getDouble("value");
+                value = op_item.getDouble("value");
 
                 break;
         }

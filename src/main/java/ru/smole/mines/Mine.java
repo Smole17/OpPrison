@@ -2,24 +2,24 @@ package ru.smole.mines;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import ru.smole.OpPrison;
+import ru.smole.data.event.OpEvents;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
 import ru.xfenilafs.core.util.cuboid.BlockVector3;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 import ru.xfenilafs.core.util.temporal.TemporalUtils;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 @Getter
 public class Mine {
@@ -92,7 +92,7 @@ public class Mine {
                         fillMap.set(new HashMap<>());
                     }
 
-                    if (block.getType() != Material.AIR) continue;
+                    if (block.getType() != Material.AIR || block.getType() != Material.CHEST) continue;
 
                     for (int i = 0; i < blocks.size(); i++)
                         if (random.nextInt(101) <= blocks.get(i).getChance() || i == blocks.size() - 1)

@@ -20,7 +20,7 @@ import java.util.Queue;
 
 public class MineFillExecutor extends BukkitRunnable {
 
-    private Queue<Map<Block, ResourceBlock>> queue;
+    private final Queue<Map<Block, ResourceBlock>> queue;
     private final Plugin plugin;
     private final int delay;
 

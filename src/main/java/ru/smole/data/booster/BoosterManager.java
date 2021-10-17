@@ -132,6 +132,6 @@ public class BoosterManager {
         OpEvents.getBreakEvents().keySet().stream().findFirst().ifPresent(s -> event[0] = s);
 
         BAR.setTitle(String.format("§fБустер сервера: §a+%s §8| §fАктивное событие: §b%s",
-                StringUtils._fixDouble(1, BOOSTER) + "%", event[0] == null ? "отсутсвует" : event[0]));
+                StringUtils._fixDouble(1, BOOSTER) + "%", event[0] == null ? "отсутствует" : event[0]));
     }
 }

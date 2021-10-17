@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Rabbit;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -17,10 +18,12 @@ import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.mines.Mine;
 import ru.smole.utils.StringUtils;
+import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.achievements.Achievements;
 
+import javax.swing.*;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
@@ -40,7 +43,7 @@ import static ru.smole.OpPrison.MINES;
     public double getNeedExp() {
         double needXp = 1000D;
         if (level != 0) {
-            double form = needXp * level * 1.5 * (level / 8);
+            double form = needXp * level * 35 * (level / 8);
             needXp = needXp + form;
         }
 
@@ -52,10 +55,8 @@ import static ru.smole.OpPrison.MINES;
         setExp(exp + count);
 
         if (exp >= getNeedExp()) {
-            OpPlayer opPlayer = new OpPlayer(player);
-
             addLevel(1);
-            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+            OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
         }
     }
 
@@ -67,6 +68,30 @@ import static ru.smole.OpPrison.MINES;
             Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
 
             achievements.addAchievement(ach);
+        }
+
+        if (level % 5 == 0) {
+            ItemStack itemStack = Items.getItem("mine_key", 16.0);
+
+            if (itemStack == null)
+                return;
+
+            itemStack = itemStack.clone();
+
+            OpPlayer.add(player, itemStack);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fx%s", itemStack.getItemMeta().getDisplayName(), itemStack.getAmount());
+        }
+
+        if (level % 10 == 0) {
+            ItemStack itemStack = Items.getItem("epic_key", 4.0);
+
+            if (itemStack == null)
+                return;
+
+            itemStack = itemStack.clone();
+
+            OpPlayer.add(player, itemStack);
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fx%s", itemStack.getItemMeta().getDisplayName(), itemStack.getAmount());
         }
     }
 
@@ -91,7 +116,7 @@ import static ru.smole.OpPrison.MINES;
                     if (noneMine)
                         continue;
 
-                    if (block1.getType() == Material.AIR)
+                    if (block1.getType() == Material.AIR || block1.getType() == Material.CHEST)
                         continue;
 
                     block1.setType(Material.AIR);
@@ -132,7 +157,7 @@ import static ru.smole.OpPrison.MINES;
                         continue;
 
 
-                    if (block1.getType() == Material.AIR)
+                    if (block1.getType() == Material.AIR || block1.getType() == Material.CHEST)
                         continue;
 
                     block1.setType(Material.AIR);
@@ -256,6 +281,7 @@ import static ru.smole.OpPrison.MINES;
 
         double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 1500 * fortuneLevel : 1500) * (multiplier == 0 ? 1 : multiplier);
         double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 400 * token_minerLevel : 400;
+        double exp = 1;
         Random random = new Random();
 
         if (OpPrison.BOOSTER > 0) {
@@ -370,12 +396,13 @@ import static ru.smole.OpPrison.MINES;
 
                 cost = cost * blocks;
                 token = token * blocks;
+                exp = exp * blocks;
             }
 
             playerData.addBlocks(1);
             playerData.addMoney(cost);
             playerData.addToken(token);
-            pickaxe.addExp(1);
+            pickaxe.addExp(exp);
 
             return;
         }
@@ -387,12 +414,13 @@ import static ru.smole.OpPrison.MINES;
 
                 cost = cost * blocks;
                 token = token * blocks;
+                exp = exp * blocks;
             }
 
             playerData.addBlocks(1);
             playerData.addMoney(cost);
             playerData.addToken(token);
-            pickaxe.addExp(1);
+            pickaxe.addExp(exp);
 
             return;
         }
@@ -400,6 +428,6 @@ import static ru.smole.OpPrison.MINES;
         playerData.addBlocks(1);
         playerData.addMoney(cost);
         playerData.addToken(token);
-        pickaxe.addExp(1);
+        pickaxe.addExp(exp);
     }
 }

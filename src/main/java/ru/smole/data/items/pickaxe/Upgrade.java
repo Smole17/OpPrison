@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 75000, 650000,
+            0, 20, 75000, 6500000,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",
@@ -52,7 +52,7 @@ import java.util.function.BiConsumer;
 
     KEY_FINDER("§4Добыча ключей",
             "Увеличивает количество добываемых ключей",
-            2, 0, 50, 250000000,
+            2, 0, 50, 550000000,
             Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, true),
 
     EXPLOSIVE("§4Взрыв",
