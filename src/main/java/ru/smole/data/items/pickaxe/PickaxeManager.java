@@ -41,9 +41,20 @@ public class PickaxeManager {
         );
 
         pickaxes.put(name, pickaxe);
+
+        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name));
+
+        if (!player.getInventory().contains(itemStack))
+            OpPlayer.add(player, itemStack);
     }
 
     public void load(String statsSQL) {
+        if (statsSQL == null || statsSQL.isEmpty()) {
+            create();
+            return;
+        }
+
+
         upgradeMap = new HashMap<>();
 
         OpPlayer opPlayer = new OpPlayer(player);

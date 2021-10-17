@@ -31,7 +31,10 @@ public class RepairCommand extends BukkitCommand<Player> {
             return;
         }
 
-        itemStack.setDurability(itemStack.getType().getMaxDurability());
+        if (itemStack.getType().getMaxDurability() == 0)
+            return;
+
+        itemStack.setDurability((short) 0);
         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы починили предмет");
     }
 }

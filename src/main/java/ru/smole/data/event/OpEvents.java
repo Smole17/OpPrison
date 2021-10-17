@@ -64,6 +64,17 @@ public class OpEvents {
         if (breakEvents.containsKey(name))
             return;
 
+        OpPrison main = OpPrison.getInstance();
+        Predicate<Player> predicate = player -> main.getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 75000000;
+
+        if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
+            ChatUtil.broadcast("");
+            ChatUtil.broadcast("   Событие &b" + name + " &fне началось из-за недостатка игроков");
+            ChatUtil.broadcast("   Условие: 4 игрока с 75M престижей");
+            ChatUtil.broadcast("");
+            return;
+        }
+
         breakEvents.put(name, event -> {
             Player player = event.getPlayer();
             String playerName = player.getName();
@@ -76,17 +87,6 @@ public class OpEvents {
 
             blocks.replace(playerName, blocks.get(playerName) + 1);
         });
-
-        OpPrison main = OpPrison.getInstance();
-        Predicate<Player> predicate = player -> main.getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 75000000;
-
-        if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 4) {
-            ChatUtil.broadcast("");
-            ChatUtil.broadcast("   Событие &b" + name + " &fне началось из-за недостатка игроков");
-            ChatUtil.broadcast("   Условие: 4 игрока с 75M престижей");
-            ChatUtil.broadcast("");
-            return;
-        }
 
         ChatUtil.broadcast("");
         ChatUtil.broadcast("   Событие &b" + name + " &fначалось");
@@ -112,6 +112,7 @@ public class OpEvents {
                             .limit(3)
                             .forEachOrdered(x -> {
                                 ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
+                                i[0]++;
 
                                 if (Bukkit.getPlayer(x.getKey()) == null|| !Bukkit.getPlayer(x.getKey()).isOnline())
                                     return;
@@ -124,7 +125,6 @@ public class OpEvents {
                                 double added = playerData.getToken() * 0.15 / i[0];
 
                                 playerData.addToken(added);
-                                i[0]++;
 
                                 Question question = playerData.getQuestions().get("SOFOS");
                                 Question.QuestionStep step = question.getStep();
