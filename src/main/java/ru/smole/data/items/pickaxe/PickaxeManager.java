@@ -1,6 +1,7 @@
 package ru.smole.data.items.pickaxe;
 
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.data.items.Items;
@@ -8,6 +9,7 @@ import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.StringUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -42,10 +44,7 @@ public class PickaxeManager {
 
         pickaxes.put(name, pickaxe);
 
-        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name));
-
-        if (!player.getInventory().contains(itemStack))
-            OpPlayer.add(player, itemStack);
+        OpPlayer.add(player, Items.getItem("pickaxe", name));
     }
 
     public void load(String statsSQL) {
@@ -54,10 +53,8 @@ public class PickaxeManager {
             return;
         }
 
-
         upgradeMap = new HashMap<>();
 
-        OpPlayer opPlayer = new OpPlayer(player);
         String pickaxeName = "null";
         double exp = 0.0;
         double level = 0.0;
@@ -103,15 +100,19 @@ public class PickaxeManager {
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
         pickaxes.put(name, pickaxe);
 
-        ItemStack itemStack = Objects.requireNonNull(Items.getItem("pickaxe", name));
-
-        if (!player.getInventory().contains(itemStack))
-            opPlayer.add(itemStack);
+        OpPlayer.add(player, Items.getItem("pickaxe", name));
     }
 
     public void unload() {
         if (!pickaxes.isEmpty())
             pickaxes.remove(name);
+
+        Arrays.stream(player.getInventory().getStorageContents())
+                .parallel()
+                .filter(itemStack1 -> itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .forEach(itemStack1 -> {
+                    player.getInventory().remove(itemStack1);
+                });
     }
 
     public String getStats() {

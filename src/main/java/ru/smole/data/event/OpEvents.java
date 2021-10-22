@@ -222,6 +222,11 @@ public class OpEvents {
                     ChatUtil.broadcast("");
 
                     breakEvents.remove(name);
+                    treasureMap.forEach((s, locations) -> {
+                        locations.forEach(location -> {
+                            location.getBlock().setType(Material.AIR);
+                        });
+                    });
                     treasureMap.clear();
                     BoosterManager.updateBar();
                 },

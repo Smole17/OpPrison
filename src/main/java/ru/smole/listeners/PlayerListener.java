@@ -47,6 +47,7 @@ import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -78,9 +79,23 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        event.setKeepInventory(true);
         event.setDroppedExp(0);
         event.setDeathMessage("");
+
+        Player player = event.getEntity();
+        Player killer = player.getKiller();
+
+        Arrays
+                .stream(player.getInventory().getStorageContents())
+                .forEach(itemStack -> {
+                    Material material = itemStack.getType();
+                    if (material == Material.IRON_SWORD || material == Material.DIAMOND_SWORD || material == Material.IRON_BOOTS || material == Material.IRON_LEGGINGS || material == Material.IRON_CHESTPLATE || material == Material.IRON_HELMET || material == Material.DIAMOND_BOOTS || material == Material.DIAMOND_LEGGINGS
+                            || material == Material.DIAMOND_CHESTPLATE || material == Material.DIAMOND_HELMET)
+                        event.getDrops().remove(itemStack);
+                });
+
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getDisplayName());
+        ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a", player.getDisplayName());
     }
 
     @EventHandler

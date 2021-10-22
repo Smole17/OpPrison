@@ -27,7 +27,7 @@ import java.util.function.BiConsumer;
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 75000, 6500000,
+            0, 20, 75000, 2200000,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     HASTE("§eСпешка",

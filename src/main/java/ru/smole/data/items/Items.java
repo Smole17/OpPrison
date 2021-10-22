@@ -392,8 +392,8 @@ public class Items {
         MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический §fключ").build()),
         SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build());
 
-        private String name;
-        private ItemStack stack;
+        private final String name;
+        private final ItemStack stack;
 
         public static Key getKeyFromString(String key) {
             for (Key type : Key.values()) {
