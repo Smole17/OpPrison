@@ -31,7 +31,7 @@ public class ServerUtil {
 
             PlayerDataManager playerData = OpPrison.getInstance().getPlayerDataManager();
             playerData.unload(player);
-            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 3));
+            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 4));
         });
 
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);

@@ -3,6 +3,7 @@ package ru.smole.data.pads;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,6 +20,7 @@ public class LaunchPad {
     public LaunchPad(ConfigurationSection section) {
         this.location = ConfigUtils.loadLocationFromConfigurationSectionSplit(section);
         this.vector = loadVector(section);
+        location.getBlock().setType(Material.IRON_PLATE);
     }
 
     public void launch(Player player) {

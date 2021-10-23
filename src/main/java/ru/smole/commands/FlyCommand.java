@@ -19,12 +19,17 @@ public class FlyCommand extends BukkitCommand<Player> {
     protected void onExecute(Player player, String[] args) {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
+        if (player.getWorld().getName().contains("gangs")) {
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы не можете включить здесь полёт");
+            return;
+        }
+
         if (playerData.isFly()) {
             is = !is;
             player.setAllowFlight(is);
             player.setFlying(is);
 
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + String.format("Вы %s полёт", is ? "включили" : "выключили"));
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы %s полёт", is ? "включили" : "выключили");
             return;
         }
 

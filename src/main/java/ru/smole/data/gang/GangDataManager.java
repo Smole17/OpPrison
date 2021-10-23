@@ -32,35 +32,16 @@ public class GangDataManager {
     }
 
     public void load() {
-        List<String> name = new ArrayList<>();
 
         GangDataSQL.get(resultSet -> {
             try {
-                if (!resultSet.next())
-                    return;
+                while (resultSet.next()) {
+                    val gangPlayersList = getGangPlayers(new String(Base64.getDecoder().decode(resultSet.getString("members"))));
 
-                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                    name.add(resultSet.getString(i));
+                    String s = resultSet.getString("name");
+
+                    gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet.getDouble("score")));
                 }
-
-                if (name.isEmpty())
-                    return;
-
-                for (String s : name) {
-                    GangDataSQL.get(s, resultSet1 -> {
-                        try {
-                        if (!resultSet1.next())
-                            return;
-
-                        val gangPlayersList = getGangPlayers(s);
-
-                            gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet1.getDouble("score")));
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
-                    });
-                }
-
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -87,6 +68,9 @@ public class GangDataManager {
     }
 
     public boolean playerInGang(GangData gangData, String playerName) {
+        if (gangData == null)
+            return false;
+
         return gangData.getGangPlayerMap().containsKey(playerName.toLowerCase());
     }
 
@@ -106,34 +90,23 @@ public class GangDataManager {
         return gangData;
     }
 
-    protected Map<String, GangData.GangPlayer> getGangPlayers(String name) {
+    protected Map<String, GangData.GangPlayer> getGangPlayers(String members) {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
 
-        GangDataSQL.get(name, resultSet -> {
+        for (String s : members.split(",")) {
+            String[] data = s.split("-");
+
+            String playerName = data[0];
+            GangPlayerType type;
+
             try {
-                if (!resultSet.next())
-                    return;
-
-                String members = new String(Base64.getDecoder().decode(resultSet.getString("members")));
-
-                for (String s : members.split(",")) {
-                    String[] data = s.split("-");
-
-                    String playerName = data[0];
-                    GangPlayerType type;
-
-                    try {
-                        type = GangPlayerType.valueOf(data[1]);
-                    } catch (Exception ex) {
-                        throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
-                    }
-
-                    gangPlayerMap.put(playerName.toLowerCase(), new GangData.GangPlayer(playerName, type));
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                type = GangPlayerType.valueOf(data[1]);
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
             }
-        });
+
+            gangPlayerMap.put(playerName.toLowerCase(), new GangData.GangPlayer(playerName, type));
+        }
 
         return gangPlayerMap;
     }

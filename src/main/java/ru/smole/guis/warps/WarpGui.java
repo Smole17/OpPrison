@@ -14,6 +14,8 @@ import ru.smole.data.group.GroupsManager;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventory;
+import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.TeleportUtil;
@@ -30,6 +32,8 @@ public class WarpGui extends BaseSimpleInventory {
 
     @Override
     public void drawInventory(@NonNull Player player) {
+        PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
+
         FileConfiguration config = configManager.getRegionConfig().getConfiguration();
         ConfigurationSection regions = config.getConfigurationSection("regions");
 
@@ -54,6 +58,7 @@ public class WarpGui extends BaseSimpleInventory {
                 if (material == null)
                     return;
 
+
                 Location location = new Location(
                         Bukkit.getWorld(spawnLoc[0]),
                         Double.parseDouble(spawnLoc[1]), Double.parseDouble(spawnLoc[2]), Double.parseDouble(spawnLoc[3]),
@@ -68,21 +73,26 @@ public class WarpGui extends BaseSimpleInventory {
                                 .setLore("§7Нажмите, для телепортации")
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {
+                            double needPrestige = item.getDouble("prestige");
+
+                            if (needPrestige != 0) {
+                                if (playerData.getPrestige() >= needPrestige) {
+                                    tp.teleport(player, location, "§bТелепортация...", "§7Подождите немного");
+                                    player.closeInventory();
+
+                                    player.setFlying(false);
+                                    player.setAllowFlight(false);
+                                    playerData.setFly(false);
+                                }
+
+                                return;
+                            }
+
                             tp.teleport(player, location, "§bТелепортация...", "§7Подождите немного");
                             player.closeInventory();
                         });
             }
         });
-
-
-        for (int i = 1; i <= inventory.getSize(); i++) {
-            if (i !=25 && i != 21 && i !=41)
-                addItem(i,
-                        ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
-                                .setName(" ")
-                                .setDurability(7)
-                                .build());
-        }
 
         addItem(21,
                 ApiManager.newItemBuilder(Material.DIAMOND)
@@ -96,6 +106,7 @@ public class WarpGui extends BaseSimpleInventory {
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new PrestigeWarpGui(configManager).openInventory(player));
 
+        setGlassPanel(getInventoryRows(), this);
     }
 
     public static class PrestigeWarpGui extends BaseSimpleInventory {
@@ -140,15 +151,6 @@ public class WarpGui extends BaseSimpleInventory {
                         });
             });
 
-            for (int i = 1; i <= inventory.getSize(); i++) {
-                if (i !=21 && i !=22 && i !=23 && i !=24 && i !=25 && i != 40 && i != 42)
-                    addItem(i,
-                            ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
-                                    .setName(" ")
-                                    .setDurability(7)
-                                    .build());
-            }
-
             addItem(42,
                     ApiManager.newItemBuilder(Material.DIAMOND)
                             .setName("§aШахты для групп")
@@ -160,6 +162,8 @@ public class WarpGui extends BaseSimpleInventory {
                             .setName("§aОсновные локации")
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new WarpGui(configManager).openInventory(player));
+
+            setGlassPanel(getInventoryRows(), this);
         }
     }
 
@@ -207,15 +211,6 @@ public class WarpGui extends BaseSimpleInventory {
                         });
             });
 
-            for (int i = 1; i <= inventory.getSize(); i++) {
-                if (i !=21 && i !=22 && i !=23 && i !=24 && i !=25 && i !=40 && i !=42)
-                    addItem(i,
-                            ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
-                                    .setName(" ")
-                                    .setDurability(7)
-                                    .build());
-            }
-
             addItem(40,
                     ApiManager.newItemBuilder(Material.BOOK)
                             .setName("§fОсновные локации")
@@ -227,6 +222,24 @@ public class WarpGui extends BaseSimpleInventory {
                             .setName("§fШахты престижей")
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new PrestigeWarpGui(configManager).openInventory(player));
+
+            setGlassPanel(getInventoryRows(), this);
+        }
+    }
+
+    private static void setGlassPanel(int rows, BaseSimpleInventory inv) {
+        for (int i = 1; i <= rows * 9; i++) {
+            BaseInventoryItem item = inv.getInventoryInfo().getItem(i - 2);
+
+            if (item == null)
+                inv.addItem(
+                        i,
+                        ApiManager
+                                .newItemBuilder(Material.STAINED_GLASS_PANE)
+                                .setName(" ")
+                                .setDurability(7)
+                                .build()
+                );
         }
     }
 }

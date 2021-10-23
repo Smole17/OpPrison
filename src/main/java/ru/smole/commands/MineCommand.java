@@ -35,7 +35,7 @@ public class MineCommand extends SexyCommand<CommandSender> {
     }
 
     protected void process(CommandContext<CommandSender> ctx) {
-        String mine = ctx.<String>getArg(0);
+        String mine = ctx.getArg(0);
         if (mine.equalsIgnoreCase("list"))
             ctx.sendMessage(
                     "Список шахт §7- §a%s",

@@ -62,6 +62,7 @@ import ru.xfenilafs.core.player.world.WorldStatistic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
 import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.cuboid.Cuboid;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -107,9 +108,9 @@ public class OpPrison extends CorePlugin {
         gangDataManager = new GangDataManager();
         configManager = new ConfigManager();
         base = RemoteDatabasesApi.getInstance().createMysqlConnection(RemoteDatabasesApi.getInstance().createConnectionFields(
-                "localhost",
+                "162.55.103.53",
                 "root",
-                "OZ|NF6za38YMWSOV6PJMXR$Xv96WqlG*hDL4Ev{98{@d6q*|LN",
+                "DevmysqlHBJFhjFHAJAFHJHKy1123fHJ%qYTUKLJHASdASDHJhjf",
                 "OpPrison"
         ));
 
@@ -156,7 +157,6 @@ public class OpPrison extends CorePlugin {
         PickaxeManager.pickaxes = new HashMap<>();
         Items.init();
 
-        loadSaveWorld();
         loadCrates();
         loadRegionsAndMines();
         loadCases();
@@ -172,10 +172,6 @@ public class OpPrison extends CorePlugin {
         base.handleDisconnect();
         BAR.removeAll();
         gangDataManager.unload();
-    }
-
-    public void loadSaveWorld() {
-        worldStatistic = WorldStatistic.init(this, base, TypeStats.values());
     }
 
     public void loadCrates() {
@@ -247,7 +243,11 @@ public class OpPrison extends CorePlugin {
                     )
             );
 
-            WorldBorderUtils.spawn(region.getZone().getWorld(), region.getZone().getCenter(), 250);
+            Cuboid cuboid = region.getZone();
+
+            if (!cuboid.getWorld().getName().contains("gangs"))
+                WorldBorderUtils.spawn(region.getZone().getWorld(), cuboid.getCenter(), cuboid.getSizeX() + cuboid.getSizeZ());
+
             REGIONS.put(name.toLowerCase(), region);
         });
         log.info("Loaded {} regions!", REGIONS.size());
@@ -359,7 +359,6 @@ public class OpPrison extends CorePlugin {
 
             blocks.update();
             prestige.update();
-            gang.update();
 
             if (getGangDataManager().getGangDataMap().isEmpty()) return;
 
@@ -370,12 +369,17 @@ public class OpPrison extends CorePlugin {
                             gangData.getScore()
                     )
             );
+
+            gang.update();
         }, 20 * 300, 20 * 300);
     }
 
     private void loadEffects() {
-        BukkitTask pickaxeTask = Bukkit.getScheduler().runTaskTimer( this, () ->
+        Bukkit.getScheduler().runTaskTimer( this, () ->
                 Bukkit.getOnlinePlayers().forEach(player -> {
+                    if (player.getWorld().getName().contains("gangs"))
+                        return;
+
                     String item = Items.getItemName(player.getInventory().getItemInMainHand());
 
                     if (item.length() < 1 || !item.equals("pickaxe"))
@@ -431,16 +435,13 @@ public class OpPrison extends CorePlugin {
     private void loadEvents() {
         Map<String, Double> blocks = new HashMap<>();
 
-        BukkitTask event1Task =
                 Bukkit.getScheduler().runTaskTimer(
                         this,
                         () -> {
                             if (!OpEvents.getBreakEvents().isEmpty())
                                 return;
 
-                            int random = ThreadLocalRandom.current().nextInt(3);
-
-                            switch (random) {
+                            switch (ThreadLocalRandom.current().nextInt(3)) {
                                 case 0: {
                                     OpEvents.applyBlockContest(blocks);
                                     break;
@@ -458,13 +459,13 @@ public class OpPrison extends CorePlugin {
 
                             }
                         },
-                        20 * 60,
+                        1,
                         20 * 60 * 50
                 );
 
 
 
-        BukkitTask barTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 String item = Items.getItemName(player.getInventory().getItemInMainHand());
 

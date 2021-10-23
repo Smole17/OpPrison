@@ -59,10 +59,10 @@ public class OpEvents {
     }
 
     public void applyBlockContest(Map<String, Double> blocks) {
-        String name = "Состязание";
-
-        if (breakEvents.containsKey(name))
+        if (!breakEvents.isEmpty())
             return;
+
+        String name = "Состязание";
 
         OpPrison main = OpPrison.getInstance();
         Predicate<Player> predicate = player -> main.getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 75000000;
@@ -150,10 +150,10 @@ public class OpEvents {
     }
     
     public void applyBoosterEvent() {
-        String name = "Увеличенный бустер";
-
-        if (breakEvents.containsKey(name))
+        if (!breakEvents.isEmpty())
             return;
+
+        String name = "Увеличенный бустер";
 
         breakEvents.put(name, null);
 
@@ -183,10 +183,10 @@ public class OpEvents {
     }
 
     public void applyTreasureHunter() {
-        String name = "Искатель сокровищ";
-
-        if (breakEvents.containsKey(name))
+        if (!breakEvents.isEmpty())
             return;
+
+        String name = "Искатель сокровищ";
 
         ThreadLocalRandom randomO = ThreadLocalRandom.current();
         breakEvents.put(name, event -> {

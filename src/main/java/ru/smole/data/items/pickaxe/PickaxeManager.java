@@ -44,6 +44,11 @@ public class PickaxeManager {
 
         pickaxes.put(name, pickaxe);
 
+        Arrays.stream(player.getInventory().getStorageContents())
+                .parallel()
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .forEach(itemStack1 -> itemStack1.setAmount(0));
+
         OpPlayer.add(player, Items.getItem("pickaxe", name));
     }
 
@@ -100,6 +105,11 @@ public class PickaxeManager {
         Pickaxe pickaxe = new Pickaxe(player, pickaxeName, exp, level, upgradeMap);
         pickaxes.put(name, pickaxe);
 
+        Arrays.stream(player.getInventory().getStorageContents())
+                .parallel()
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .forEach(itemStack1 -> itemStack1.setAmount(0));
+
         OpPlayer.add(player, Items.getItem("pickaxe", name));
     }
 
@@ -109,10 +119,8 @@ public class PickaxeManager {
 
         Arrays.stream(player.getInventory().getStorageContents())
                 .parallel()
-                .filter(itemStack1 -> itemStack1.getType() == Material.DIAMOND_PICKAXE)
-                .forEach(itemStack1 -> {
-                    player.getInventory().remove(itemStack1);
-                });
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .forEach(itemStack1 -> itemStack1.setAmount(0));
     }
 
     public String getStats() {

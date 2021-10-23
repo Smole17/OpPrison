@@ -27,21 +27,20 @@ public class GroupsManager {
     @AllArgsConstructor
     public enum Group {
 
-        MANTLE("§7", 0),
-        EARTH("§8", 259200000),
-            AQUA("§9", 345600000),
-        AIR("§f", 432000000),
-        SKY("§b", 518400000),
-        COSMOS("§5", 604800000),
-        SUN("§e", 691200000),
-        GALAXY("§d", 777600000),
-        UNIVERSE("§0", 864000000),
-        ADMIN("§c", 0);
+        MANTLE("§7"),
+        EARTH("§8"),
+        AQUA("§9"),
+        AIR("§f"),
+        SKY("§b"),
+        COSMOS("§5"),
+        SUN("§e"),
+        GALAXY("§d"),
+        UNIVERSE("§0"),
+        ADMIN("§c");
 
-        private @Getter String color;
-        private @Getter long kitTime;
+        private final @Getter String color;
 
-        public String  getName() {
+        public String getName() {
             return color + name();
         }
 

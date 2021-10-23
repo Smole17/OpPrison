@@ -86,9 +86,11 @@ public class RegionListener implements Listener {
             return;
         }
 
-        String playerName = player.getName();
-        GangDataManager gManager = OpPrison.getInstance().getGangDataManager();
-        if (!region.isPvp() || (gManager.playerHasGang(playerName) && gManager.playerInGang(gManager.getGangFromPlayer(playerName), damager.getName()))) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR || event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
+            event.setCancelled(true);
+        }
+
+        if (!region.isPvp()) {
             event.setCancelled(true);
         }
     }

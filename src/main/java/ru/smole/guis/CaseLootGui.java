@@ -14,17 +14,17 @@ import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import java.util.List;
 
 public class CaseLootGui extends BaseSimpleInventory {
-    private Case customCase;
+    private final Case customCase;
 
     public CaseLootGui(Case customCase) {
-        super(4, "Шансы выпадения");
+        super(6, "Шансы выпадения");
         this.customCase = customCase;
     }
 
     @Override
     public void drawInventory(@NonNull Player player) {
         for (int i = 0; i <= inventory.getSize(); ++i) {
-            if (i > 27 && i < 37 && i != 32) {
+            if (i > 45 && i < 55 && i != 50) {
                 addItem(i,
                         ApiManager.newItemBuilder(Material.STAINED_GLASS_PANE)
                                 .setName(" ")
@@ -39,7 +39,7 @@ public class CaseLootGui extends BaseSimpleInventory {
         if (needKey == null)
             return;
 
-        addItem(32,
+        addItem(50,
                 ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK)
                         .setName(customCase.getName())
                         .setLore(
@@ -73,8 +73,7 @@ public class CaseLootGui extends BaseSimpleInventory {
 
                 addItem(
                         i,
-                        ApiManager.newItemBuilder(itemStack.getType())
-                                .setName(itemStack.getItemMeta().getDisplayName())
+                        ApiManager.newItemBuilder(itemStack)
                                 .setLore(
                                        String.format("§fШанс выпадения: §b%s%%",
                                                StringUtils._fixDouble(fix, chance))

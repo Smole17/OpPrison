@@ -2,21 +2,31 @@ package ru.smole.data.player;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import ru.luvas.rmcs.utils.UtilBungee;
 import ru.smole.OpPrison;
 import ru.smole.commands.GangCommand;
 import ru.smole.commands.KitCommand;
 import ru.smole.data.group.GroupsManager;
+import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.mysql.PlayerDataSQL;
 import ru.smole.data.npc.question.Question;
 import ru.smole.scoreboard.ScoreboardManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.smole.utils.server.ServerUtil;
 import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.CooldownUtil;
+import sexy.kostya.mineos.network.server.BungeeClient;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerDataManager {
 
@@ -27,6 +37,13 @@ public class PlayerDataManager {
     }
 
     public void load(Player player) {
+        if (CooldownUtil.hasCooldown("player_join")) {
+            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 4));
+            ChatUtil.sendMessage(player, "§aПопробуйте зайти позже...");
+        }
+
+        CooldownUtil.putCooldown("player_join", 2000L);
+
         OpPlayer opPlayer = new OpPlayer(player);
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
@@ -95,7 +112,7 @@ public class PlayerDataManager {
             player.setFlying(true);
         }
 
-
+        opPlayer.add(Items.getItem("location_gui"));
     }
 
     public void unload(Player player) {
@@ -129,7 +146,6 @@ public class PlayerDataManager {
 
         OpPrison.BAR.removeAll();
         Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
-        OpPrison.getInstance().getWorldStatistic().save(player);
     }
 
     public void updateTop(Player player) {

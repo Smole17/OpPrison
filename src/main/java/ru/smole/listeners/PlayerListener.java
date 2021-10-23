@@ -49,6 +49,7 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -57,7 +58,7 @@ public class PlayerListener implements Listener {
     private final PlayerDataManager dataManager = OpPrison.getInstance().getPlayerDataManager();
 
     @EventHandler
-    public void onJoin(WorldStatisticPostLoadEvent event) {
+    public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
         dataManager.load(player);
@@ -78,24 +79,49 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onFly(PlayerToggleFlightEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.getWorld().getName().contains("gangs")) {
+            player.setAllowFlight(false);
+            player.setFlying(false);
+        }
+    }
+
+    @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        event.setDroppedExp(0);
-        event.setDeathMessage("");
+        event.setKeepInventory(true);
 
         Player player = event.getEntity();
         Player killer = player.getKiller();
 
-        Arrays
-                .stream(player.getInventory().getStorageContents())
+        event.getDrops()
                 .forEach(itemStack -> {
                     Material material = itemStack.getType();
-                    if (material == Material.IRON_SWORD || material == Material.DIAMOND_SWORD || material == Material.IRON_BOOTS || material == Material.IRON_LEGGINGS || material == Material.IRON_CHESTPLATE || material == Material.IRON_HELMET || material == Material.DIAMOND_BOOTS || material == Material.DIAMOND_LEGGINGS
-                            || material == Material.DIAMOND_CHESTPLATE || material == Material.DIAMOND_HELMET)
-                        event.getDrops().remove(itemStack);
+                    if (
+                            material == Material.FISHING_ROD
+                            || material == Material.IRON_BOOTS
+                            || material == Material.IRON_LEGGINGS
+                            || material == Material.IRON_CHESTPLATE
+                            || material == Material.IRON_HELMET
+                            || material == Material.DIAMOND_BOOTS
+                            || material == Material.DIAMOND_LEGGINGS
+                            || material == Material.CHAINMAIL_BOOTS
+                            || material == Material.CHAINMAIL_LEGGINGS
+                            || material == Material.CHAINMAIL_CHESTPLATE
+                            || material == Material.CHAINMAIL_HELMET
+                            || material == Material.DIAMOND_CHESTPLATE
+                            || material == Material.DIAMOND_HELMET) {
+                        player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
+                        itemStack.setAmount(0);
+                    }
                 });
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getDisplayName());
-        ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a", player.getDisplayName());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getName());
+        ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a%s", player.getName());
+
+        event.setDroppedExp(0);
+        event.setDeathMessage("");
     }
 
     @EventHandler
@@ -224,7 +250,7 @@ public class PlayerListener implements Listener {
                             break;
 
                         case 3:
-                            playerData.addToken(250000000000D);
+                            playerData.addToken(25000000000D);
                             ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+⛃25B");
                             break;
 

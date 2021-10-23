@@ -45,7 +45,7 @@ public class GangData {
     }
 
     public void removeGangPlayer(String playerName) {
-        if (!gangPlayerMap.containsKey(playerName))
+        if (!gangPlayerMap.containsKey(playerName.toLowerCase()))
             return;
 
         gangPlayerMap.remove(playerName.toLowerCase());

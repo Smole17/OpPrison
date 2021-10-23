@@ -219,8 +219,12 @@ public class PickaxeGui extends BaseSimpleInventory {
         Upgrade.UpgradeStat up = upgradeMap.get(upgrade);
         up.setCount(up.getCount() + upgrades);
 
-        OpPlayer opPlayer = new OpPlayer(player);
-        opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+        Arrays.stream(player.getInventory().getStorageContents())
+                .parallel()
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .forEach(itemStack1 -> itemStack1.setAmount(0));
+
+        OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
 
         Achievements achievements = RPlayer.checkAndGet(player.getName()).getAchievements();
 

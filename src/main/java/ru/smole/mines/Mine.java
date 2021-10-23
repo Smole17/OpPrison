@@ -92,7 +92,7 @@ public class Mine {
                         fillMap.set(new HashMap<>());
                     }
 
-                    if (block.getType() != Material.AIR) continue;
+                    if (block.getType() != Material.AIR && block.getType() != Material.CHEST) continue;
 
                     for (int i = 0; i < blocks.size(); i++)
                         if (random.nextInt(101) <= blocks.get(i).getChance() || i == blocks.size() - 1)

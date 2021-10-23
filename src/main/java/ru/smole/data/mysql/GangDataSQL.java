@@ -39,9 +39,9 @@ public class GangDataSQL {
         OpPrison.getInstance().getGangs()
                 .newDatabaseQuery()
                 .selectQuery()
-                .setSelectedRows("name")
+                .setSelectedRows("*")
                 .executeQueryAsync(OpPrison.getInstance().getBase())
-                .thenAccept(resultSetConsumer);
+                .thenAcceptAsync(resultSetConsumer);
     }
 
     public static void save(String name, String members, double score) {

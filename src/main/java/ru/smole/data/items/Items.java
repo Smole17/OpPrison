@@ -281,6 +281,8 @@ public class Items {
 
         Arrays.stream(Material.values())
                 .filter(material ->
+                        material == Material.CHAINMAIL_BOOTS || material == Material.CHAINMAIL_LEGGINGS ||
+                                material == Material.CHAINMAIL_CHESTPLATE || material == Material.CHAINMAIL_HELMET ||
                         material == Material.IRON_BOOTS || material == Material.IRON_LEGGINGS
                                 || material == Material.IRON_CHESTPLATE || material == Material.IRON_HELMET
                                 || material == Material.DIAMOND_BOOTS || material == Material.DIAMOND_LEGGINGS
@@ -295,7 +297,8 @@ public class Items {
                                                     (material.name().contains("BOOTS") ? "§fБотинки" :
                                                             material.name().contains("LEGGINGS") ? "§fПоножи" :
                                                                     material.name().contains("CHESTPLATE") ? "§fНагрудник" : "§fШлем")
-                                                            + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
+                                                            + (material.name().contains("IRON") ? " §8(§7ЖЕЛЕЗНАЯ§8)" :
+                                                            material.name().contains("CHAINMAIL") ? " §8(§8КОЛЬЧУЖНАЯ§8)" : " §8(§bАЛМАЗНАЯ§8)")
                                             );
 
                                     int protection = ((Double) objects[0]).intValue();
