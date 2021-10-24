@@ -92,7 +92,7 @@ import java.util.function.BiConsumer;
 
     JACKPOT("§3Джекпот",
             "Выдаёт случайно токены, деньги. С 3 уровня - ключи",
-            40, 0, 5, 45000000000000D,
+            40, 0, 5, 10000000000000D,
             Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true),
 
     PRESTIGE_FINDER("§5Добыча престижей",

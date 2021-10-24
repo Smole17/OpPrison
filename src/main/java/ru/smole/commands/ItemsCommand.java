@@ -72,7 +72,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     }
 
                     opPlayer.add(itemStack);
-                    ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+                    ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName() == null ? itemStack.getType().name() : itemStack.getItemMeta().getDisplayName());
 
                     break;
             }
@@ -123,7 +123,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     }
 
                     opPlayer.add(itemStack.clone());
-                    ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName());
+                    ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s", itemStack.getItemMeta().getDisplayName() == null ? itemStack.getType().name() : itemStack.getItemMeta().getDisplayName());
 
                     break;
             }

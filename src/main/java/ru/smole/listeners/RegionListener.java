@@ -55,7 +55,7 @@ public class RegionListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.FALL || event.getCause() == EntityDamageEvent.DamageCause.LAVA || event.getCause() == EntityDamageEvent.DamageCause.FIRE || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK || event.getCause() == EntityDamageEvent.DamageCause.DROWNING) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || event.getCause() == EntityDamageEvent.DamageCause.FALL || event.getCause() == EntityDamageEvent.DamageCause.LAVA || event.getCause() == EntityDamageEvent.DamageCause.FIRE || event.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK || event.getCause() == EntityDamageEvent.DamageCause.DROWNING || event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR || event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
             event.setCancelled(true);
         }
     }
@@ -86,11 +86,12 @@ public class RegionListener implements Listener {
             return;
         }
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR || event.getCause() == EntityDamageEvent.DamageCause.LAVA) {
-            event.setCancelled(true);
-        }
+        String entityName = entity.getName();
+        String damagerName = player.getName();
 
-        if (!region.isPvp()) {
+        GangDataManager dataManager = OpPrison.getInstance().getGangDataManager();
+
+        if (!region.isPvp() || dataManager.playerInGang(dataManager.getGangFromPlayer(damagerName), entityName)) {
             event.setCancelled(true);
         }
     }

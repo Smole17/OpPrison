@@ -350,13 +350,17 @@ public class Items {
                         .newItemBuilder(Material.FISHING_ROD)
                         .setName("§fУдочка")
                         .build());
-    }
 
-    public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
-        creators.put(name.toLowerCase(), creator);
-        if (interact != null)
-            interacts.put(name.toLowerCase(), interact);
-    }
+        registerItem("arrow", objects -> ApiManager.newItemBuilder(Material.ARROW).setAmount(((Double) objects[0]).intValue()).build());
+
+        registerItem("ender_pearl", objects -> ApiManager.newItemBuilder(Material.ENDER_PEARL).setAmount(((Double) objects[0]).intValue()).build());
+        }
+
+        public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
+            creators.put(name.toLowerCase(), creator);
+            if (interact != null)
+                interacts.put(name.toLowerCase(), interact);
+        }
 
     public static void registerItem(String name, ItemStack item, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
         registerItem(name, (o) -> item.clone(), interact);

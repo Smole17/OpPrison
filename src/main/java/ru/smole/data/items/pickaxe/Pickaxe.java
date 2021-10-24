@@ -24,6 +24,7 @@ import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.achievements.Achievements;
 
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Random;
@@ -56,6 +57,12 @@ import static ru.smole.OpPrison.MINES;
 
         if (exp >= getNeedExp()) {
             addLevel(1);
+
+            Arrays.stream(player.getInventory().getStorageContents())
+                    .parallel()
+                    .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                    .forEach(itemStack1 -> itemStack1.setAmount(0));
+
             OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
         }
     }

@@ -35,7 +35,6 @@ public class PickaxeGui extends BaseSimpleInventory {
     public void drawInventory(@NonNull Player player) {
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
-        OpPlayer opPlayer = new OpPlayer(player);
 
         List<String> lore = new ArrayList<>();
         for (Upgrade upgrade : Upgrade.values()) {
@@ -100,7 +99,12 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                                     player.closeInventory();
 
-                                    opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+                                    Arrays.stream(player.getInventory().getStorageContents())
+                                            .parallel()
+                                            .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                                            .forEach(itemStack1 -> itemStack1.setAmount(0));
+
+                                    OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
                                 }
                             }
                         }
@@ -158,7 +162,12 @@ public class PickaxeGui extends BaseSimpleInventory {
 
                                 player.closeInventory();
 
-                                opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+                                Arrays.stream(player.getInventory().getStorageContents())
+                                        .parallel()
+                                        .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                                        .forEach(itemStack1 -> itemStack1.setAmount(0));
+
+                                OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
                                 return;
                             }
                         }
@@ -167,7 +176,13 @@ public class PickaxeGui extends BaseSimpleInventory {
                             upgrades.get(upgrade).setIs(!isIs);
 
                             player.closeInventory();
-                            opPlayer.set(Items.getItem("pickaxe", player.getName()), 1);
+
+                            Arrays.stream(player.getInventory().getStorageContents())
+                                    .parallel()
+                                    .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                                    .forEach(itemStack1 -> itemStack1.setAmount(0));
+
+                            OpPlayer.add(player, Items.getItem("pickaxe", player.getName()));
 
                             return;
                         }

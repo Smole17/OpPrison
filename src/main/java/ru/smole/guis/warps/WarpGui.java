@@ -82,7 +82,6 @@ public class WarpGui extends BaseSimpleInventory {
 
                                     player.setFlying(false);
                                     player.setAllowFlight(false);
-                                    playerData.setFly(false);
                                 }
 
                                 return;

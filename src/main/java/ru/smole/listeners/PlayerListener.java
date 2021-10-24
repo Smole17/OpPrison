@@ -111,7 +111,9 @@ public class PlayerListener implements Listener {
                             || material == Material.CHAINMAIL_CHESTPLATE
                             || material == Material.CHAINMAIL_HELMET
                             || material == Material.DIAMOND_CHESTPLATE
-                            || material == Material.DIAMOND_HELMET) {
+                            || material == Material.DIAMOND_HELMET
+                            || material == Material.BOW
+                    ) {
                         player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
                         itemStack.setAmount(0);
                     }
@@ -441,7 +443,7 @@ public class PlayerListener implements Listener {
             String text_peace = amount == 1 ? "" : " §fx" + amount;
             String text = String.format("§8[§f%s%s§8]",
                     item.hasItemMeta() ? item.getItemMeta().getDisplayName()
-                            : Bukkit.getServer().getItemFactory().getItemMeta(item.getType()).getDisplayName(), text_peace);
+                            : item.getType().name().replace("_", ""), text_peace);
 
 //            msg = text;
 //
