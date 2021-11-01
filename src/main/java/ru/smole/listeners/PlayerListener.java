@@ -3,6 +3,7 @@ package ru.smole.listeners;
 import com.google.common.collect.Lists;
 import lombok.val;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -42,6 +43,7 @@ import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.player.world.WorldStatisticPostLoadEvent;
+import ru.xfenilafs.core.player.world.WorldStatisticPreLoadEvent;
 import ru.xfenilafs.core.protocollib.entity.FakeBaseEntity;
 import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
@@ -122,6 +124,7 @@ public class PlayerListener implements Listener {
         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getName());
         ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a%s", player.getName());
 
+        OpPrison.getInstance().getPvPCooldown().removePlayer(player, false);
         event.setDroppedExp(0);
         event.setDeathMessage("");
     }
@@ -181,6 +184,11 @@ public class PlayerListener implements Listener {
 
         if (event.hasBlock()) {
             Material type = block.getType();
+
+            if (type == Material.ANVIL) {
+                event.setCancelled(true);
+                return;
+            }
 
             switch (action) {
                 case LEFT_CLICK_BLOCK: {
@@ -388,10 +396,10 @@ public class PlayerListener implements Listener {
 
         RPlayer rPlayer = RPlayer.checkAndGet(name);
 
-        String guildName = rPlayer.getGuild() == null || rPlayer.getGuild().getTag() == null ? "" : String.format("§7<%s§7> ", rPlayer.getGuild().getTag());
+        String guildName = rPlayer.getColoredTag();
         String prefix = rPlayer.getLongPrefix();
 
-        String format = String.format("%s§8[§a%s§8] %s%s§7: §f",
+        String format = String.format("%s §8[§a%s§8] %s%s§7: §f",
                 guildName,
                 StringUtils.formatDouble(
                         StringUtils._fixDouble(0,
@@ -422,6 +430,7 @@ public class PlayerListener implements Listener {
 
         TextComponent _component = new TextComponent(format.replaceFirst("!", ""));
         _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
+        _component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, ChatUtil.text("/m %s ", player.getName())));
         _component.addExtra(getHand(msg, item));
 
         event.setCancelled(true);

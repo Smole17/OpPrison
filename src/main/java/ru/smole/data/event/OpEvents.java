@@ -1,5 +1,6 @@
 package ru.smole.data.event;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
@@ -11,10 +12,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import ru.smole.OpPrison;
 import ru.smole.data.booster.BoosterManager;
+import ru.smole.data.gang.point.PointEvent;
+import ru.smole.data.items.pickaxe.PickaxeManager;
+import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.npc.question.Question;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
+import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 
 import java.util.*;
@@ -36,6 +41,10 @@ public class OpEvents {
 
     public void stop(String name) {
         activeEvents.remove(name);
+    }
+
+    public PointEvent getPointEvent(Collection<Region> regionList) {
+        return new PointEvent(regionList);
     }
 
     public void asyncChat(AsyncPlayerChatEvent event) {
@@ -134,6 +143,7 @@ public class OpEvents {
 
                                 if (step == Question.QuestionStep.COMPLETING) {
                                     question.setStep(Question.QuestionStep.ALR_COMPLETED);
+                                    PickaxeManager.getPickaxes().get(x.getKey()).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
                                 }
                             });
 

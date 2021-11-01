@@ -65,12 +65,14 @@ public class Crate {
         CrateItem returnCrateItem = null;
 
         if (def) {
-            List<CrateItem> defList = crateItems.stream().filter(
-                    crateItem ->
-                            crateItem.getRare() == CrateItem.Rare.EPIC ||
+            List<CrateItem> defList =
+                    crateItems
+                            .stream()
+                            .filter(crateItem -> crateItem.getRare() == CrateItem.Rare.EPIC ||
                                     crateItem.getRare() == CrateItem.Rare.LEGENDARY ||
                                     crateItem.getRare() == CrateItem.Rare.MYTHICAL
-            ).collect(Collectors.toList());
+                            )
+                            .collect(Collectors.toList());
 
             while (returnCrateItem == null) {
                 for (CrateItem crateItem : defList) {
@@ -79,7 +81,7 @@ public class Crate {
                 }
             }
 
-          return returnCrateItem;
+            return returnCrateItem;
         }
 
         List<CrateItem> unDefList = crateItems.stream().filter(
@@ -101,8 +103,11 @@ public class Crate {
     @AllArgsConstructor
     public enum Type {
 
+        ARMOR("§bЯЩИК С БРОНЁЙ"),
+        RARE_ARMOR("§b§lРЕДКИЙ §r§bЯЩИК С БРОНЁЙ"),
+        POTION("§cЯЩИК С ЗЕЛЬЯМИ"),
         LOOT_BOX("§6ЛУТБОКС"),
-        MONTHLY("§aКЕЙС МЕСЯЦА");
+        MONTHLY("§aЯЩИК МЕСЯЦА");
 
         private @Getter
         final String name;
@@ -161,6 +166,27 @@ public class Crate {
                     }
 
                     setFinalReward(opPlayer, 22, 24);
+                    setGlassPanel();
+
+                    break;
+                case ARMOR:
+                    setDefaultReward(opPlayer, 1);
+                    setFinalReward(opPlayer, 15);
+                    setGlassPanel();
+
+                    break;
+                case POTION:
+                    setDefaultReward(opPlayer, 1);
+                    setFinalReward(opPlayer, 15);
+                    setGlassPanel();
+
+                    break;
+                case RARE_ARMOR:
+                    for (int i = 0; i < 2; i++) {
+                        setDefaultReward(opPlayer, i);
+                    }
+
+                    setFinalReward(opPlayer, 15);
                     setGlassPanel();
 
                     break;

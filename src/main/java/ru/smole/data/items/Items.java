@@ -6,6 +6,7 @@ import net.minecraft.server.v1_12_R1.NBTTagString;
 import net.minecraft.server.v1_12_R1.PlayerAbilities;
 import org.apache.logging.log4j.util.BiConsumer;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -17,6 +18,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.luvas.rmcs.MainClass;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
@@ -351,16 +354,60 @@ public class Items {
                         .setName("§fУдочка")
                         .build());
 
+        registerItem("bow",
+                objects -> ApiManager
+                        .newItemBuilder(Material.BOW)
+                        .setName("§fЛук")
+                        .addEnchantment(Enchantment.ARROW_DAMAGE, ((Double) objects[0]).intValue())
+                        .build()
+        );
+
         registerItem("arrow", objects -> ApiManager.newItemBuilder(Material.ARROW).setAmount(((Double) objects[0]).intValue()).build());
 
         registerItem("ender_pearl", objects -> ApiManager.newItemBuilder(Material.ENDER_PEARL).setAmount(((Double) objects[0]).intValue()).build());
-        }
 
-        public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
-            creators.put(name.toLowerCase(), creator);
-            if (interact != null)
-                interacts.put(name.toLowerCase(), interact);
-        }
+        registerItem("speed_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.POTION)
+                        .setName("§fЗелье Скорости")
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SPEED, ((Double) objects[0]).intValue(), 20 * 150), true)
+                        .setPotionColor(Color.WHITE)
+                        .build()
+                );
+
+        registerItem("regen_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.POTION)
+                        .setName("§fЗелье §dРегенерации")
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, ((Double) objects[0]).intValue(), 20 * 150), true)
+                        .setPotionColor(Color.fromRGB(255, 192, 203))
+                        .build()
+        );
+
+        registerItem("str_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.POTION)
+                        .setName("§fЗелье §4Силы")
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ((Double) objects[0]).intValue(), 20 * 150), true)
+                        .setPotionColor(Color.fromRGB(139, 0, 0))
+                        .build()
+        );
+
+        registerItem("insta_regen_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.SPLASH_POTION)
+                        .setName("§fЗелье §cМгновенного Лечения")
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.HEAL, ((Double) objects[0]).intValue(), 0), true)
+                        .setPotionColor(Color.RED)
+                        .build()
+        );
+    }
+
+    public static void registerItem(String name, Function<Object[], ItemStack> creator, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
+        creators.put(name.toLowerCase(), creator);
+        if (interact != null)
+            interacts.put(name.toLowerCase(), interact);
+    }
 
     public static void registerItem(String name, ItemStack item, BiConsumer<PlayerInteractEvent, ItemStack> interact) {
         registerItem(name, (o) -> item.clone(), interact);

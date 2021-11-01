@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.event.OpEvents;
@@ -60,6 +61,26 @@ public class RegionListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onFishing(PlayerFishEvent event) {
+        switch (event.getState()) {
+            case CAUGHT_FISH: {
+                event.setCancelled(true);
+                event.setExpToDrop(0);
+                break;
+            }
+
+            case FISHING:
+                Region region = REGIONS.values().stream().filter(rg -> rg.getZone().contains(event.getPlayer())).findAny().orElse(null);
+                if (region == null)
+                    return;
+
+                if (!region.isPvp())
+                    event.setCancelled(true);
+                break;
+        }
+    }
+
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
@@ -73,6 +94,7 @@ public class RegionListener implements Listener {
                 player = (Player) projectile.getShooter();
             }
         }
+
         if (entity.getType() != EntityType.PLAYER || player == null) {
             return;
         }
@@ -94,6 +116,8 @@ public class RegionListener implements Listener {
         if (!region.isPvp() || dataManager.playerInGang(dataManager.getGangFromPlayer(damagerName), entityName)) {
             event.setCancelled(true);
         }
+
+        OpPrison.getInstance().getPvPCooldown().addPlayer(player);
     }
 
     @EventHandler

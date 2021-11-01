@@ -37,13 +37,6 @@ public class PlayerDataManager {
     }
 
     public void load(Player player) {
-        if (CooldownUtil.hasCooldown("player_join")) {
-            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 4));
-            ChatUtil.sendMessage(player, "§aПопробуйте зайти позже...");
-        }
-
-        CooldownUtil.putCooldown("player_join", 2000L);
-
         OpPlayer opPlayer = new OpPlayer(player);
         PickaxeManager pickaxeManager = opPlayer.getPickaxeManager();
         String name = player.getName();
@@ -146,6 +139,33 @@ public class PlayerDataManager {
 
         OpPrison.BAR.removeAll();
         Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
+        OpPrison.getInstance().getWorldStatistic().save(player);
+
+        if (OpPrison.getInstance().getPvPCooldown().getPlayers().contains(player)) {
+            Arrays.stream(player.getInventory().getStorageContents())
+                    .forEach(itemStack -> {
+                        Material material = itemStack.getType();
+                        if (
+                                material == Material.FISHING_ROD
+                                        || material == Material.IRON_BOOTS
+                                        || material == Material.IRON_LEGGINGS
+                                        || material == Material.IRON_CHESTPLATE
+                                        || material == Material.IRON_HELMET
+                                        || material == Material.DIAMOND_BOOTS
+                                        || material == Material.DIAMOND_LEGGINGS
+                                        || material == Material.CHAINMAIL_BOOTS
+                                        || material == Material.CHAINMAIL_LEGGINGS
+                                        || material == Material.CHAINMAIL_CHESTPLATE
+                                        || material == Material.CHAINMAIL_HELMET
+                                        || material == Material.DIAMOND_CHESTPLATE
+                                        || material == Material.DIAMOND_HELMET
+                                        || material == Material.BOW
+                        ) {
+                            player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
+                            itemStack.setAmount(0);
+                        }
+                    });
+        }
     }
 
     public void updateTop(Player player) {

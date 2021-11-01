@@ -2,6 +2,7 @@ package ru.smole.scoreboard;
 
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.data.event.OpEvents;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
@@ -37,7 +38,9 @@ public class ScoreboardManager {
             GangDataManager gManager = main.getGangDataManager();
 
             baseScoreboard.updateScoreboardLine(9, boardPlayer,
-                    ChatUtil.text("  §fБанда: %s", gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "§c-"));
+                    ChatUtil.text("  §fБанда: %s §8(§o%s§r§8)",
+                            gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "§c-",
+                            OpEvents.getActiveEvents().contains("point") ? "Захват точек" : "нет"));
 
             baseScoreboard.updateScoreboardLine(8, boardPlayer,
                     ChatUtil.text("  §fПрестиж: §a%s", StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));

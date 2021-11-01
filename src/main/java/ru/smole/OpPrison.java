@@ -16,19 +16,15 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.AsyncCatcher;
-import ru.luvas.rmcs.commands.Kit;
-import ru.luvas.rmcs.commands.SpigotCommandsLoader;
 import ru.smole.commands.*;
-import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.gang.GangDataManager;
+import ru.smole.data.gang.point.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -36,14 +32,12 @@ import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.npc.NpcInitializer;
-import ru.smole.data.npc.question.Question;
 import ru.smole.data.pads.LaunchPad;
-import ru.smole.data.player.PlayerData;
 import ru.smole.data.player.PlayerDataManager;
+import ru.smole.data.pvpcd.PvPCooldown;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
-import ru.smole.utils.ReflectUtil;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.WorldBorderUtils;
 import ru.smole.utils.config.ConfigManager;
@@ -61,13 +55,12 @@ import ru.xfenilafs.core.player.world.TypeStats;
 import ru.xfenilafs.core.player.world.WorldStatistic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
-import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.Schedules;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static ru.smole.data.items.Items.registerItem;
@@ -92,11 +85,14 @@ public class OpPrison extends CorePlugin {
     RemoteDatabaseTable gangs;
     private @Getter
     WorldStatistic worldStatistic;
+    private @Getter
+    PvPCooldown pvPCooldown;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static final List<LaunchPad> PADS = new ArrayList<>();
+    public static final List<Player> cdList = new ArrayList<>();
     public static String PREFIX = "§f";
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
@@ -140,6 +136,8 @@ public class OpPrison extends CorePlugin {
 
         BAR = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SOLID);
 
+        pvPCooldown = new PvPCooldown();
+
         registerListeners(
                 new PlayerListener(), new RegionListener()
         );
@@ -149,13 +147,15 @@ public class OpPrison extends CorePlugin {
                 new StatsCommand(), new WarpCommand(), new PrestigeCommand(), new FlyCommand(),
                 new InfoCommand(), new KitCommand(), new EventCommand(), new TrashCommand(),
                 new RestartCommand(), new GangCommand(), new GangChatCommand(), new SpawnCommand(),
-                new EnderChestCommand(), new MineCommand(), new RepairCommand()
+                new EnderChestCommand(), new MineCommand(), new RepairCommand(), new GangSetCommand(),
+                new MineCommand()
         );
 
         gangDataManager.load();
         ServerUtil.load();
         PickaxeManager.pickaxes = new HashMap<>();
         Items.init();
+        worldStatistic = WorldStatistic.init(this, base, TypeStats.values());
 
         loadCrates();
         loadRegionsAndMines();
@@ -286,11 +286,22 @@ public class OpPrison extends CorePlugin {
         });
         log.info("Loaded {} mines!", MINES.size());
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+        PointEvent pointEvent = OpEvents.getPointEvent(REGIONS.values());
+        Schedules.runAsync(() -> {
+
             AsyncCatcher.enabled = false;
             MINES.values().forEach(Mine::reset);
             AsyncCatcher.enabled = true;
-        }, 20L, 20L);
+
+//            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
+//
+//            if (calendar.get(Calendar.HOUR_OF_DAY) == 19 && !OpEvents.getActiveEvents().contains("point")) {
+//                pointEvent.start();
+//                return;
+//            }
+//
+//            pointEvent.stop();
+        }, 20, 20);
 
         FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
         ConfigurationSection pads = misc.getConfigurationSection("pads");
@@ -355,7 +366,10 @@ public class OpPrison extends CorePlugin {
             if (Bukkit.getOnlinePlayers().size() == 0)
                 return;
 
-            Bukkit.getOnlinePlayers().forEach(getPlayerDataManager()::updateTop);
+            Bukkit.getOnlinePlayers().forEach(player -> {
+              playerDataManager.updateTop(player);
+              worldStatistic.save(player);
+            });
 
             blocks.update();
             prestige.update();

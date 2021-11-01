@@ -373,7 +373,7 @@ public class GangCommand extends BukkitCommand<Player> {
 
                         gangPlayers.forEach(tempGangPlayer -> {
                             GangPlayerType tempType = tempGangPlayer.getType();
-                            String format = "%s &7%s &7,";
+                            String format = "%s &7%s&7,";
 
                             if (gangPlayers.get(gangPlayers.size() - 1).equals(tempGangPlayer))
                                 format = format.replace(",", "");

@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
+import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.npc.question.Question;
@@ -30,7 +31,7 @@ public class NpcInitializer {
     public static void init() {
         createNpc(
                 "Telpochtli",
-                    new Location(Bukkit.getWorld("mine_10"), 84.5, 182, 7.5, 90, 0),
+                new Location(Bukkit.getWorld("mine_10"), 84.5, 182, 7.5, 90, 0),
                 "§eСофос"
         ).handleClick(player -> {
             if (Bukkit.getScheduler().getPendingTasks().contains(ChatUtil.task))
@@ -58,13 +59,17 @@ public class NpcInitializer {
                         "§8[&eСофос§8] §fЖелаю тебе удачи, мой юный друг!"
                 );
 
-                if (!questions.containsKey("SOFOS") || questions.get("SOFOS") != null)
-                    questions.put("SOFOS", new Question(Question.QuestionStep.COMPLETING));
+                questions.put("SOFOS", new Question(Question.QuestionStep.COMPLETING));
+                return;
             }
 
-            if (!Bukkit.getScheduler().getPendingTasks().contains(ChatUtil.task)) {
-                ru.xfenilafs.core.util.ChatUtil.sendMessage(player, "§8[&eСофос§8] §fЗдраствуй %s! Как твои дела?", name);
+            if (questions.get("SOFOS").getStep() == Question.QuestionStep.ALR_COMPLETED) {
+                PickaxeManager.getPickaxes().get(name).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
+                ru.xfenilafs.core.util.ChatUtil.sendMessage(player, "§8[&eСофос§8] §fПоздравляю %s! Вы получили моё чудесное знание, желаю вам удачи!", name);
+                return;
             }
+
+            ru.xfenilafs.core.util.ChatUtil.sendMessage(player, "§8[&eСофос§8] §fЗдраствуй %s! Как твои дела?", name);
         });
     }
 
