@@ -2,10 +2,19 @@ package ru.smole.data.gang;
 
 import lombok.Getter;
 import lombok.val;
+import org.bukkit.inventory.ItemStack;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import ru.smole.commands.GangCommand;
+import ru.smole.data.items.Items;
 import ru.smole.data.mysql.GangDataSQL;
+import ru.smole.data.npc.question.Question;
+import ru.smole.utils.ItemStackUtils;
+import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventoryItem;
+import ru.xfenilafs.core.inventory.item.BaseInventoryStackItem;
+import ru.xfenilafs.core.util.Base64Util;
 
+import java.io.IOException;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
@@ -22,9 +31,10 @@ public class GangDataManager {
 
     public void create(String name, String leader) {
         Map<String, GangData.GangPlayer> gangPlayerMap = new HashMap<>();
-        gangPlayerMap.put(leader.toLowerCase(), new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER));
+        GangData gangData = new GangData(name, gangPlayerMap, 0.0, null);
+        gangData.addGangPlayer(new GangData.GangPlayer(leader, GangData.GangPlayer.GangPlayerType.LEADER, 0.0));
 
-        gangDataMap.put(name, new GangData(name, gangPlayerMap, 0.0));
+        gangDataMap.put(name, gangData);
         GangDataSQL.create(
                 name,
                 getGangPlayers(gangPlayerMap)
@@ -32,15 +42,19 @@ public class GangDataManager {
     }
 
     public void load() {
-
         GangDataSQL.get(resultSet -> {
             try {
                 while (resultSet.next()) {
-                    val gangPlayersList = getGangPlayers(new String(Base64.getDecoder().decode(resultSet.getString("members"))));
+                    val gangPlayersList =
+                            getGangPlayers(
+                                    new String(
+                                            Base64.getDecoder().decode(resultSet.getString("members"))
+                                    )
+                            );
 
                     String s = resultSet.getString("name");
 
-                    gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet.getDouble("score")));
+                    gangDataMap.put(s, new GangData(s, gangPlayersList, resultSet.getDouble("score"), resultSet.getString("vault")));
                 }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -56,7 +70,8 @@ public class GangDataManager {
                 GangDataSQL.save(
                         s,
                         Base64.getEncoder().encodeToString(getGangPlayers(gangData.getGangPlayerMap()).getBytes()),
-                        gangData.getScore()
+                        gangData.getScore(),
+                        gangData.saveVault()
                 )
         );
 
@@ -105,7 +120,9 @@ public class GangDataManager {
                 throw new IllegalArgumentException("Could not load GangPlayerType with name + " + data[1]);
             }
 
-            gangPlayerMap.put(playerName.toLowerCase(), new GangData.GangPlayer(playerName, type));
+            double score = Double.parseDouble(data[2]);
+
+            gangPlayerMap.put(playerName.toLowerCase(), new GangData.GangPlayer(playerName, type, score));
         }
 
         return gangPlayerMap;
@@ -115,14 +132,14 @@ public class GangDataManager {
         StringBuilder builder = new StringBuilder();
 
         int i = 1;
-        String format = "%s-%s,";
+        String format = "%s-%s-%s,";
 
         for (GangData.GangPlayer gangPlayer : gangPlayerMap.values()) {
             if (i == gangPlayerMap.size())
-                format = "%s-%s";
+                format = "%s-%s-%s";
 
             String member = String.format(format,
-                    gangPlayer.getPlayerName(), gangPlayer.getType().name());
+                    gangPlayer.getPlayerName(), gangPlayer.getType().name(), gangPlayer.getScore());
 
             builder.append(member);
             i++;

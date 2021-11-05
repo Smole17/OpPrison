@@ -1,6 +1,7 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
+import javafx.print.PageOrientation;
 import lombok.val;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -28,6 +29,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.gang.GangDataManager;
+import ru.smole.data.gang.point.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
@@ -48,6 +50,7 @@ import ru.xfenilafs.core.protocollib.entity.FakeBaseEntity;
 import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
+import sexy.kostya.mineos.achievements.Achievement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -115,14 +118,18 @@ public class PlayerListener implements Listener {
                             || material == Material.DIAMOND_CHESTPLATE
                             || material == Material.DIAMOND_HELMET
                             || material == Material.BOW
+                                    || material == Material.POTION
+                                    || material == Material.SPLASH_POTION
                     ) {
                         player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
                         itemStack.setAmount(0);
                     }
                 });
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getName());
-        ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a%s", player.getName());
+        if (killer != null) {
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getName());
+            ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a%s", player.getName());
+        }
 
         OpPrison.getInstance().getPvPCooldown().removePlayer(player, false);
         event.setDroppedExp(0);
@@ -139,36 +146,44 @@ public class PlayerListener implements Listener {
 
             simpleHolographic.spawn();
         });
+
+        PointEvent.holograms.forEach(protocolHolographic -> {
+            if (!protocolHolographic.getLocation().getWorld().equals(player.getWorld()))
+                return;
+
+            protocolHolographic.spawn();
+        });
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onWorldChange(PlayerChangedWorldEvent event) {
-        Player player = event.getPlayer();
-        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
-            LeaderBoard.holograms.forEach(holographic -> {
-
-                boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
-
-                if (equalWorld) {
-                    holographic.addViewers(player);
-                    return;
-                }
-
-                holographic.removeViewers(player);
-            });
-
-            NpcInitializer.npcList.forEach(fakePlayer -> {
-                boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
-
-                if (equalWorld) {
-                    fakePlayer.addViewers(player);
-                    return;
-                }
-
-                fakePlayer.removeViewers(player);
-            });
-        }, 10L);
-    }
+//
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onWorldChange(PlayerChangedWorldEvent event) {
+//        Player player = event.getPlayer();
+//        Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), () -> {
+//            LeaderBoard.holograms.forEach(holographic -> {
+//
+//                boolean equalWorld = holographic.getLocation().getWorld().equals(player.getWorld());
+//
+//                if (equalWorld) {
+//                    holographic.addViewers(player);
+//                    return;
+//                }
+//
+//                holographic.removeViewers(player);
+//            });
+//
+//            NpcInitializer.npcList.forEach(fakePlayer -> {
+//                boolean equalWorld = fakePlayer.getLocation().getWorld().equals(player.getWorld());
+//
+//                if (equalWorld) {
+//                    fakePlayer.addViewers(player);
+//                    return;
+//                }
+//
+//                fakePlayer.removeViewers(player);
+//            });
+//        }, 10L);
+//    }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
@@ -279,6 +294,8 @@ public class PlayerListener implements Listener {
 
                     block.getWorld().spawnParticle(Particle.CLOUD, loc, 7);
                     block.setType(Material.AIR);
+
+                    RPlayer.checkAndGet(player.getName()).getAchievements().addAchievement(Achievement.OP_TAKE_TREASURE);
                     event.setCancelled(true);
                     break;
                 }
@@ -400,7 +417,7 @@ public class PlayerListener implements Listener {
         String prefix = rPlayer.getLongPrefix();
 
         String format = String.format("%s §8[§a%s§8] %s%s§7: §f",
-                guildName,
+                guildName.replace('&', '§'),
                 StringUtils.formatDouble(
                         StringUtils._fixDouble(0,
                         playerData.getPrestige()).length() <= 3 ? 0 : 2,
@@ -428,7 +445,7 @@ public class PlayerListener implements Listener {
             comps[i] = new TextComponent(ChatUtil.color(String.format("%s%s", lore.get(i), i == lore.size() - 1 ? "" : "\n")));
         }
 
-        TextComponent _component = new TextComponent(format.replaceFirst("!", ""));
+        TextComponent _component = new TextComponent(format);
         _component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, comps));
         _component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, ChatUtil.text("/m %s ", player.getName())));
         _component.addExtra(getHand(msg, item));

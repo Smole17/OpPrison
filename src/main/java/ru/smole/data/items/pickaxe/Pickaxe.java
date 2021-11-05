@@ -256,7 +256,7 @@ import static ru.smole.OpPrison.MINES;
         return "ничего";
     }
 
-    public void procUpgrades(BlockBreakEvent event) {
+    public void procUpgrades(BlockBreakEvent event, Random random) {
         Player player = event.getPlayer();
         OpPlayer opPlayer = new OpPlayer(player);
 
@@ -289,7 +289,6 @@ import static ru.smole.OpPrison.MINES;
         double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 1500 * fortuneLevel : 1500) * (multiplier == 0 ? 1 : multiplier);
         double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 400 * token_minerLevel : 400;
         double exp = 1;
-        Random random = new Random();
 
         if (OpPrison.BOOSTER > 0) {
             cost = cost + (cost * OpPrison.BOOSTER / 100);

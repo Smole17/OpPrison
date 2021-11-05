@@ -5,22 +5,32 @@ import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.event.OpEvents;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
+import ru.smole.utils.config.ConfigUtils;
+import ru.smole.utils.leaderboard.LeaderBoard;
+import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.holographic.ProtocolHolographic;
+import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.regions.Region;
+import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
+import sexy.kostya.mineos.achievements.Achievement;
 
-import java.util.Collection;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class PointEvent {
 
+    public static final Collection<ProtocolHolographic> holograms = new ArrayList<>();
     private final @Getter Collection<Region> regionList;
     private BukkitTask task;
+    private BukkitTask task2;
 
     public PointEvent(Collection<Region> regionList) {
         this.regionList = regionList;
@@ -28,7 +38,14 @@ public class PointEvent {
 
     public void start() {
         OpEvents.start("point");
+
         task = Schedules.runAsync(() -> {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
+            if (calendar.get(Calendar.MINUTE) == 20 && OpEvents.getActiveEvents().contains("point")) {
+                stop();
+                return;
+            }
+
             regionList
                     .stream()
                     .parallel()
@@ -42,10 +59,39 @@ public class PointEvent {
                                 .forEach(player -> {
                                     if (zone.contains(player)) {
                                         OpPlayer.add(player, Items.getItem("sponge", 50.0));
+                                        RPlayer.checkAndGet(player.getName()).getAchievements().addAchievement(Achievement.OP_POINT_EVENT);
                                     }
                                 });
                     });
         }, 20, 20);
+
+        task2 = Schedules.runAsync(() -> {
+            Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> ChatUtil.sendTitle(player, "§fЗахват Точек", "§aактивен", 15));
+            ChatUtil.broadcast("");
+            ChatUtil.broadcast("   &fСобытие Захват Точек §aактивно");
+            ChatUtil.broadcast("   &fСуть события в захвате точек на бандитской арене,");
+            ChatUtil.broadcast("   &fкоторые находятся на 3-х островах с шахтами");
+            ChatUtil.broadcast("");
+        }, 1, 20 * 300);
+
+        OpPrison.REGIONS.forEach((name, region) -> {
+            String s = region.getName();
+            if (!s.contains("point_"))
+                return;
+
+            ProtocolHolographic point = ApiManager.createHolographic(
+                    ConfigUtils.loadLocationFromConfigurationSection(
+                            OpPrison.getInstance().getConfigManager().getMiscConfig().getConfiguration().getConfigurationSection(s)
+                    )
+            );
+
+            point.addTextLine("§fТочка §b" + s.split("_")[1]);
+            point.addTextLine("§8§o(стойте на точке, чтобы получать очки)");
+
+            point.spawn();
+
+            holograms.add(point);
+        });
     }
 
     public void stop() {
@@ -53,5 +99,16 @@ public class PointEvent {
 
         if (task != null && !task.isCancelled())
             task.cancel();
+
+        if (task2 != null && !task2.isCancelled())
+            task2.cancel();
+
+        holograms.forEach(ProtocolHolographic::remove);
+        holograms.clear();
+
+        Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> ChatUtil.sendTitle(player, "§fЗахват Точек", "§cокончилось", 15));
+        ChatUtil.broadcast("");
+        ChatUtil.broadcast("   &fСобытие Захват Точек §cокончилось");
+        ChatUtil.broadcast("");
     }
 }

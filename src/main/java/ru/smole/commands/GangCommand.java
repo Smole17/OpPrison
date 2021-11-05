@@ -62,13 +62,13 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             gangPlayers.forEach(tempGangPlayer -> {
                                 GangPlayerType tempType = tempGangPlayer.getType();
-                                String format = "%s &7%s&7, ";
+                                String format = "%s &7%s &8&o(%s)&7, ";
 
                                 if (gangPlayers.get(gangPlayers.size() - 1).equals(tempGangPlayer))
                                     format = format.replace(",", "");
 
                                 builder.append(String.format(format,
-                                        tempType.getName(), tempGangPlayer.getPlayerName()));
+                                        tempType.getName(), tempGangPlayer.getPlayerName(), StringUtils.fixDouble(0, tempGangPlayer.getScore())));
                             });
 
                             ChatUtil.sendMessage(player, "   &fУчастники:");
@@ -97,6 +97,11 @@ public class GangCommand extends BukkitCommand<Player> {
                             gangData.removeGangPlayer(playerName);
 
                             return;
+
+                        case "vault":
+                            player.openInventory(gangData.getVault());
+
+                            return;
                     }
 
                     break;
@@ -118,7 +123,9 @@ public class GangCommand extends BukkitCommand<Player> {
                                 return;
                             }
 
-                            gangDataMap.remove(gangData.getName());
+                            gangDataMap.remove(gangName);
+
+                            GangDataSQL.set(gangName, "name", args[1]);
                             gangData.setName(args[1]);
                             gangDataMap.put(gangData.getName(), gangData);
 
@@ -263,13 +270,13 @@ public class GangCommand extends BukkitCommand<Player> {
 
                             gangPlayers.forEach(tempGangPlayer -> {
                                 GangPlayerType tempType = tempGangPlayer.getType();
-                                String format = "%s &7%s &7,";
+                                String format = "%s &7%s &8&o(%s)&7, ";
 
                                 if (gangPlayers.get(gangPlayers.size() - 1).equals(tempGangPlayer))
                                     format = format.replace(",", "");
 
                                 builder.append(String.format(format,
-                                        tempType.getName(), tempGangPlayer.getPlayerName()));
+                                        tempType.getName(), tempGangPlayer.getPlayerName(), StringUtils.fixDouble(0, tempGangPlayer.getScore())));
                             });
 
                             ChatUtil.sendMessage(player, "   &fУчастники:");
@@ -403,7 +410,7 @@ public class GangCommand extends BukkitCommand<Player> {
                         }
 
                         invitedList.get(playerName.toLowerCase()).remove(acceptedGang.getName());
-                        acceptedGang.addGangPlayer(new GangPlayer(playerName, GangPlayerType.DEFAULT));
+                        acceptedGang.addGangPlayer(new GangPlayer(playerName, GangPlayerType.DEFAULT, 0.0));
                         acceptedGang.sendMessage(String.format("Игрок &b%s &fвступил в банду", playerName));
 
                         return;
@@ -423,6 +430,7 @@ public class GangCommand extends BukkitCommand<Player> {
         ChatUtil.sendMessage(player, "   &b/gang info <Имя банды> &f- посмотреть информацию о банде");
         ChatUtil.sendMessage(player, "   &b/gang rename <Новое имя банды> &f- сменить название банды");
         ChatUtil.sendMessage(player, "   &b/gangchat (/gac) <Сообщение> &f- написать сообщение в чат банды");
+        ChatUtil.sendMessage(player, "   &b/gang vault &f- открыть хранилище банды");
         ChatUtil.sendMessage(player, "");
         ChatUtil.sendMessage(player, "   &b/gang invite <Ник игрока> &f- отправить игроку запрос в банду &8&o(от Старейшины)");
         ChatUtil.sendMessage(player, "   &b/gang kick <Ник игрока> &f- исключить игрока из банды &8&o(от Соруководителя)");

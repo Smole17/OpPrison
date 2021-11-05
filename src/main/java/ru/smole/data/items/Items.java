@@ -277,7 +277,10 @@ public class Items {
 
                     double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" очков")[0]);
 
-                    gangDataManager.getGangFromPlayer(playerName).addScore(count);
+                    GangData gangData = gangDataManager.getGangFromPlayer(playerName);
+
+                    gangData.getGangPlayerMap().get(playerName.toLowerCase()).addScore(count);
+                    gangData.addScore(count);
                     itemStack.setAmount(itemStack.getAmount() - 1);
                     ChatUtil.sendMessage(player, OpPrison.PREFIX + "+§e" + StringUtils._fixDouble(0, count) + " §fочков");
                 });
@@ -369,36 +372,63 @@ public class Items {
         registerItem("speed_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье Скорости")
-                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SPEED, ((Double) objects[0]).intValue(), 20 * 150), true)
-                        .setPotionColor(Color.WHITE)
+                        .setName("§fЗелье Скорости " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 150, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.SPEED.getColor())
                         .build()
-                );
+        );
+
+        registerItem("jump_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.POTION)
+                        .setName("§fЗелье §aПрыгучести " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 150, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.JUMP.getColor())
+                        .build()
+        );
 
         registerItem("regen_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье §dРегенерации")
-                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, ((Double) objects[0]).intValue(), 20 * 150), true)
-                        .setPotionColor(Color.fromRGB(255, 192, 203))
+                        .setName("§fЗелье §dРегенерации " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 20, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.REGENERATION.getColor())
                         .build()
         );
 
         registerItem("str_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье §4Силы")
-                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, ((Double) objects[0]).intValue(), 20 * 150), true)
-                        .setPotionColor(Color.fromRGB(139, 0, 0))
+                        .setName("§fЗелье §4Силы " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 30, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.INCREASE_DAMAGE.getColor())
                         .build()
         );
 
-        registerItem("insta_regen_potion",
+        registerItem("heal_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPLASH_POTION)
-                        .setName("§fЗелье §cМгновенного Лечения")
-                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.HEAL, ((Double) objects[0]).intValue(), 0), true)
-                        .setPotionColor(Color.RED)
+                        .setName("§fЗелье §cМгновенного Лечения " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.HEAL, 0, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.HEAL.getColor())
+                        .build()
+        );
+
+        registerItem("slow_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.SPLASH_POTION)
+                        .setName("§fЗелье §9Медлительности " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.SLOW.getColor())
+                        .build()
+        );
+
+        registerItem("poison_potion",
+                objects -> ApiManager
+                        .newItemBuilder(Material.SPLASH_POTION)
+                        .setName("§fЗелье §2Отравления " + ((Double) objects[0]).intValue())
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, ((Double) objects[0]).intValue()), false)
+                        .setPotionColor(PotionEffectType.SLOW.getColor())
                         .build()
         );
     }

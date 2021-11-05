@@ -38,9 +38,8 @@ public class ScoreboardManager {
             GangDataManager gManager = main.getGangDataManager();
 
             baseScoreboard.updateScoreboardLine(9, boardPlayer,
-                    ChatUtil.text("  §fБанда: %s §8(§o%s§r§8)",
-                            gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "§c-",
-                            OpEvents.getActiveEvents().contains("point") ? "Захват точек" : "нет"));
+                    ChatUtil.text("  §fБанда: %s",
+                            gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "§c-"));
 
             baseScoreboard.updateScoreboardLine(8, boardPlayer,
                     ChatUtil.text("  §fПрестиж: §a%s", StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));

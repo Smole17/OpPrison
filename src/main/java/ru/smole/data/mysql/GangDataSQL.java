@@ -1,7 +1,9 @@
 package ru.smole.data.mysql;
 
+import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.xfenilafs.core.database.query.row.ValueQueryRow;
+import ru.xfenilafs.core.util.Base64Util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,19 +22,9 @@ public class GangDataSQL {
                 .queryRow(new ValueQueryRow("name", name))
                 .queryRow(new ValueQueryRow("members", Base64.getEncoder().encodeToString(owner.getBytes())))
                 .queryRow(new ValueQueryRow("score", 0.0))
+                .queryRow(new ValueQueryRow("vault", null))
 
                 .executeSync(OpPrison.getInstance().getBase());
-    }
-
-    public static void get(String name, Consumer<ResultSet> resultSetConsumer) {
-        OpPrison.getInstance().getGangs()
-                .newDatabaseQuery()
-                .selectQuery()
-
-                .queryRow(new ValueQueryRow("name", name))
-
-                .executeQueryAsync(OpPrison.getInstance().getBase())
-                .thenAccept(resultSetConsumer);
     }
 
     public static void get(Consumer<ResultSet> resultSetConsumer) {
@@ -44,16 +36,16 @@ public class GangDataSQL {
                 .thenAcceptAsync(resultSetConsumer);
     }
 
-    public static void save(String name, String members, double score) {
+    public static void save(String name, String members, double score, String vault) {
         OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE gangs SET `name` = ?, `members` = ?, `score` = ?  WHERE `name` = ?",
-                name, members, score, name
+                "UPDATE gangs SET `members` = ?, `score` = ?, `vault` = ?  WHERE `name` = ?",
+                members, score, vault, name
         );
     }
 
     public static void set(String name, String table, String input) {
         OpPrison.getInstance().getBase().getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE gangs SET" + table + " = ?  WHERE `name` = ?",
+                "UPDATE gangs SET `" + table + "` = ?  WHERE `name` = ?",
                 input, name
         );
     }

@@ -89,12 +89,36 @@ import java.util.Map;
             return 0.0;
 
         setMultiplier(added);
+
+        if (multiplier >= 5000) {
+            RPlayer.checkAndGet(name).getAchievements().addAchievement(Achievement.OP_MORE_MULTI);
+        }
+
         return added;
     }
 
     public double addPrestige(double count) {
         double added = prestige + count;
         setPrestige(added);
+
+        Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
+
+        if (prestige >= 15000000) {
+            achievements.addAchievement(Achievement.OP_PRESTIGE_15M);
+        }
+
+        if (prestige >= 150000000) {
+            achievements.addAchievement(Achievement.OP_PRESTIGE_150M);
+        }
+
+        if (prestige >= 500000000) {
+            achievements.addAchievement(Achievement.OP_PRESTIGE_500M);
+        }
+
+        if (prestige >= 1000000000) {
+            achievements.addAchievement(Achievement.OP_PRESTIGE_1B);
+        }
+
         return added;
     }
 }

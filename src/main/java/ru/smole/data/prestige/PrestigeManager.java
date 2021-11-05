@@ -29,11 +29,11 @@ public class PrestigeManager {
 
     protected void upgradePrestige(int i) {
         double prestige = playerData.getPrestige();
-        double upped = prestige + 1;
+        double upped = 1;
         double money = playerData.getMoney();
 
-        double c = 12500D;
-        double multip = 1.005F;
+        double c = 5500D;
+        double multip = 1.001F;
         double cost = prestige == 0 ? c : upped * multip * c;
 
         if (cost > money) {
@@ -44,7 +44,7 @@ public class PrestigeManager {
         switch (i) {
             case 1:
                 playerData.setMoney(money - cost);
-                playerData.setPrestige(upped);
+                playerData.addPrestige(upped);
 
                 ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, upped));
                 return;
@@ -66,7 +66,7 @@ public class PrestigeManager {
                 }
 
                 playerData.setMoney(money - cost2);
-                playerData.setPrestige(upped);
+                playerData.addPrestige(upped);
 
                 ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
         }

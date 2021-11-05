@@ -1,14 +1,29 @@
 package ru.smole.data.gang;
 
+import gnu.trove.map.TIntObjectMap;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import ru.luvas.rmcs.player.RPlayer;
+import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventory;
+import ru.xfenilafs.core.inventory.BaseInventoryItem;
+import ru.xfenilafs.core.inventory.handler.impl.BaseInventoryNotClickable;
+import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
+import ru.xfenilafs.core.util.Base64Util;
 import ru.xfenilafs.core.util.ChatUtil;
+import sexy.kostya.mineos.achievements.Achievement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Data
@@ -17,14 +32,16 @@ public class GangData {
     private String name;
     private Map<String, GangPlayer> gangPlayerMap;
     private double score;
+    private Inventory vault;
 
-    public GangData(String name, Map<String, GangPlayer> gangPlayerMap, double score) {
+    public GangData(String name, Map<String, GangPlayer> gangPlayerMap, double score, String data) {
         this.name = name;
         this.gangPlayerMap = gangPlayerMap;
         this.score = score;
+        this.vault = Bukkit.createInventory(null, 6 * 9, String.format("Хранилище %s", name));
+
+        loadVault(data);
     }
-
-
 
     public void sendMessage(String message) {
         gangPlayerMap.values().forEach(gangPlayer ->
@@ -42,6 +59,8 @@ public class GangData {
             return;
 
         gangPlayerMap.put(gangPlayer.getName().toLowerCase(), gangPlayer);
+
+        RPlayer.checkAndGet(gangPlayer.getPlayerName()).getAchievements().addAchievement(Achievement.OP_GANG_JOIN);
     }
 
     public void removeGangPlayer(String playerName) {
@@ -54,7 +73,6 @@ public class GangData {
     public boolean isFull() {
         return gangPlayerMap.size() >= 10;
     }
-
 
 
     public GangPlayer getGangPlayer(String playerName) {
@@ -74,7 +92,16 @@ public class GangData {
         return gangPlayerList;
     }
 
+    public String saveVault() {
+        return Base64Util.encodeItems(vault.getContents());
+    }
 
+    public void loadVault(String data) {
+        if (data == null || data.isEmpty())
+            return;
+
+        vault.setContents(Base64Util.decodeItems(data));
+    }
 
     @AllArgsConstructor
     @Data
@@ -82,9 +109,14 @@ public class GangData {
 
         private String name;
         private GangPlayerType type;
+        private double score;
 
         public String getPlayerName() {
             return Bukkit.getOfflinePlayer(name).getName();
+        }
+
+        public void addScore(double added) {
+            setScore(score + added);
         }
 
         @AllArgsConstructor

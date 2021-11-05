@@ -92,7 +92,6 @@ public class OpPrison extends CorePlugin {
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static final List<LaunchPad> PADS = new ArrayList<>();
-    public static final List<Player> cdList = new ArrayList<>();
     public static String PREFIX = "§f";
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
@@ -129,6 +128,7 @@ public class OpPrison extends CorePlugin {
                 .queryRow(new TypedQueryRow(TEXT, "name"))
                 .queryRow(new TypedQueryRow(TEXT, "members"))
                 .queryRow(new TypedQueryRow(DOUBLE, "score"))
+                .queryRow(new TypedQueryRow(TEXT, "vault"))
                 .executeSync(base);
 
         players = base.getTable("players");
@@ -288,19 +288,18 @@ public class OpPrison extends CorePlugin {
 
         PointEvent pointEvent = OpEvents.getPointEvent(REGIONS.values());
         Schedules.runAsync(() -> {
-
             AsyncCatcher.enabled = false;
             MINES.values().forEach(Mine::reset);
             AsyncCatcher.enabled = true;
 
-//            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
-//
-//            if (calendar.get(Calendar.HOUR_OF_DAY) == 19 && !OpEvents.getActiveEvents().contains("point")) {
-//                pointEvent.start();
-//                return;
-//            }
-//
-//            pointEvent.stop();
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
+
+            if (calendar.get(Calendar.HOUR_OF_DAY) == 19) {
+                if (OpEvents.getActiveEvents().contains("point"))
+                    return;
+
+                pointEvent.start();
+            }
         }, 20, 20);
 
         FileConfiguration misc = configManager.getMiscConfig().getConfiguration();
@@ -344,16 +343,16 @@ public class OpPrison extends CorePlugin {
                 "gangs"
         );
 
-        SimpleHolographic simpleHolographic = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("info")));
+        SimpleHolographic info = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("info")));
 
-        simpleHolographic.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
-        simpleHolographic.addEmptyLine();
-        simpleHolographic.addTextLine("§fВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
-        simpleHolographic.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|pr max)");
-        simpleHolographic.addTextLine("§fА остальную информацию Вы можете узнать через §b/opprison");
-        simpleHolographic.addEmptyLine();
-        simpleHolographic.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
-        LeaderBoard.holograms.add(simpleHolographic);
+        info.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
+        info.addEmptyLine();
+        info.addTextLine("§fВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
+        info.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|pr max)");
+        info.addTextLine("§fА остальную информацию Вы можете узнать через §b/opprison");
+        info.addEmptyLine();
+        info.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
+        LeaderBoard.holograms.add(info);
 
         SimpleHolographic caseHere = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("caseHere")));
 
@@ -362,7 +361,7 @@ public class OpPrison extends CorePlugin {
 
         LeaderBoard.holograms.add(caseHere);
 
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
+        Schedules.runAsync(() -> {
             if (Bukkit.getOnlinePlayers().size() == 0)
                 return;
 
@@ -380,7 +379,8 @@ public class OpPrison extends CorePlugin {
                     GangDataSQL.save(
                             s,
                             Base64.getEncoder().encodeToString(getGangDataManager().getGangPlayers(gangData.getGangPlayerMap()).getBytes()),
-                            gangData.getScore()
+                            gangData.getScore(),
+                            gangData.saveVault()
                     )
             );
 
@@ -473,8 +473,8 @@ public class OpPrison extends CorePlugin {
 
                             }
                         },
-                        1,
-                        20 * 60 * 50
+                        20 * 60 * 2,
+                        20 * 60 * 5
                 );
 
 

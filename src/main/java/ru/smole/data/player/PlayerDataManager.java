@@ -6,6 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.luvas.rmcs.utils.UtilBungee;
 import ru.smole.OpPrison;
 import ru.smole.commands.GangCommand;
@@ -22,6 +23,7 @@ import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.smole.utils.server.ServerUtil;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.CooldownUtil;
+import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.network.server.BungeeClient;
 
 import java.sql.SQLException;
@@ -91,7 +93,13 @@ public class PlayerDataManager {
         GangCommand.invitedList.put(name.toLowerCase(), new ArrayList<>());
 
         OpPrison.BAR.removeAll();
-        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> {
+            if (OpPrison.BOOSTER >= 20) {
+                RPlayer.checkAndGet(onPlayer.getName()).getAchievements().addAchievement(Achievement.OP_BOOSTER_20);
+            }
+
+            OpPrison.BAR.addPlayer(onPlayer);
+        });
 
         LeaderBoard.holograms.forEach(simpleHolographic -> {
             if (!simpleHolographic.getLocation().getWorld().equals(player.getWorld()))
@@ -138,13 +146,23 @@ public class PlayerDataManager {
         playerDataMap.remove(name);
 
         OpPrison.BAR.removeAll();
-        Bukkit.getOnlinePlayers().forEach(onPlayer -> OpPrison.BAR.addPlayer(onPlayer));
+        Bukkit.getOnlinePlayers().forEach(onPlayer -> {
+            if (OpPrison.BOOSTER >= 20) {
+                RPlayer.checkAndGet(onPlayer.getName()).getAchievements().addAchievement(Achievement.OP_BOOSTER_20);
+            }
+
+            OpPrison.BAR.addPlayer(onPlayer);
+        });
         OpPrison.getInstance().getWorldStatistic().save(player);
 
         if (OpPrison.getInstance().getPvPCooldown().getPlayers().contains(player)) {
             Arrays.stream(player.getInventory().getStorageContents())
                     .forEach(itemStack -> {
+                        if (itemStack == null)
+                            return;
+
                         Material material = itemStack.getType();
+
                         if (
                                 material == Material.FISHING_ROD
                                         || material == Material.IRON_BOOTS
@@ -160,11 +178,15 @@ public class PlayerDataManager {
                                         || material == Material.DIAMOND_CHESTPLATE
                                         || material == Material.DIAMOND_HELMET
                                         || material == Material.BOW
+                                        || material == Material.POTION
+                                        || material == Material.SPLASH_POTION
                         ) {
                             player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
                             itemStack.setAmount(0);
                         }
                     });
+
+            RPlayer.checkAndGet(name).getAchievements().addAchievement(Achievement.OP_LEAVE_PVP);
         }
     }
 
@@ -193,6 +215,7 @@ public class PlayerDataManager {
                 format = format.replace(",", "");
 
             sb.append(String.format(format, s));
+            i++;
         }
 
         return sb.toString();
@@ -230,6 +253,7 @@ public class PlayerDataManager {
                 format = format.replace(",", "");
 
             sb.append(String.format(format, s, question.getStep().name().toUpperCase()));
+            i++;
         }
 
         return sb.toString();

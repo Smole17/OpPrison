@@ -22,12 +22,15 @@ import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
 import java.util.Collection;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
 import static ru.smole.OpPrison.*;
 
 public class RegionListener implements Listener {
+
+    private final Random random = new Random();
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event) {
@@ -185,7 +188,7 @@ public class RegionListener implements Listener {
         }
 
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
-        pickaxe.procUpgrades(event);
+        pickaxe.procUpgrades(event, random);
         OpEvents.blockBreak(event);
     }
 }

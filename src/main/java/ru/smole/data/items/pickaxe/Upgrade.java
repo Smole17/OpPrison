@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 
     EFFICIENCY("§7Эффективность",
             "Увеличивает скорость добычи блоков",
-            0,10, 300,  70000,
+            0,10, 300,  35000,
             Material.ANVIL, GroupsManager.Group.MANTLE, false),
 
     FORTUNE("§7Шахтёр",

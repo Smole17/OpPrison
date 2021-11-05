@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.gang.point.PointEvent;
@@ -21,6 +22,7 @@ import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
+import sexy.kostya.mineos.achievements.Achievement;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -134,6 +136,7 @@ public class OpEvents {
                                 double added = playerData.getToken() * 0.15 / i[0];
 
                                 playerData.addToken(added);
+                                RPlayer.checkAndGet(x.getKey()).getAchievements().addAchievement(Achievement.OP_CONTEST_WINNER);
 
                                 Question question = playerData.getQuestions().get("SOFOS");
                                 Question.QuestionStep step = question.getStep();
@@ -163,7 +166,7 @@ public class OpEvents {
         if (!breakEvents.isEmpty())
             return;
 
-        String name = "Увеличенный бустер";
+        String name = "Увеличенный Бустер";
 
         breakEvents.put(name, null);
 
@@ -196,7 +199,7 @@ public class OpEvents {
         if (!breakEvents.isEmpty())
             return;
 
-        String name = "Искатель сокровищ";
+        String name = "Искатель Сокровищ";
 
         ThreadLocalRandom randomO = ThreadLocalRandom.current();
         breakEvents.put(name, event -> {
