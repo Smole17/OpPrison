@@ -36,7 +36,7 @@ public class LeaderBoard {
     public void update() {
         OpPrison.getInstance().getBase().getExecuteHandler()
                 .executeQuery(true, "SELECT * FROM " + table + " ORDER BY " + criteria + " DESC LIMIT 10")
-                .thenAccept(resultSet -> {
+                .thenAcceptAsync(resultSet -> {
                     for (int i = 1; resultSet.next(); i++)
                         simpleHolographic.setTextLine(i, getLine(i, resultSet.getString("name"), resultSet.getDouble(criteria)));
                 });

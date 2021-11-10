@@ -3,7 +3,6 @@ package ru.smole.data.booster;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
-import ru.smole.data.event.OpEvents;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.util.ChatUtil;
 
@@ -42,6 +41,7 @@ public class BoosterManager {
             case 70:
                 addBooster(0.6);
                 break;
+            case 200:
             case 80:
                 addBooster(0.7);
                 break;
@@ -51,6 +51,9 @@ public class BoosterManager {
             case 100:
             case 901:
                 addBooster(2.0);
+                break;
+            default:
+                addBooster(0.0);
                 break;
         }
     }
@@ -80,6 +83,7 @@ public class BoosterManager {
             case 70:
                 delBooster(0.6);
                 break;
+            case 200:
             case 80:
                 delBooster(0.7);
                 break;
@@ -89,6 +93,9 @@ public class BoosterManager {
             case 100:
             case 901:
                 delBooster(2.0);
+                break;
+            default:
+                delBooster(0.0);
                 break;
         }
     }
@@ -128,10 +135,10 @@ public class BoosterManager {
     }
 
     public static void updateBar() {
-        String[] event = {null};
-        OpEvents.getBreakEvents().keySet().stream().findFirst().ifPresent(s -> event[0] = s);
+//        String[] event = {null};
+//        OpEvents.getBreakEvents().keySet().stream().findFirst().ifPresent(s -> event[0] = s);
 
-        BAR.setTitle(String.format("§fБустер сервера: §a+%s §8| §fАктивное событие: §b%s",
-                StringUtils._fixDouble(1, BOOSTER) + "%", event[0] == null ? "отсутствует" : event[0]));
+        BAR.setTitle(String.format("§fБустер Режима: §a+%s",
+                StringUtils._fixDouble(1, BOOSTER) + "%"));
     }
 }

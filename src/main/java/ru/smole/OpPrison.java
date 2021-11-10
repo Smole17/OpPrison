@@ -9,6 +9,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -19,12 +20,16 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.AsyncCatcher;
+import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.commands.*;
+import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.cases.Case;
-import ru.smole.data.event.OpEvents;
+import ru.smole.data.event.EventManager;
+import ru.smole.data.event.data.impl.BlockEvent;
 import ru.smole.data.gang.GangDataManager;
-import ru.smole.data.gang.point.PointEvent;
+import ru.smole.data.event.data.impl.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -32,12 +37,15 @@ import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.npc.NpcInitializer;
+import ru.smole.data.npc.question.Question;
 import ru.smole.data.pads.LaunchPad;
+import ru.smole.data.player.PlayerData;
 import ru.smole.data.player.PlayerDataManager;
 import ru.smole.data.pvpcd.PvPCooldown;
 import ru.smole.listeners.PlayerListener;
 import ru.smole.listeners.RegionListener;
 import ru.smole.mines.Mine;
+import ru.smole.scoreboard.ScoreboardManager;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.WorldBorderUtils;
 import ru.smole.utils.config.ConfigManager;
@@ -55,12 +63,17 @@ import ru.xfenilafs.core.player.world.TypeStats;
 import ru.xfenilafs.core.player.world.WorldStatistic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
+import ru.xfenilafs.core.scoreboard.BaseScoreboard;
+import ru.xfenilafs.core.scoreboard.BaseScoreboardScope;
+import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
+import sexy.kostya.mineos.achievements.Achievement;
 
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static ru.smole.data.items.Items.registerItem;
@@ -71,28 +84,23 @@ public class OpPrison extends CorePlugin {
 
     private @Getter static OpPrison instance;
 
-    private @Getter
-    PlayerDataManager playerDataManager;
-    private @Getter
-    ConfigManager configManager;
-    private @Getter
-    RemoteDatabaseConnectionHandler base;
-    private @Getter
-    GangDataManager gangDataManager;
-    private @Getter
-    RemoteDatabaseTable players;
-    private @Getter
-    RemoteDatabaseTable gangs;
-    private @Getter
-    WorldStatistic worldStatistic;
-    private @Getter
-    PvPCooldown pvPCooldown;
+    private @Getter PlayerDataManager playerDataManager;
+    private @Getter ConfigManager configManager;
+    private @Getter RemoteDatabaseConnectionHandler base;
+    private @Getter GangDataManager gangDataManager;
+    private @Getter RemoteDatabaseTable players;
+    private @Getter RemoteDatabaseTable gangs;
+    private @Getter WorldStatistic worldStatistic;
+    private @Getter PvPCooldown pvPCooldown;
+    private @Getter EventManager eventManager;
+    private @Getter ScoreboardManager scoreboardManager;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
     public static final Set<Player> BUILD_MODE = new HashSet<>();
     public static final List<LaunchPad> PADS = new ArrayList<>();
-    public static String PREFIX = "§f";
+    public static String PREFIX = "§a";
+    public static String PREFIX_N = "§c";
     public static BossBar BAR;
     public static double BOOSTER = 0.0;
 
@@ -110,26 +118,26 @@ public class OpPrison extends CorePlugin {
         ));
 
         base.newDatabaseQuery("players").createTableQuery().setCanCheckExists(true)
-                .queryRow(new TypedQueryRow(TEXT,"name"))
-                .queryRow(new TypedQueryRow(DOUBLE,"blocks"))
-                .queryRow(new TypedQueryRow(DOUBLE,"money"))
-                .queryRow(new TypedQueryRow(DOUBLE,"token"))
-                .queryRow(new TypedQueryRow(DOUBLE,"multiplier"))
-                .queryRow(new TypedQueryRow(DOUBLE,"prestige"))
-                .queryRow(new TypedQueryRow(TEXT,"rank"))
-                .queryRow(new TypedQueryRow(INT,"fly"))
-                .queryRow(new TypedQueryRow(TEXT,"pickaxe"))
-                .queryRow(new TypedQueryRow(TEXT,"kit"))
-                .queryRow(new TypedQueryRow(TEXT,"access"))
-                .queryRow(new TypedQueryRow(TEXT,"questions"))
-                .executeSync(base);
+                .queryRow(new TypedQueryRow(TEXT, "name"))
+                .queryRow(new TypedQueryRow(DOUBLE, "blocks"))
+                .queryRow(new TypedQueryRow(DOUBLE, "money"))
+                .queryRow(new TypedQueryRow(DOUBLE, "token"))
+                .queryRow(new TypedQueryRow(DOUBLE, "multiplier"))
+                .queryRow(new TypedQueryRow(DOUBLE, "prestige"))
+                .queryRow(new TypedQueryRow(TEXT, "rank"))
+                .queryRow(new TypedQueryRow(INT, "fly"))
+                .queryRow(new TypedQueryRow(TEXT, "pickaxe"))
+                .queryRow(new TypedQueryRow(TEXT, "kit"))
+                .queryRow(new TypedQueryRow(TEXT, "access"))
+                .queryRow(new TypedQueryRow(TEXT, "questions"))
+                .executeAsync(base);
 
         base.newDatabaseQuery("gangs").createTableQuery().setCanCheckExists(true)
                 .queryRow(new TypedQueryRow(TEXT, "name"))
                 .queryRow(new TypedQueryRow(TEXT, "members"))
                 .queryRow(new TypedQueryRow(DOUBLE, "score"))
                 .queryRow(new TypedQueryRow(TEXT, "vault"))
-                .executeSync(base);
+                .executeAsync(base);
 
         players = base.getTable("players");
         gangs = base.getTable("gangs");
@@ -137,6 +145,8 @@ public class OpPrison extends CorePlugin {
         BAR = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SOLID);
 
         pvPCooldown = new PvPCooldown();
+        eventManager = new EventManager();
+        scoreboardManager = ScoreboardManager.get("§eＯＰＰＲＩＳＯＮ", BaseScoreboardScope.PROTOTYPE);
 
         registerListeners(
                 new PlayerListener(), new RegionListener()
@@ -157,6 +167,7 @@ public class OpPrison extends CorePlugin {
         Items.init();
         worldStatistic = WorldStatistic.init(this, base, TypeStats.values());
 
+        loadScoreboard();
         loadCrates();
         loadRegionsAndMines();
         loadCases();
@@ -172,6 +183,45 @@ public class OpPrison extends CorePlugin {
         base.handleDisconnect();
         BAR.removeAll();
         gangDataManager.unload();
+    }
+
+    public void loadScoreboard() {
+        scoreboardManager.line(10, "")
+                .line(9, "§7Загрузка...")
+                .line(8, "")
+                .line(7, "§7Загрузка...")
+                .line(6, "§7Загрузка...")
+                .line(5, "")
+                .updater(((baseScoreboard, boardPlayer) -> {
+                    String playerName = boardPlayer.getName();
+
+                    PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName);
+
+                    if (playerData == null)
+                        return;
+
+                    baseScoreboard.updateScoreboardLine(9, boardPlayer,
+                            ChatUtil.text(
+                                    " §a❖ §f%s",
+                                    StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())
+                            )
+                    );
+
+                    baseScoreboard.updateScoreboardLine(7, boardPlayer,
+                            ChatUtil.text(
+                                    "§fДеньги: §6$%s",
+                                    StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getMoney()).length() <= 3 ? 0 : 2, playerData.getMoney())
+                            )
+                    );
+
+                    baseScoreboard.updateScoreboardLine(6, boardPlayer,
+                            ChatUtil.text(
+                                    "§fТокены: §e⛃%s",
+                                    StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getToken()).length() <= 3 ? 0 : 2, playerData.getToken())
+                            )
+                    );
+                }), 1)
+                .build();
     }
 
     public void loadCrates() {
@@ -286,7 +336,7 @@ public class OpPrison extends CorePlugin {
         });
         log.info("Loaded {} mines!", MINES.size());
 
-        PointEvent pointEvent = OpEvents.getPointEvent(REGIONS.values());
+        PointEvent pointEvent = eventManager.getPointEvent(REGIONS.values());
         Schedules.runAsync(() -> {
             AsyncCatcher.enabled = false;
             MINES.values().forEach(Mine::reset);
@@ -295,7 +345,7 @@ public class OpPrison extends CorePlugin {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
 
             if (calendar.get(Calendar.HOUR_OF_DAY) == 19) {
-                if (OpEvents.getActiveEvents().contains("point"))
+                if (eventManager.getOtherEvents().containsKey("point"))
                     return;
 
                 pointEvent.start();
@@ -367,7 +417,6 @@ public class OpPrison extends CorePlugin {
 
             Bukkit.getOnlinePlayers().forEach(player -> {
               playerDataManager.updateTop(player);
-              worldStatistic.save(player);
             });
 
             blocks.update();
@@ -402,10 +451,10 @@ public class OpPrison extends CorePlugin {
                     Pickaxe pickaxe = PickaxeManager.pickaxes.get(player.getName());
                     val upgrades = pickaxe.getUpgrades();
 
-                    int hasteLevel = (int) upgrades.get(Upgrade.HASTE).getCount();
-                    int speedLevel = (int) upgrades.get(Upgrade.SPEED).getCount();
-                    int jump_boostLevel = (int) upgrades.get(Upgrade.JUMP_BOOST).getCount();
-                    int night_visionLevel = (int) upgrades.get(Upgrade.NIGHT_VISION).getCount();
+                    int hasteLevel = (int) upgrades.get(Upgrade.HASTE).getCount() - 1;
+                    int speedLevel = (int) upgrades.get(Upgrade.SPEED).getCount() - 1;
+                    int jump_boostLevel = (int) upgrades.get(Upgrade.JUMP_BOOST).getCount() - 1;
+                    int night_visionLevel = (int) upgrades.get(Upgrade.NIGHT_VISION).getCount() - 1;
 
                     if (hasteLevel != 0) {
                         if (upgrades.get(Upgrade.HASTE).isIs()) {
@@ -447,60 +496,186 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadEvents() {
-        Map<String, Double> blocks = new HashMap<>();
+        ThreadLocalRandom random0 = ThreadLocalRandom.current();
 
-                Bukkit.getScheduler().runTaskTimer(
-                        this,
-                        () -> {
-                            if (!OpEvents.getBreakEvents().isEmpty())
+        Schedules.runAsync(
+                () -> {
+                    Map<String, BlockEvent> blockEMap = eventManager.getBlockEvents();
+                    if (!blockEMap.isEmpty())
+                        return;
+
+                    switch (random0.nextInt(0, 1)) {
+                        case 0: {
+                            Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 0;
+
+                            if (Bukkit.getOnlinePlayers().stream().filter(predicate).count() < 1) {
+                                ChatUtil.broadcast("");
+                                ChatUtil.broadcast("   &fСобытие &aСостязание &fне началось из-за недостатка игроков.");
+                                ChatUtil.broadcast("   &fУсловие: 4 игрока с 75M престижей.");
+                                ChatUtil.broadcast("");
                                 return;
-
-                            switch (ThreadLocalRandom.current().nextInt(3)) {
-                                case 0: {
-                                    OpEvents.applyBlockContest(blocks);
-                                    break;
-                                }
-
-                                case 1: {
-                                    OpEvents.applyBoosterEvent();
-                                    break;
-                                }
-
-                                case 2: {
-                                    OpEvents.applyTreasureHunter();
-                                    break;
-                                }
-
                             }
-                        },
-                        20 * 60 * 2,
-                        20 * 60 * 5
-                );
 
+                            Map<String, Double> blocks = eventManager.getBlocks();
 
+                            scoreboardManager
+                                    .line(
+                                            1,
+                                            ""
+                                    )
+                                    .reloadScoreboard();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                String item = Items.getItemName(player.getInventory().getItemInMainHand());
+                            BukkitTask task = Schedules.runAsync(() -> {
+                                if (Bukkit.getOnlinePlayers().isEmpty())
+                                    return;
 
-                if (item.length() < 1 || !item.equals("pickaxe"))
-                    return;
+                                Bukkit.getOnlinePlayers().forEach(player -> {
+                                    String playerName = player.getName();
 
-                String playerName = player.getName();
+                                    scoreboardManager
+                                            .getBaseScoreboard()
+                                            .updateScoreboardLine(
+                                                    2,
+                                                    player,
+                                                    "   §7➤ §e" + (blocks.containsKey(playerName) ? StringUtils.replaceComma(blocks.get(playerName)) : "0")
+                                            );
+                                });
+                            }, 5, 5);
 
-                Pickaxe pickaxe = PickaxeManager.pickaxes.get(playerName);
+                            BlockEvent.get()
+                                    .id("contest")
+                                    .name("&aСостязание")
+                                    .description(
+                                            "   Суть том, чтобы телепортироваться на шахту &a75M &fпрестижей",
+                                            "   и накопать больше всех блоков за 20 минут"
+                                    )
+                                    .consumer(event -> {
+                                        Player player = event.getPlayer();
+                                        String playerName = player.getName();
 
-                player.spigot().sendMessage(
-                        ChatMessageType.ACTION_BAR,
-                        new TextComponent(String.format("§f%s: §b%s §8| §f%s: §b%s/%s %s",
-                                "Уровень кирки", StringUtils._fixDouble(0, pickaxe.getLevel()),
-                                "Прогресс", StringUtils._fixDouble(0, pickaxe.getExp()), StringUtils._fixDouble(0, pickaxe.getNeedExp()),
-                                blocks.isEmpty() || !blocks.containsKey(playerName) ? ""
-                                        :
-                                        String.format("§8| §fСостязание: §b%s", StringUtils._fixDouble(0, blocks.get(playerName)))
-                        ))
-                );
-            });
-        }, 20, 20);
+                                        if (OpPrison.MINES.get(-1).getBlocks().stream().noneMatch(resourceBlock -> resourceBlock.getType() == event.getBlock().getType()))
+                                            return;
+
+                                        if (blocks.isEmpty() || !blocks.containsKey(playerName))
+                                            blocks.put(playerName, 0.0);
+
+                                        blocks.replace(playerName, blocks.get(playerName) + 1);
+                                    })
+                                    .runnable((blockEvent) -> () -> {
+                                        int[] i = {1};
+
+                                        ChatUtil.broadcast("");
+                                        blocks.entrySet()
+                                                .stream()
+                                                .sorted((o1, o2) -> -o1.getValue().compareTo(o2.getValue()))
+                                                .limit(3)
+                                                .forEachOrdered(x -> {
+                                                    ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
+                                                    i[0]++;
+
+                                                    if (Bukkit.getPlayer(x.getKey()) == null || !Bukkit.getPlayer(x.getKey()).isOnline())
+                                                        return;
+
+                                                    PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
+
+                                                    if (playerData == null)
+                                                        return;
+
+                                                    double added = playerData.getToken() * 0.15 / i[0];
+
+                                                    playerData.addToken(added);
+                                                    RPlayer.checkAndGet(x.getKey()).getAchievements().addAchievement(Achievement.OP_CONTEST_WINNER);
+
+                                                    Question question = playerData.getQuestions().get("SOFOS");
+
+                                                    if (question == null)
+                                                        return;
+
+                                                    Question.QuestionStep step = question.getStep();
+
+                                                    if (step == null)
+                                                        return;
+
+                                                    if (step == Question.QuestionStep.COMPLETING) {
+                                                        question.setStep(Question.QuestionStep.ALR_COMPLETED);
+                                                        PickaxeManager.getPickaxes().get(x.getKey()).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
+                                                    }
+                                                });
+
+                                        ChatUtil.broadcast("");
+
+                                        blocks.clear();
+                                        task.cancel();
+
+                                        scoreboardManager
+                                                .removeLine(2)
+                                                .removeLine(1)
+                                                .reloadScoreboard();
+
+                                        blockEvent.stop();
+                                    })
+                                    .start(20 * 60 * 1);
+                            break;
+                        }
+
+                        case 1: {
+                            Map<String, List<Location>> treasureMap = eventManager.getTreasureMap();
+
+                            BlockEvent.get()
+                                    .id("treasure")
+                                    .name("Искатель Сокровищ")
+                                    .description("   Суть события в том, что нужно копать блоки и находить сокровища")
+                                    .consumer(event -> {
+                                        Player player = event.getPlayer();
+                                        String playerName = player.getName();
+                                        if (!treasureMap.containsKey(playerName))
+                                            treasureMap.put(playerName, new ArrayList<>());
+
+                                        float random = random0.nextFloat();
+
+                                        if (random <= 0.01) {
+                                            event.setCancelled(true);
+
+                                            Block block = event.getBlock();
+
+                                            block.setType(Material.CHEST);
+                                            event.getPlayer().sendTitle("", "§aВы нашли сокровище", 5, 20, 5);
+                                            treasureMap.get(playerName).add(block.getLocation());
+                                        }
+                                    })
+                                    .runnable(blockEvent -> () -> {
+                                        treasureMap.forEach((s, locations) -> {
+                                            locations.forEach(location -> {
+                                                location.getBlock().setType(Material.AIR);
+                                            });
+                                        });
+
+                                        treasureMap.clear();
+                                        blockEvent.stop();
+                                    })
+                                    .start(20 * 60 * 1);
+                            break;
+                        }
+
+                        case 2: {
+                            BoosterManager.addBooster(10);
+
+                            BlockEvent.get()
+                                    .id("booster")
+                                    .name("Увеличенный Бустер")
+                                    .description("   Суть события в том, что к бустеру сервера прибавляется 10%")
+                                    .consumer(null)
+                                    .runnable(blockEvent -> () -> {
+                                        BoosterManager.delBooster(10);
+                                        blockEvent.stop();
+                                    })
+                                    .start(20 * 60 * 1);
+                            break;
+                        }
+                    }
+                },
+                20 * 60,
+                20 * 60 * 5
+        );
     }
 }

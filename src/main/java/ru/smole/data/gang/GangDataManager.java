@@ -131,18 +131,13 @@ public class GangDataManager {
     public String getGangPlayers(Map<String, GangData.GangPlayer> gangPlayerMap) {
         StringBuilder builder = new StringBuilder();
 
-        int i = 1;
         String format = "%s-%s-%s,";
 
         for (GangData.GangPlayer gangPlayer : gangPlayerMap.values()) {
-            if (i == gangPlayerMap.size())
-                format = "%s-%s-%s";
-
             String member = String.format(format,
                     gangPlayer.getPlayerName(), gangPlayer.getType().name(), gangPlayer.getScore());
 
             builder.append(member);
-            i++;
         }
 
         return builder.toString();

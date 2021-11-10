@@ -1,20 +1,17 @@
-package ru.smole.data.gang.point;
+package ru.smole.data.event.data.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
-import ru.smole.data.event.OpEvents;
+import ru.smole.data.event.EventManager;
+import ru.smole.data.event.data.Event;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.config.ConfigUtils;
-import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.ApiManager;
 import ru.xfenilafs.core.holographic.ProtocolHolographic;
-import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
@@ -23,7 +20,6 @@ import sexy.kostya.mineos.achievements.Achievement;
 
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class PointEvent {
 
@@ -37,11 +33,11 @@ public class PointEvent {
     }
 
     public void start() {
-        OpEvents.start("point");
+        Event.getEventManager().getOtherEvents().put("point", null);
 
         task = Schedules.runAsync(() -> {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Moscow")));
-            if (calendar.get(Calendar.MINUTE) == 20 && OpEvents.getActiveEvents().contains("point")) {
+            if (calendar.get(Calendar.HOUR_OF_DAY) == 20 && Event.getEventManager().getOtherEvents().containsKey("point")) {
                 stop();
                 return;
             }
@@ -53,8 +49,7 @@ public class PointEvent {
                     .forEach(region -> {
                         Cuboid zone = region.getZone();
 
-                        Bukkit.getOnlinePlayers().
-                                stream()
+                        Bukkit.getOnlinePlayers().stream()
                                 .parallel()
                                 .forEach(player -> {
                                     if (zone.contains(player)) {
@@ -66,7 +61,9 @@ public class PointEvent {
         }, 20, 20);
 
         task2 = Schedules.runAsync(() -> {
-            Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> ChatUtil.sendTitle(player, "§fЗахват Точек", "§aактивен", 15));
+            if (!Bukkit.getOnlinePlayers().isEmpty())
+                Bukkit.getOnlinePlayers().stream().parallel().forEach(player -> ChatUtil.sendTitle(player, "§fЗахват Точек", "§aактивен", 15));
+
             ChatUtil.broadcast("");
             ChatUtil.broadcast("   &fСобытие Захват Точек §aактивно");
             ChatUtil.broadcast("   &fСуть события в захвате точек на бандитской арене,");
@@ -95,7 +92,7 @@ public class PointEvent {
     }
 
     public void stop() {
-        OpEvents.stop("point");
+        Event.getEventManager().stop(-1, "point");
 
         if (task != null && !task.isCancelled())
             task.cancel();

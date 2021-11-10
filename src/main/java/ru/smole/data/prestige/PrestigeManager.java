@@ -8,8 +8,8 @@ import ru.xfenilafs.core.util.ChatUtil;
 
 public class PrestigeManager {
 
-    private Player player;
-    private PlayerData playerData;
+    private final Player player;
+    private final PlayerData playerData;
 
     public PrestigeManager(Player player) {
         this.player = player;
@@ -46,7 +46,7 @@ public class PrestigeManager {
                 playerData.setMoney(money - cost);
                 playerData.addPrestige(upped);
 
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, upped));
+                ChatUtil.sendMessage(player, OpPrison.PREFIX + "&fВы прокачали престиж до: &b%s", StringUtils._fixDouble(0, playerData.getPrestige()));
                 return;
             case 2:
                 double cost2 = 0;

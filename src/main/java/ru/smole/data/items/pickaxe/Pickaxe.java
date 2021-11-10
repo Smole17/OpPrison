@@ -43,16 +43,17 @@ import static ru.smole.OpPrison.MINES;
 
     public double getNeedExp() {
         double needXp = 1000D;
-        if (level != 0) {
-            double form = needXp * level * 35 * (level / 8);
-            needXp = needXp + form;
+        double form = needXp * (level <= 0 ? 1 : level) * 2.5;
+        if (level > 5) {
+             form = needXp * (level * 50);
         }
+
+        needXp = form;
 
         return needXp;
     }
 
     public void addExp(double count) {
-
         setExp(exp + count);
 
         if (exp >= getNeedExp()) {
@@ -78,28 +79,33 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (level % 5 == 0) {
-            ItemStack itemStack = Items.getItem("mine_key", 16.0);
+            ItemStack itemStack = Items.getItem("mine_key", 4.0);
 
             if (itemStack == null)
                 return;
 
-            itemStack = itemStack.clone();
-
-            OpPlayer.add(player, itemStack);
+            OpPlayer.add(player, itemStack.clone());
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fx%s", itemStack.getItemMeta().getDisplayName(), itemStack.getAmount());
         }
 
         if (level % 10 == 0) {
-            ItemStack itemStack = Items.getItem("epic_key", 4.0);
+            ItemStack itemStack = Items.getItem("epic_key", 2.0);
 
             if (itemStack == null)
                 return;
 
-            itemStack = itemStack.clone();
-
-            OpPlayer.add(player, itemStack);
+            OpPlayer.add(player, itemStack.clone());
             ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fx%s", itemStack.getItemMeta().getDisplayName(), itemStack.getAmount());
         }
+
+        ItemStack itemStack = Items.getItem("mine_key", 2.0);
+
+        if (itemStack == null)
+            return;
+
+        OpPlayer.add(player, itemStack.clone());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fx%s", itemStack.getItemMeta().getDisplayName(), itemStack.getAmount());
+        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы прокачали уровень кирки до %s", StringUtils._fixDouble(0, level));
     }
 
     protected int explosive(Block block) {
@@ -183,18 +189,18 @@ import static ru.smole.OpPrison.MINES;
 
         switch (random.nextInt(i)) {
             case 0:
-                double money = luckyLevel >= 25 ? 2500000000000D : 1000000000000D;
+                double money = luckyLevel >= 25 ? 250000000D : 100000000D;
 
                 playerData.addMoney(money);
-                return "§a$" + StringUtils.replaceComma(money);
+                return "§6$" + StringUtils.replaceComma(money);
             case 1:
             case 2:
-                double token = luckyLevel >= 25 ? 1500000000D : 500000000D;
+                double token = luckyLevel >= 25 ? 1500000D : 500000D;
 
                 playerData.addToken(token);
                 return "§e⛃" + StringUtils.replaceComma(token);
             case 3:
-                double count = 4;
+                double count = 3;
                 ItemStack mineKey = Items.getItem("mine_key", count);
 
                 if (mineKey == null)
@@ -204,7 +210,7 @@ import static ru.smole.OpPrison.MINES;
                 return String.format("%s §fx4", mineKey.getItemMeta().getDisplayName());
             case 4:
             case 5:
-                count = 2;
+                count = 1;
                 ItemStack epicKey = Items.getItem("epic_key", count);
 
                 if (epicKey == null)
@@ -224,33 +230,33 @@ import static ru.smole.OpPrison.MINES;
 
         switch (random.nextInt(i)) {
             case 0:
-                double money = 10000000000000000000D;
+                double money = 300000000D;
 
                 playerData.addMoney(money);
-                return "§a$" + StringUtils.replaceComma(money);
+                return "§6$" + StringUtils.replaceComma(money);
             case 1:
-                double token = 1500000000000D;
+                double token = 1500000000D;
 
                 playerData.addToken(token);
                 return "§e⛃" + StringUtils.replaceComma(token);
             case 2:
-                double count = 12;
+                double count = 6;
                 ItemStack legKey = Items.getItem("legendary_key", count);
 
                 if (legKey == null)
                     break;
 
                 opPlayer.add(legKey);
-                return String.format("%s §fx%s", legKey.getItemMeta().getDisplayName(), count);
+                return String.format("%s §fx%s", legKey.getItemMeta().getDisplayName(), StringUtils._fixDouble(0, count));
             case 3:
-                double count1 = 6;
+                double count1 = 3;
                 ItemStack mythKey = Items.getItem("mythical_key", count1);
 
                 if (mythKey == null)
                     break;
 
                 opPlayer.add(mythKey);
-                return String.format("%s §fx%s", mythKey.getItemMeta().getDisplayName(), count1);
+                return String.format("%s §fx%s", mythKey.getItemMeta().getDisplayName(), StringUtils._fixDouble(0, count1));
         }
 
         return "ничего";
@@ -286,8 +292,8 @@ import static ru.smole.OpPrison.MINES;
         double jackPotLevel = upgrades.get(Upgrade.JACKPOT).getCount();
         double ig_moneyLevel = upgrades.get(Upgrade.IG_MONEY).getCount();
 
-        double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 1500 * fortuneLevel : 1500) * (multiplier == 0 ? 1 : multiplier);
-        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 400 * token_minerLevel : 400;
+        double cost = (upgrades.get(Upgrade.FORTUNE).isIs() ? 1.5 * fortuneLevel : 1.5) * (multiplier == 0 ? 1 : multiplier);
+        double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 0.4 * token_minerLevel : 0.4;
         double exp = 1;
 
         if (OpPrison.BOOSTER > 0) {
@@ -299,25 +305,24 @@ import static ru.smole.OpPrison.MINES;
             double chance = prestige_finderLevel / 60000;
 
             if (random.nextFloat() <= chance) {
-                double prestige = prestige_finderLevel;
+                double prestige = prestige_finderLevel / 100;
                 if (prestige_merchantLevel > 0 && upgrades.get(Upgrade.PRESTIGE_MERCHANT).isIs()) {
-                    double mer_chance = prestige_merchantLevel / 250000;
+                    double mer_chance = prestige_merchantLevel / 2500000;
                     if (random.nextFloat() <= mer_chance)
-                        prestige = prestige_finderLevel + ((prestige_finderLevel * prestige_merchantLevel) / 10000);
+                        prestige = prestige_finderLevel + ((prestige_finderLevel * prestige_merchantLevel) / 75000);
                 }
 
-                playerData.addPrestige(prestige);
                 Upgrade.PRESTIGE_FINDER.sendProcMessage(player, String.format("§5%s §fпрестижей", StringUtils.replaceComma(prestige)));
+                playerData.addPrestige(prestige);
             }
         }
 
         if (lepreLevel > 0 && upgrades.get(Upgrade.LEPRECHAUN).isIs()) {
             double chance = lepreLevel / 200000;
             if (new Random().nextFloat() <= chance) {
-                double costt = 100000000 * lepreLevel;
-                Upgrade.LEPRECHAUN.setName("§aЛепрекон");
+                double costt = 100 * lepreLevel;
                 Bukkit.getOnlinePlayers().forEach(onPlayer -> {
-                    Upgrade.LEPRECHAUN.sendProcMessagePlayer(onPlayer, name, String.format("§a$%s", StringUtils.replaceComma(costt)));
+                    Upgrade.LEPRECHAUN.sendProcMessagePlayer(onPlayer, String.format("§6$%s", StringUtils.replaceComma(costt)));
                     OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(onPlayer.getName()).addMoney(costt);
                 });
             }
@@ -326,24 +331,23 @@ import static ru.smole.OpPrison.MINES;
         if (blessingsLevel > 0 && upgrades.get(Upgrade.BLESSINGS).isIs()) {
             double chance = blessingsLevel / 100000;
             if (new Random().nextFloat() <= chance) {
-                double bless = token * blessingsLevel / 200;
-                Upgrade.BLESSINGS.setName("§bБлагославление");
+                double bless = token * blessingsLevel / 175;
                 Bukkit.getOnlinePlayers().forEach(onPlayer -> {
-                    Upgrade.BLESSINGS.sendProcMessagePlayer(onPlayer, name, String.format("§e⛃%s", StringUtils.replaceComma(bless)));
+                    Upgrade.BLESSINGS.sendProcMessagePlayer(onPlayer, String.format("§e⛃%s", StringUtils.replaceComma(bless)));
                     OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(onPlayer.getName()).addToken(bless);
                 });
             }
         }
 
         if (luckyLevel > 0 && upgrades.get(Upgrade.LUCKY).isIs()) {
-            double chance = (luckyLevel / 50) / 40;
+            double chance = (luckyLevel / 50) / 100;
             if (random.nextFloat() <= chance) {
                 Upgrade.LUCKY.sendProcMessage(player, getRandomRewardLucky(opPlayer, luckyLevel, random));
             }
         }
 
         if (key_finderLevel > 0 && upgrades.get(Upgrade.KEY_FINDER).isIs()) {
-            double chance = (key_finderLevel / 50) / 40;
+            double chance = (key_finderLevel / 50) / 65;
             if (random.nextFloat() <= chance) {
                 int type = random.nextInt(3) + 1;
                 double count = 1;
@@ -358,7 +362,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (token_merchantLevel > 0 && upgrades.get(Upgrade.TOKEN_MERCHANT).isIs()) {
-            double chance = (token_merchantLevel / 10) / 40000;
+            double chance = (token_merchantLevel / 10) / 65000;
             if (new Random().nextFloat() <= chance) {
                 double t_merchant = token * token_merchantLevel / 3.5;
                 token = token + t_merchant;
@@ -370,7 +374,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (multi_finderLevel > 0 && upgrades.get(Upgrade.MULTI_FINDER).isIs()) {
-            double chance = (multi_finderLevel / 5) / 40000;
+            double chance = (multi_finderLevel / 5) / 100000;
             if (random.nextFloat() <= chance) {
                 int multi = random.nextInt(3) + 1;
 
@@ -396,7 +400,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (explosiveLevel > 0 && upgrades.get(Upgrade.EXPLOSIVE).isIs()) {
-            double chance = (explosiveLevel / 10) / 100;
+            double chance = (explosiveLevel / 10) / 125;
             if (new Random().nextFloat() <= chance) {
                 int blocks = explosive(block);
 
@@ -414,7 +418,7 @@ import static ru.smole.OpPrison.MINES;
         }
 
         if (jack_hammerLevel > 0 && upgrades.get(Upgrade.JACK_HAMMER).isIs()) {
-            double chance = (jack_hammerLevel / 10) / 6300;
+            double chance = (jack_hammerLevel / 10) / 8000;
             if (new Random().nextFloat() <= chance) {
                 int blocks = breakLayer(block);
 

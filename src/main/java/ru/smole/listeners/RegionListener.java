@@ -1,23 +1,29 @@
 package ru.smole.listeners;
 
-import org.bukkit.*;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.event.OpEvents;
+import ru.smole.data.event.EventManager;
+import ru.smole.data.event.data.Event;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
-import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.player.OpPlayer;
+import ru.smole.data.pvpcd.PvPCooldown;
 import ru.smole.mines.Mine;
 import ru.xfenilafs.core.regions.Region;
 
@@ -118,9 +124,12 @@ public class RegionListener implements Listener {
 
         if (!region.isPvp() || dataManager.playerInGang(dataManager.getGangFromPlayer(damagerName), entityName)) {
             event.setCancelled(true);
+            return;
         }
 
-        OpPrison.getInstance().getPvPCooldown().addPlayer(player);
+        PvPCooldown pvp = OpPrison.getInstance().getPvPCooldown();
+        pvp.addPlayer(player);
+        pvp.addPlayer((Player) entity);
     }
 
     @EventHandler
@@ -187,8 +196,13 @@ public class RegionListener implements Listener {
             return;
         }
 
+        if (block.getType() == Material.CHEST) {
+            event.setCancelled(true);
+            return;
+        }
+
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
         pickaxe.procUpgrades(event, random);
-        OpEvents.blockBreak(event);
+        Event.getEventManager().blockBreak(event);
     }
 }

@@ -1,65 +1,105 @@
 package ru.smole.scoreboard;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NonNull;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.smole.OpPrison;
-import ru.smole.data.event.OpEvents;
-import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.scoreboard.BaseScoreboard;
 import ru.xfenilafs.core.scoreboard.BaseScoreboardBuilder;
 import ru.xfenilafs.core.scoreboard.BaseScoreboardScope;
+import ru.xfenilafs.core.scoreboard.ScoreboardUpdater;
 import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.Schedules;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class ScoreboardManager {
-    public static void loadScoreboard(Player player) {
-        BaseScoreboardBuilder scoreboardBuilder = ApiManager.newScoreboardBuilder();
-        scoreboardBuilder.scoreboardDisplay("§b§lＯＰＰＲＩＳＯＮ");
-        scoreboardBuilder.scoreboardScope(BaseScoreboardScope.PROTOTYPE);
 
-        scoreboardBuilder.scoreboardLine(12, "");
-        scoreboardBuilder.scoreboardLine(11, "§b" + player.getName());
-        scoreboardBuilder.scoreboardLine(10, "  §fДобыто блоков: §aЗагрузка...");
-        scoreboardBuilder.scoreboardLine(9, "  §fБанда: Загрузка...");
-        scoreboardBuilder.scoreboardLine(8, "  §fПрестиж: §bЗагрузка...");
-        scoreboardBuilder.scoreboardLine(7, "  §fГруппа: §fЗагрузка...");
-        scoreboardBuilder.scoreboardLine(6, "");
-        scoreboardBuilder.scoreboardLine(5, "§bБаланс");
-        scoreboardBuilder.scoreboardLine(4, "  §fДеньги: §aЗагрузка...");
-        scoreboardBuilder.scoreboardLine(3, "  §fТокены: §eЗагрузка...");
-        scoreboardBuilder.scoreboardLine(2, "  §fМножитель: §dЗагрузка...");
-        scoreboardBuilder.scoreboardLine(1, "");
+    private final @Getter BaseScoreboardBuilder scoreboardBuilder;
+    private final @Getter List<ScoreboardUpdater> updaters;
 
-        scoreboardBuilder.scoreboardUpdater(((baseScoreboard, boardPlayer) -> {
-            String playerName = boardPlayer.getName();
-            OpPrison main = OpPrison.getInstance();
+    private @Getter BaseScoreboard baseScoreboard;
 
-            PlayerData playerData = main.getPlayerDataManager().getPlayerDataMap().get(playerName);
-            GangDataManager gManager = main.getGangDataManager();
+    private ScoreboardManager(String scoreboardName, BaseScoreboardScope scoreboardScope) {
+        scoreboardBuilder = ApiManager.newScoreboardBuilder()
+                .scoreboardDisplay(scoreboardName)
+                .scoreboardScope(scoreboardScope);
+        this.updaters = new ArrayList<>();
+    }
 
-            baseScoreboard.updateScoreboardLine(9, boardPlayer,
-                    ChatUtil.text("  §fБанда: %s",
-                            gManager.playerHasGang(playerName) ? gManager.getGangFromPlayer(playerName).getName() : "§c-"));
+    public static ScoreboardManager get(String scoreboardName, BaseScoreboardScope scoreboardScope) {
+        return new ScoreboardManager(scoreboardName, scoreboardScope);
+    }
 
-            baseScoreboard.updateScoreboardLine(8, boardPlayer,
-                    ChatUtil.text("  §fПрестиж: §a%s", StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())));
+    public ScoreboardManager line(int i, String put) {
+        removeLine(i);
+        scoreboardBuilder.scoreboardLine(i, put);
+        return this;
+    }
 
-            baseScoreboard.updateScoreboardLine(7, boardPlayer,
-                    ChatUtil.text("  §fГруппа: §f%s", playerData.getGroup().getName()));
+    public ScoreboardManager updateLine(int i, Player player, String put) {
+        if (baseScoreboard == null)
+            return this;
 
-            baseScoreboard.updateScoreboardLine(10, boardPlayer,
-                    ChatUtil.text("  §fДобыто блоков: §a%s", StringUtils._fixDouble(0, playerData.getBlocks())));
+        baseScoreboard.updateScoreboardLine(i, player, put);
+        return this;
+    }
 
-            baseScoreboard.updateScoreboardLine(4, boardPlayer,
-                    ChatUtil.text("  §fДеньги: §a$%s", StringUtils.formatDouble(2, playerData.getMoney())));
+    public ScoreboardManager removeLine(int i) {
+        scoreboardBuilder.getScoreboardLineMap().remove(i);
+        return this;
+    }
 
-            baseScoreboard.updateScoreboardLine(3, boardPlayer,
-                    ChatUtil.text("  §fТокены: §e⛃%s", StringUtils.formatDouble(2, playerData.getToken())));
+    public ScoreboardManager updater(ru.xfenilafs.core.scoreboard.ScoreboardUpdater updater, int tick) {
+        updaters.add(new ScoreboardUpdater(updater, tick));
+        return this;
+    }
 
-            baseScoreboard.updateScoreboardLine(2, boardPlayer,
-                    ChatUtil.text("  §fМножитель: §d%sx", StringUtils._fixDouble(0, playerData.getMultiplier())));
-        }), 30);
+    public ScoreboardManager build() {
+        baseScoreboard = scoreboardBuilder.build();
 
-        scoreboardBuilder.build().setScoreboardToPlayer(player);
+        if (!updaters.isEmpty())
+            updaters.forEach(scoreboardUpdater -> baseScoreboard.addScoreboardUpdater(scoreboardUpdater.getUpdater(), scoreboardUpdater.getTick()));
+
+        reloadScoreboard();
+        return this;
+    }
+
+    public void loadScoreboard(Player player) {
+        baseScoreboard.setScoreboardToPlayer(player);
+    }
+
+    public void unloadScoreboard(Player player) {
+        baseScoreboard.removeScoreboardToPlayer(player);
+    }
+
+    public void reloadScoreboard() {
+        if (Bukkit.getOnlinePlayers().isEmpty())
+            return;
+
+        Bukkit.getOnlinePlayers()
+                .stream()
+                .parallel()
+                .forEach(player -> {
+                    unloadScoreboard(player);
+                    loadScoreboard(player);
+                });
+    }
+
+    @AllArgsConstructor
+    @Data
+    public static class ScoreboardUpdater {
+
+        private ru.xfenilafs.core.scoreboard.ScoreboardUpdater updater;
+        private int tick;
     }
 }

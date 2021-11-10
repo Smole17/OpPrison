@@ -52,12 +52,13 @@ public class Crate {
     }
 
     public void open(Player player) {
-        Bukkit.getOnlinePlayers().forEach(onPlayer ->
-                ChatUtil.sendMessage(onPlayer, OpPrison.PREFIX +
-                        String.format("&b%s &fоткрывает %s&f...",
-                                player.getName(), type.getName())));
+        if (type.isMessage())
+            Bukkit.getOnlinePlayers().forEach(onPlayer ->
+                    ChatUtil.sendMessage(onPlayer, OpPrison.PREFIX +
+                            String.format("&a%s &fоткрывает %s&f...",
+                                    player.getName(), type.getName())));
 
-        new CrateGui(type.getName()).openInventory(player);
+        new CrateGui().openInventory(player);
     }
 
     public CrateItem getRandomItem(boolean def) {
@@ -103,14 +104,14 @@ public class Crate {
     @AllArgsConstructor
     public enum Type {
 
-        ARMOR("§bЯЩИК С БРОНЁЙ"),
-        RARE_ARMOR("§b§lРЕДКИЙ §r§bЯЩИК С БРОНЁЙ"),
-        POTION("§cЯЩИК С ЗЕЛЬЯМИ"),
-        LOOT_BOX("§6ЛУТБОКС"),
-        MONTHLY("§aЯЩИК МЕСЯЦА");
+        ARMOR("§bЯЩИК С БРОНЁЙ", false),
+        RARE_ARMOR("§b§lРЕДКИЙ §r§bЯЩИК С БРОНЁЙ", false),
+        POTION("§cЯЩИК С ЗЕЛЬЯМИ", false),
+        LOOT_BOX("§6ЛУТБОКС", true),
+        MONTHLY("§aЯЩИК МЕСЯЦА", true);
 
-        private @Getter
-        final String name;
+        private final @Getter String name;
+        private final @Getter boolean message;
 
         public ItemStack getStack() {
             List<String> lore = new ArrayList<>();
@@ -142,8 +143,8 @@ public class Crate {
     // inventory
 
     public class CrateGui extends BaseSimpleInventory {
-        public CrateGui(String name) {
-            super(3, name);
+        public CrateGui() {
+            super(3, "§bЗаберите Награду");
         }
 
         @Override
@@ -219,14 +220,13 @@ public class Crate {
                         inv.setItem(clickedSlot, itemStack);
 
                         if (crateItem.getType() == CrateItem.CrateItemType.ITEM)
-                            opPlayer.add(itemStack);
+                            opPlayer.add(itemStack.clone());
 
                         items.remove(crateItem);
                     });
         }
 
         private void setFinalReward(OpPlayer opPlayer, int... i) {
-
             for (int f : i) {
                 CrateItem crateItem = getRandomItem(true);
                 ItemStack itemStack = crateItem.get(opPlayer.getPlayer().getName());
@@ -251,7 +251,7 @@ public class Crate {
                             inv.setItem(clickedSlot, itemStack);
 
                             if (crateItem.getType() == CrateItem.CrateItemType.ITEM)
-                                opPlayer.add(itemStack);
+                                opPlayer.add(itemStack.clone());
 
                             items.remove(crateItem);
 

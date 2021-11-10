@@ -89,7 +89,7 @@ public class PlayerDataManager {
             }
         });
 
-        ScoreboardManager.loadScoreboard(player);
+        OpPrison.getInstance().getScoreboardManager().loadScoreboard(player);
         GangCommand.invitedList.put(name.toLowerCase(), new ArrayList<>());
 
         OpPrison.BAR.removeAll();
@@ -112,6 +112,12 @@ public class PlayerDataManager {
             player.setAllowFlight(true);
             player.setFlying(true);
         }
+
+        Arrays.stream(player.getInventory().getStorageContents())
+                .parallel()
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.NETHER_STAR)
+                .forEach(itemStack1 -> itemStack1.setAmount(0));
+
 
         opPlayer.add(Items.getItem("location_gui"));
     }
@@ -141,6 +147,8 @@ public class PlayerDataManager {
                 name, blocks, money, token, multiplier, group, prestige, fly, pickaxe,
                 KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions)
         );
+
+        OpPrison.getInstance().getScoreboardManager().unloadScoreboard(player);
         opPlayer.getBoosterManager().unload();
         pickaxeManager.unload();
         playerDataMap.remove(name);
@@ -153,49 +161,20 @@ public class PlayerDataManager {
 
             OpPrison.BAR.addPlayer(onPlayer);
         });
-        OpPrison.getInstance().getWorldStatistic().save(player);
 
         if (OpPrison.getInstance().getPvPCooldown().getPlayers().contains(player)) {
-            Arrays.stream(player.getInventory().getStorageContents())
-                    .forEach(itemStack -> {
-                        if (itemStack == null)
-                            return;
-
-                        Material material = itemStack.getType();
-
-                        if (
-                                material == Material.FISHING_ROD
-                                        || material == Material.IRON_BOOTS
-                                        || material == Material.IRON_LEGGINGS
-                                        || material == Material.IRON_CHESTPLATE
-                                        || material == Material.IRON_HELMET
-                                        || material == Material.DIAMOND_BOOTS
-                                        || material == Material.DIAMOND_LEGGINGS
-                                        || material == Material.CHAINMAIL_BOOTS
-                                        || material == Material.CHAINMAIL_LEGGINGS
-                                        || material == Material.CHAINMAIL_CHESTPLATE
-                                        || material == Material.CHAINMAIL_HELMET
-                                        || material == Material.DIAMOND_CHESTPLATE
-                                        || material == Material.DIAMOND_HELMET
-                                        || material == Material.BOW
-                                        || material == Material.POTION
-                                        || material == Material.SPLASH_POTION
-                        ) {
-                            player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
-                            itemStack.setAmount(0);
-                        }
-                    });
-
+            player.setHealth(0);
             RPlayer.checkAndGet(name).getAchievements().addAchievement(Achievement.OP_LEAVE_PVP);
         }
+
+        OpPrison.getInstance().getWorldStatistic().save(player);
     }
 
     public void updateTop(Player player) {
         String name = player.getName();
         PlayerData data = playerDataMap.get(name);
 
-        PlayerDataSQL.set(name, "blocks", data.getBlocks());
-        PlayerDataSQL.set(name, "prestige", data.getPrestige());
+        PlayerDataSQL.set(name, "blocks", "prestige", data.getBlocks(), data.getPrestige());
     }
 
     protected List<String> getListFromString(String str) {

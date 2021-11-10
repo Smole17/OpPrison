@@ -30,16 +30,16 @@ public class StringUtils {
         return _fixDouble(i, d / 1.0E27D).replace(",", ".") + "Oc";
     }
 
-    public static Double fixDouble(int i, double d) {
-        return Double.valueOf(String.format("%." + i + "f", d).replace(",", "."));
-    }
-
     public static String _fixDouble(int i, double d) {
         return String.format("%." + i + "f", d);
     }
 
     public static String replaceComma(double d) {
-        return String.format("%,.0f", d);
+        return _replaceComma(0, d);
+    }
+
+    public static String _replaceComma(int i, double d) {
+        return String.format("%,." + i + "f", d);
     }
 
     public static String unReplaceComma(String text) {

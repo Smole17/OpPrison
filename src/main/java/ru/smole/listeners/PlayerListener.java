@@ -1,7 +1,6 @@
 package ru.smole.listeners;
 
 import com.google.common.collect.Lists;
-import javafx.print.PageOrientation;
 import lombok.val;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -14,7 +13,6 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -27,13 +25,13 @@ import org.bukkit.inventory.ItemStack;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
-import ru.smole.data.event.OpEvents;
+import ru.smole.data.event.EventManager;
+import ru.smole.data.event.data.Event;
 import ru.smole.data.gang.GangDataManager;
-import ru.smole.data.gang.point.PointEvent;
+import ru.smole.data.event.data.impl.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
-import ru.smole.data.npc.NpcInitializer;
 import ru.smole.data.pads.LaunchPad;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
@@ -42,19 +40,11 @@ import ru.smole.guis.CaseLootGui;
 import ru.smole.utils.ItemStackUtils;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.leaderboard.LeaderBoard;
-import ru.xfenilafs.core.ApiManager;
-import ru.xfenilafs.core.holographic.impl.SimpleHolographic;
-import ru.xfenilafs.core.player.world.WorldStatisticPostLoadEvent;
-import ru.xfenilafs.core.player.world.WorldStatisticPreLoadEvent;
-import ru.xfenilafs.core.protocollib.entity.FakeBaseEntity;
-import ru.xfenilafs.core.protocollib.entity.FakeEntityRegistry;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
 import sexy.kostya.mineos.achievements.Achievement;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -120,6 +110,7 @@ public class PlayerListener implements Listener {
                             || material == Material.BOW
                                     || material == Material.POTION
                                     || material == Material.SPLASH_POTION
+                            || material == Material.ARROW
                     ) {
                         player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
                         itemStack.setAmount(0);
@@ -146,6 +137,9 @@ public class PlayerListener implements Listener {
 
             simpleHolographic.spawn();
         });
+
+        if (PointEvent.holograms.isEmpty())
+            return;
 
         PointEvent.holograms.forEach(protocolHolographic -> {
             if (!protocolHolographic.getLocation().getWorld().equals(player.getWorld()))
@@ -187,7 +181,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
-        OpEvents.asyncChat(event);
+        Event.getEventManager().asyncChat(event);
         sendChat(event);
     }
 
@@ -223,18 +217,18 @@ public class PlayerListener implements Listener {
                     if (type != Material.CHEST)
                         break;
 
-                    if (!OpEvents.getBreakEvents().containsKey("Искатель сокровищ")) {
+                    if (!Event.getEventManager().getBlockEvents().containsKey("treasure")) {
                         event.setCancelled(true);
                         break;
                     }
 
-                    if (player.getWorld() == Bukkit.getWorld("spawn")) {
+                    if (player.getWorld().equals(Bukkit.getWorld("spawn"))) {
                         event.setCancelled(true);
                         break;
                     }
 
                     Location loc = block.getLocation();
-                    if (!OpEvents.getTreasureMap().containsKey(player.getName()) || !OpEvents.getTreasureMap().get(player.getName()).contains(loc)) {
+                    if (!Event.getEventManager().getTreasureMap().containsKey(player.getName()) || !Event.getEventManager().getTreasureMap().get(player.getName()).contains(loc)) {
                         ChatUtil.sendMessage(player, OpPrison.PREFIX + "Это не ваше сокровище!");
                         event.setCancelled(true);
                         break;
@@ -270,13 +264,15 @@ public class PlayerListener implements Listener {
                             break;
 
                         case 2:
-                            playerData.addMoney(100000000000000D);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§a+$100T");
+                            double current = 100000000000D;
+                            playerData.addMoney(current);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§6+$" + StringUtils.formatDouble(0, current));
                             break;
 
                         case 3:
-                            playerData.addToken(25000000000D);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+⛃25B");
+                            double current1 = 25000000D;
+                            playerData.addToken(current1);
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "§e+⛃" + StringUtils.formatDouble(0, current1));
                             break;
 
                         case 4:
@@ -297,7 +293,7 @@ public class PlayerListener implements Listener {
 
                     RPlayer.checkAndGet(player.getName()).getAchievements().addAchievement(Achievement.OP_TAKE_TREASURE);
                     event.setCancelled(true);
-                    break;
+                    return;
                 }
             }
         }
@@ -351,6 +347,15 @@ public class PlayerListener implements Listener {
             ItemStack item = player.getInventory().getContents()[event.getHotbarButton()];
             if(item != null)
                 if (Items.isSomePickaxe(item, player.getName()))
+                    event.setCancelled(true);
+                return;
+        }
+
+        InventoryAction action = event.getAction();
+
+        if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY || action == InventoryAction.CLONE_STACK || action == InventoryAction.COLLECT_TO_CURSOR) {
+            if (event.getInventory().getName() != null && event.getInventory().getName().contains("Хранилище"))
+                if (Items.isSomePickaxe(event.getCurrentItem(), player.getName()) || event.getCurrentItem().getType() == Material.NETHER_STAR)
                     event.setCancelled(true);
         }
     }

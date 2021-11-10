@@ -74,10 +74,10 @@ public class PlayerDataSQL {
         );
     }
 
-    public static void set(String name, String table, double input) {
+    public static void set(String name, String table, String table2, double input, double input2) {
         base.getExecuteHandler().executeUpdate(true,//language=SQL
-                "UPDATE players SET `" + table + "` = ?  WHERE `name` = ?",
-                input, name
+                "UPDATE players SET `" + table + "` = ?, `" + table2 +"` = ?  WHERE `name` = ?",
+                input, input2, name
         );
     }
 }

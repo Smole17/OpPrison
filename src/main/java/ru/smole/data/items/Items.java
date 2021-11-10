@@ -32,6 +32,7 @@ import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
+import ru.smole.guis.MenuGui;
 import ru.smole.guis.PickaxeGui;
 import ru.smole.guis.warps.WarpGui;
 import ru.smole.utils.ItemStackUtils;
@@ -341,7 +342,7 @@ public class Items {
         registerItem("location_gui",
                 objects -> ApiManager
                         .newItemBuilder(Material.NETHER_STAR)
-                        .setName("§fЛокации режима")
+                        .setName("§fМеню режима")
                         .addItemFlags(
                                 ItemFlag.HIDE_ATTRIBUTES,
                                 ItemFlag.HIDE_DESTROYS,
@@ -349,7 +350,7 @@ public class Items {
                         )
                         .setLore("§7Нажмите для активации")
                         .build(),
-                (event, itemStack) -> new WarpGui(OpPrison.getInstance().getConfigManager()).openInventory(event.getPlayer()));
+                (event, itemStack) -> new MenuGui().openInventory(event.getPlayer()));
 
         registerItem(Material.FISHING_ROD.name().toLowerCase(),
                 objects -> ApiManager
@@ -372,7 +373,7 @@ public class Items {
         registerItem("speed_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье Скорости " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье Скорости " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 150, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.SPEED.getColor())
                         .build()
@@ -381,7 +382,7 @@ public class Items {
         registerItem("jump_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье §aПрыгучести " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье §aПрыгучести " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.JUMP, 20 * 150, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.JUMP.getColor())
                         .build()
@@ -390,7 +391,7 @@ public class Items {
         registerItem("regen_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье §dРегенерации " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье §dРегенерации " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 20, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.REGENERATION.getColor())
                         .build()
@@ -399,7 +400,7 @@ public class Items {
         registerItem("str_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.POTION)
-                        .setName("§fЗелье §4Силы " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье §4Силы " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20 * 30, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.INCREASE_DAMAGE.getColor())
                         .build()
@@ -408,7 +409,7 @@ public class Items {
         registerItem("heal_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPLASH_POTION)
-                        .setName("§fЗелье §cМгновенного Лечения " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье §cМгновенного Лечения " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.HEAL, 0, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.HEAL.getColor())
                         .build()
@@ -417,7 +418,7 @@ public class Items {
         registerItem("slow_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPLASH_POTION)
-                        .setName("§fЗелье §9Медлительности " + ((Double) objects[0]).intValue())
+                        .setName("§fЗелье §9Медлительности " + (((Double) objects[0]).intValue() + 1))
                         .addCustomPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.SLOW.getColor())
                         .build()
@@ -426,8 +427,8 @@ public class Items {
         registerItem("poison_potion",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPLASH_POTION)
-                        .setName("§fЗелье §2Отравления " + ((Double) objects[0]).intValue())
-                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 7, ((Double) objects[0]).intValue()), false)
+                        .setName("§fЗелье §2Отравления " + (((Double) objects[0]).intValue() + 1))
+                        .addCustomPotionEffect(new PotionEffect(PotionEffectType.POISON , 20 * 7, ((Double) objects[0]).intValue()), false)
                         .setPotionColor(PotionEffectType.SLOW.getColor())
                         .build()
         );
