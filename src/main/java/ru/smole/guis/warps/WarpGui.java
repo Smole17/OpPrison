@@ -7,10 +7,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
+import ru.smole.mines.Mine;
 import ru.smole.utils.StringUtils;
 import ru.smole.utils.config.ConfigManager;
 import ru.xfenilafs.core.ApiManager;
@@ -18,6 +20,8 @@ import ru.xfenilafs.core.inventory.BaseInventory;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.regions.Region;
+import ru.xfenilafs.core.util.ChatUtil;
+import ru.xfenilafs.core.util.ItemUtil;
 import ru.xfenilafs.core.util.TeleportUtil;
 
 import java.util.Objects;
@@ -109,7 +113,7 @@ public class WarpGui extends BaseSimpleInventory {
     }
 
     public static class PrestigeWarpGui extends BaseSimpleInventory {
-        private ConfigManager configManager;
+        private final ConfigManager configManager;
 
         public PrestigeWarpGui(ConfigManager configManager) {
             super(5, "Точки телепортации (Престиж)");
@@ -137,11 +141,31 @@ public class WarpGui extends BaseSimpleInventory {
                 TeleportUtil tp = new TeleportUtil(OpPrison.getInstance());
                 Material material = is ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
 
+                ItemUtil.ItemBuilder builder = ApiManager.newItemBuilder(material)
+                        .setName("§a" + name + " §fпрестижей шахта");
+
+                String s = null;
+                if (is && slot == 15) {
+                    s = "§8На шахте не работает Взрыв и Разрушитель";
+                }
+
+                Mine mine = OpPrison.MINES
+                        .values()
+                        .stream()
+                        .parallel()
+                        .filter(mine1 -> mine1.getRegion().equals(region))
+                        .findFirst()
+                        .orElse(null);
+
+                builder.setLore(
+                        s,
+                        mine == null ? null : mine.getBonus() == 0 ? null : ChatUtil.text("&6+%s% к добываемым деньгам", StringUtils.replaceComma(mine.getBonus())),
+                        "",
+                        is ? "§eНажмите, для телепортации" : null
+                );
+
                 addItem(slot,
-                        ApiManager.newItemBuilder(material)
-                                .setName("§a" + name + " §fпрестижей шахта")
-                                .setLore(is ? "§7Нажмите, для телепортации" : null)
-                                .build(),
+                        builder.build(),
                         (baseInventory, inventoryClickEvent) -> {
                             if (is) {
                                 tp.teleport(player, region.getSpawnLocation(), "§bТелепортация...", "§7Подождите немного");
@@ -197,11 +221,31 @@ public class WarpGui extends BaseSimpleInventory {
                 TeleportUtil tp = new TeleportUtil(OpPrison.getInstance());
                 Material material = is ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
 
+                ItemUtil.ItemBuilder builder =                         ApiManager.newItemBuilder(material)
+                        .setName(name + " §fшахта");
+
+                String s = null;
+                if (is && slot == 15) {
+                    s = "§8На шахте не работает Взрыв и Разрушитель";
+                }
+
+                Mine mine = OpPrison.MINES
+                        .values()
+                        .stream()
+                        .parallel()
+                        .filter(mine1 -> mine1.getRegion().equals(region))
+                        .findFirst()
+                        .orElse(null);
+
+                builder.setLore(
+                        s,
+                        mine == null ? null : mine.getBonus() == 0 ? null : ChatUtil.text("&6+%s% к добываемым деньгам", StringUtils.replaceComma(mine.getBonus())),
+                        "",
+                        is ? "§eНажмите, для телепортации" : null
+                );
+
                 addItem(slot,
-                        ApiManager.newItemBuilder(material)
-                                .setName(name + " §fшахта")
-                                .setLore(is ? "§7Нажмите, для телепортации" : null)
-                                .build(),
+                        builder.build(),
                         (baseInventory, inventoryClickEvent) -> {
                             if (is) {
                                 tp.teleport(player, region.getSpawnLocation(), "§bТелепортация...", "§7Подождите немного");

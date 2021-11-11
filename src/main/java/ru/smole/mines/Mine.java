@@ -30,10 +30,11 @@ public class Mine {
     private final Cuboid zone;
     private final long respawn;
     private final List<ResourceBlock> blocks;
+    private final double bonus;
 
     private long lastUpdate;
 
-    public Mine(int level, String region, String world, String minPoint, String maxPoint, String resetTime, List<ResourceBlock> blocks) {
+    public Mine(int level, String region, String world, String minPoint, String maxPoint, String resetTime, List<ResourceBlock> blocks, double bonus) {
         this.level = level;
         this.region = OpPrison.REGIONS.get(region.toLowerCase());
         String[] minPointSplit = minPoint.split(" ");
@@ -53,6 +54,7 @@ public class Mine {
         );
         this.respawn = TemporalUtils.parseTemporal(resetTime).get(TimeUnit.MILLISECONDS);
         this.blocks = blocks;
+        this.bonus = bonus;
         blocksForFill = zone.getSizeX() * zone.getSizeY() * zone.getSizeZ() / 6;
         blocks.sort(Comparator.comparingInt(ResourceBlock::getChance));
     }

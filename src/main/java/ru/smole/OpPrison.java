@@ -312,6 +312,7 @@ public class OpPrison extends CorePlugin {
             String minPoint = section.getString("minPoint");
             String resetTime = section.getString("resetTime");
             List<String> blocks = section.getStringList("blocks");
+            double bonus = section.getDouble("bonus");
             Mine mine = new Mine(
                     level,
                     region,
@@ -329,7 +330,8 @@ public class OpPrison extends CorePlugin {
                                         !split[0].contains(":") ? 0 : Integer.parseInt(split[0].split(":")[1])
                                 );
                     })
-                            .collect(Collectors.toList())
+                            .collect(Collectors.toList()),
+                    bonus
             );
             MINES.put(mine.getLevel(), mine);
 

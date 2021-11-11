@@ -296,11 +296,6 @@ import static ru.smole.OpPrison.MINES;
         double token = upgrades.get(Upgrade.TOKEN_MINER).isIs() ? 0.4 * token_minerLevel : 0.4;
         double exp = 1;
 
-        if (OpPrison.BOOSTER > 0) {
-            cost = cost + (cost * OpPrison.BOOSTER / 100);
-            token = token + (token * OpPrison.BOOSTER / 100);
-        }
-
         if (prestige_finderLevel > 0 && upgrades.get(Upgrade.PRESTIGE_FINDER).isIs()) {
             double chance = prestige_finderLevel / 60000;
 
@@ -410,8 +405,8 @@ import static ru.smole.OpPrison.MINES;
             }
 
             playerData.addBlocks(1);
-            playerData.addMoney(cost);
-            playerData.addToken(token);
+            playerData.addMoney(multiplyCost(cost));
+            playerData.addToken(multiplyToken(token));
             pickaxe.addExp(exp);
 
             return;
@@ -428,16 +423,41 @@ import static ru.smole.OpPrison.MINES;
             }
 
             playerData.addBlocks(1);
-            playerData.addMoney(cost);
-            playerData.addToken(token);
+            playerData.addMoney(multiplyCost(cost));
+            playerData.addToken(multiplyToken(token));
             pickaxe.addExp(exp);
 
             return;
         }
 
         playerData.addBlocks(1);
-        playerData.addMoney(cost);
-        playerData.addToken(token);
+        playerData.addMoney(multiplyCost(cost));
+        playerData.addToken(multiplyToken(token));
         pickaxe.addExp(exp);
+    }
+
+    private double multiplyCost(double cost) {
+        if (OpPrison.BOOSTER > 0) {
+            cost = cost + (cost * OpPrison.BOOSTER / 100);
+        }
+
+        Mine mine = MINES.values()
+                .stream()
+                .parallel()
+                .filter(mine1 -> mine1.getRegion().getZone().contains(player))
+                .findFirst()
+                .orElse(null);
+
+        double bonus = mine == null ? 0.01 : mine.getBonus();
+
+        return cost + (cost * (bonus == 0 ? 0.01 : bonus));
+    }
+
+    private double multiplyToken(double token) {
+        if (OpPrison.BOOSTER > 0) {
+            token = token + (token * OpPrison.BOOSTER / 100);
+        }
+
+        return token;
     }
 }
