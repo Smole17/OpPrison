@@ -30,7 +30,7 @@ public class WarpGui extends BaseSimpleInventory {
     private final ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
-        super(5, "Точки телепортации (Основные)");
+        super(5, "§lЛокации режима");
         this.configManager = configManager;
     }
 
@@ -116,7 +116,7 @@ public class WarpGui extends BaseSimpleInventory {
         private final ConfigManager configManager;
 
         public PrestigeWarpGui(ConfigManager configManager) {
-            super(5, "Точки телепортации (Престиж)");
+            super(5, "§lШахты престижей");
             this.configManager = configManager;
         }
 
@@ -195,7 +195,7 @@ public class WarpGui extends BaseSimpleInventory {
         private final ConfigManager configManager;
 
         public DonateWarpGui(ConfigManager configManager) {
-            super(5, "Точки телепортации (Группы)");
+            super(5, "§lШахты для групп");
             this.configManager = configManager;
         }
 

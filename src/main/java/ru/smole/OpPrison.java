@@ -146,7 +146,7 @@ public class OpPrison extends CorePlugin {
 
         pvPCooldown = new PvPCooldown();
         eventManager = new EventManager();
-        scoreboardManager = ScoreboardManager.get("§eＯＰＰＲＩＳＯＮ", BaseScoreboardScope.PROTOTYPE);
+        scoreboardManager = ScoreboardManager.get("§b§lＯＰＰＲＩＳＯＮ", BaseScoreboardScope.PROTOTYPE);
 
         registerListeners(
                 new PlayerListener(), new RegionListener()
@@ -202,7 +202,7 @@ public class OpPrison extends CorePlugin {
 
                     baseScoreboard.updateScoreboardLine(9, boardPlayer,
                             ChatUtil.text(
-                                    " §a❖ §f%s",
+                                    "§a❖ §fПрестиж: §a%s",
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())
                             )
                     );
@@ -220,7 +220,7 @@ public class OpPrison extends CorePlugin {
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getToken()).length() <= 3 ? 0 : 2, playerData.getToken())
                             )
                     );
-                }), 1)
+                }), 5)
                 .build();
     }
 
@@ -539,7 +539,7 @@ public class OpPrison extends CorePlugin {
                                             .updateScoreboardLine(
                                                     2,
                                                     player,
-                                                    "   §7➤ §e" + (blocks.containsKey(playerName) ? StringUtils.replaceComma(blocks.get(playerName)) : "0")
+                                                    "§a> §aБлоков: §f" + (blocks.containsKey(playerName) ? StringUtils.replaceComma(blocks.get(playerName)) : "0")
                                             );
                                 });
                             }, 5, 5);

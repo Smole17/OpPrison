@@ -95,7 +95,7 @@ public class BlockEvent implements Event {
 
         OpPrison.getInstance().getScoreboardManager()
                 .line(4, "§fСобытие:")
-                .line(3, "§7✧ §e" + name.replace("&", "§"))
+                .line(3, "§a> §f" + name.replace("&", "§"))
                 .line(2, "")
                 .build();
 
