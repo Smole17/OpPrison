@@ -100,12 +100,7 @@ public class GangCommand extends BukkitCommand<Player> {
                             return;
 
                         case "vault":
-                            if (gangPlayerType.ordinal() < GangPlayerType.OLDEST.ordinal()) {
-                                ChatUtil.sendMessage(player, PREFIX_N + "Ваша роль в банде слишком мала для этого действия");
-                                return;
-                            }
-
-                            player.openInventory(gangData.getVault());
+                            gangData.openVault(gangPlayer);
                             return;
                     }
 

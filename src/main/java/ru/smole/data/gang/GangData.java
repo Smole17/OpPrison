@@ -26,6 +26,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static ru.smole.OpPrison.PREFIX_N;
+
 @Data
 public class GangData {
 
@@ -103,6 +105,22 @@ public class GangData {
         vault.setContents(Base64Util.decodeItems(data));
     }
 
+    public void openVault(GangPlayer player) {
+        if (player.getType().ordinal() < GangPlayer.GangPlayerType.OLDEST.ordinal()) {
+            ChatUtil.sendMessage(player.getPlayer(), PREFIX_N + "Ваша роль в банде слишком мала для этого действия");
+            return;
+        }
+
+        player.getPlayer().openInventory(this.getVault());
+    }
+
+    public void openVault(Player player) {
+        String playerName = player.getName();
+
+        if (this.getGangPlayerMap().containsKey(playerName.toLowerCase()))
+            openVault(this.getGangPlayer(playerName));
+    }
+
     @AllArgsConstructor
     @Data
     public static class GangPlayer {
@@ -113,6 +131,10 @@ public class GangData {
 
         public String getPlayerName() {
             return Bukkit.getOfflinePlayer(name).getName();
+        }
+
+        public Player getPlayer() {
+            return Bukkit.getPlayer(getPlayerName());
         }
 
         public void addScore(double added) {
