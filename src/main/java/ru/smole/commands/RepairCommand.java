@@ -20,14 +20,14 @@ public class RepairCommand extends BukkitCommand<Player> {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
         if (!GroupsManager.Group.SUN.isCan(playerData.getGroup())) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Доступно от %s", GroupsManager.Group.SUN.getName());
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Доступно от %s", GroupsManager.Group.SUN.getName());
             return;
         }
 
         ItemStack itemStack = player.getInventory().getItemInMainHand();
 
         if (itemStack == null || itemStack.getType() == Material.AIR) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Возьмите в руку корректный предмет");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Возьмите в руку корректный предмет");
             return;
         }
 

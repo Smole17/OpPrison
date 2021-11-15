@@ -50,8 +50,9 @@ public class PlayerDataSQL {
                                 .queryRow(new ValueQueryRow("kit", null))
                                 .queryRow(new ValueQueryRow("access", null))
                                 .queryRow(new ValueQueryRow("questions", null))
+                                .queryRow(new ValueQueryRow("battlepass", null))
 
-                                .executeSync(base);
+                                .executeAsync(base);
                     }
                 });
     }
@@ -67,10 +68,14 @@ public class PlayerDataSQL {
                 .thenAccept(resultSetConsumer);
     }
 
-    public static void save(String name, double blocks, double money, double token, double multiplier, GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits, String access, String questions) {
+    public static void save(
+            String name, double blocks, double money, double token, double multiplier,
+            GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits,
+            String access, String questions, String pass
+    ) {
         base.getExecuteHandler().executeUpdate(true,
-                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ?  WHERE `name` = ?",
-                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, name
+                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ? `battlepass` = ?  WHERE `name` = ?",
+                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, pass, name
         );
     }
 

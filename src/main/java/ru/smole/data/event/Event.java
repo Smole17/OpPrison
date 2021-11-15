@@ -1,9 +1,6 @@
-package ru.smole.data.event.data;
+package ru.smole.data.event;
 
-import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.scheduler.BukkitTask;
 import ru.smole.OpPrison;
-import ru.smole.data.event.EventManager;
 
 import java.util.function.Consumer;
 

@@ -27,7 +27,7 @@ import java.util.*;
 
 public class PickaxeGui extends BaseSimpleInventory {
     public PickaxeGui() {
-        super(6, "Прокачка кирки");
+        super(6, "§7Прокачка Кирки");
     }
 
     @SuppressWarnings("uncheked")

@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,12 +22,13 @@ import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.AsyncCatcher;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.commands.*;
+import ru.smole.data.battlepass.BattlePass;
 import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.EventManager;
-import ru.smole.data.event.data.impl.BlockEvent;
+import ru.smole.data.event.impl.BlockEvent;
 import ru.smole.data.gang.GangDataManager;
-import ru.smole.data.event.data.impl.PointEvent;
+import ru.smole.data.event.impl.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -63,12 +62,12 @@ import ru.xfenilafs.core.player.world.TypeStats;
 import ru.xfenilafs.core.player.world.WorldStatistic;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.regions.ResourceBlock;
-import ru.xfenilafs.core.scoreboard.BaseScoreboard;
 import ru.xfenilafs.core.scoreboard.BaseScoreboardScope;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 import sexy.kostya.mineos.achievements.Achievement;
+import ru.smole.data.battlepass.BattlePass.BattlePassPlayer.BattlePassLevel;
 
 import java.time.ZoneId;
 import java.util.*;
@@ -94,6 +93,7 @@ public class OpPrison extends CorePlugin {
     private @Getter PvPCooldown pvPCooldown;
     private @Getter EventManager eventManager;
     private @Getter ScoreboardManager scoreboardManager;
+    private @Getter BattlePass battlePass;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
@@ -130,6 +130,7 @@ public class OpPrison extends CorePlugin {
                 .queryRow(new TypedQueryRow(TEXT, "kit"))
                 .queryRow(new TypedQueryRow(TEXT, "access"))
                 .queryRow(new TypedQueryRow(TEXT, "questions"))
+                .queryRow(new TypedQueryRow(TEXT, "battlepass"))
                 .executeAsync(base);
 
         base.newDatabaseQuery("gangs").createTableQuery().setCanCheckExists(true)
@@ -197,9 +198,6 @@ public class OpPrison extends CorePlugin {
 
                     PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName);
 
-                    if (playerData == null)
-                        return;
-
                     baseScoreboard.updateScoreboardLine(9, boardPlayer,
                             ChatUtil.text(
                                     "§a❖ §fПрестиж: §a%s",
@@ -256,8 +254,8 @@ public class OpPrison extends CorePlugin {
 
     private void loadRegionsAndMines() {
         FileConfiguration config = configManager.getRegionConfig().getConfiguration();
-        ConfigurationSection regions = config.getConfigurationSection("regions");
 
+        ConfigurationSection regions = config.getConfigurationSection("regions");
         regions.getKeys(false).forEach(key -> {
             ConfigurationSection section = regions.getConfigurationSection(key);
             String name = section.getString("name");
@@ -329,8 +327,7 @@ public class OpPrison extends CorePlugin {
                                         Integer.parseInt(split[1]),
                                         !split[0].contains(":") ? 0 : Integer.parseInt(split[0].split(":")[1])
                                 );
-                    })
-                            .collect(Collectors.toList()),
+                    }).collect(Collectors.toList()),
                     bonus
             );
             MINES.put(mine.getLevel(), mine);
@@ -534,6 +531,9 @@ public class OpPrison extends CorePlugin {
                                 Bukkit.getOnlinePlayers().forEach(player -> {
                                     String playerName = player.getName();
 
+                                    if (!blocks.containsKey(playerName))
+                                        blocks.put(playerName, 0.0);
+
                                     scoreboardManager
                                             .getBaseScoreboard()
                                             .updateScoreboardLine(
@@ -567,42 +567,47 @@ public class OpPrison extends CorePlugin {
                                         int[] i = {1};
 
                                         ChatUtil.broadcast("");
-                                        blocks.entrySet()
+
+                                        val blockz = blocks.entrySet()
                                                 .stream()
                                                 .sorted((o1, o2) -> -o1.getValue().compareTo(o2.getValue()))
-                                                .limit(3)
-                                                .forEachOrdered(x -> {
-                                                    ChatUtil.broadcast("   &7%s. &b%s &f- &b%s", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()));
-                                                    i[0]++;
+                                                .limit(3);
 
-                                                    if (Bukkit.getPlayer(x.getKey()) == null || !Bukkit.getPlayer(x.getKey()).isOnline())
-                                                        return;
+                                        if (!blockz.allMatch(stringDoubleEntry -> stringDoubleEntry.getValue() == 0)) {
+                                            blockz.forEachOrdered(x -> {
+                                                ChatUtil.broadcast("   &7%s. &b%s &f- &b%s &8&o(+%s%)", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()), 15 / i[0]);
+                                                i[0]++;
 
-                                                    PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
+                                                if (Bukkit.getPlayer(x.getKey()) == null || !Bukkit.getPlayer(x.getKey()).isOnline())
+                                                    return;
 
-                                                    if (playerData == null)
-                                                        return;
+                                                PlayerData playerData = getPlayerDataManager().getPlayerDataMap().get(x.getKey());
 
-                                                    double added = playerData.getToken() * 0.15 / i[0];
+                                                if (playerData == null)
+                                                    return;
 
-                                                    playerData.addToken(added);
-                                                    RPlayer.checkAndGet(x.getKey()).getAchievements().addAchievement(Achievement.OP_CONTEST_WINNER);
+                                                double added = playerData.getToken() * 0.15 / i[0];
 
-                                                    Question question = playerData.getQuestions().get("SOFOS");
+                                                playerData.addToken(added);
+                                                RPlayer.checkAndGet(x.getKey()).getAchievements().addAchievement(Achievement.OP_CONTEST_WINNER);
 
-                                                    if (question == null)
-                                                        return;
+                                                Question question = playerData.getQuestions().get("SOFOS");
 
-                                                    Question.QuestionStep step = question.getStep();
+                                                if (question == null)
+                                                    return;
 
-                                                    if (step == null)
-                                                        return;
+                                                Question.QuestionStep step = question.getStep();
 
-                                                    if (step == Question.QuestionStep.COMPLETING) {
-                                                        question.setStep(Question.QuestionStep.ALR_COMPLETED);
-                                                        PickaxeManager.getPickaxes().get(x.getKey()).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
-                                                    }
-                                                });
+                                                if (step == null)
+                                                    return;
+
+                                                if (step == Question.QuestionStep.COMPLETING) {
+                                                    question.setStep(Question.QuestionStep.ALR_COMPLETED);
+                                                    PickaxeManager.getPickaxes().get(x.getKey()).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
+                                                }
+                                            });
+                                        } else
+                                            ChatUtil.broadcast("   &fВ событии &aСостязание &fникто не принял участие");
 
                                         ChatUtil.broadcast("");
 
@@ -679,5 +684,60 @@ public class OpPrison extends CorePlugin {
                 20 * 60,
                 20 * 60 * 5
         );
+
+        Map<Integer, BattlePass.BattlePassPlayer.BattlePassLevel> levels = new HashMap<>();
+        Map<Integer,BattlePass.BattlePassTask> tasks = new HashMap<>();
+
+        FileConfiguration config = getConfigManager().getConfig().getConfiguration();
+        ConfigurationSection pass = config.getConfigurationSection("battlepass");
+
+        pass.getConfigurationSection("levels").getKeys(false)
+                .forEach(s -> {
+                    ConfigurationSection sec = pass.getConfigurationSection("levels." + s);
+                    Set<String> rewSec = sec.getConfigurationSection("rewards").getKeys(false);
+                    BattlePassLevel.Reward[] rewards = new BattlePassLevel.Reward[rewSec.size()];
+
+                    rewSec.forEach(s1 -> {
+                        ConfigurationSection rew = sec.getConfigurationSection("rewards." + s1);
+                        List<String> itemSec = rew.getStringList("items." + s1);
+                        ItemStack[] itemStacks = new ItemStack[itemSec.size()];
+
+                        itemSec.forEach(s2 -> {
+                            String[] item = s2.split(":");
+
+                            itemStacks[Integer.parseInt(s2)] = Items.getItem(item[0], Double.parseDouble(item[1]));
+                        });
+
+                        rewards[Integer.parseInt(s1)] = new BattlePassLevel.Reward(rew.getBoolean("premium"), itemStacks, rew.getInt("slot"));
+                    });
+
+                    levels.put(
+                            Integer.parseInt(s),
+                            new BattlePassLevel(
+                                    Integer.parseInt(s),
+                                    sec.getDouble("exp"),
+                                    rewards
+                            )
+                    );
+                });
+
+        pass.getConfigurationSection("tasks").getKeys(false)
+                .forEach(s -> {
+                    ConfigurationSection sec = pass.getConfigurationSection("tasks." + s);
+
+                    tasks.put(Integer.parseInt(s), new BattlePass.BattlePassTask(
+                            Integer.parseInt(s),
+                            sec.getDouble("exp"),
+                            sec.getBoolean("premium"),
+                            false,
+                            sec.getInt("time"),
+                            new BattlePass.BattlePassTask.TaskType(
+                                    BattlePass.BattlePassTask.TaskType.Type.valueOf(sec.getString("type.name").toUpperCase()),
+                                    sec.getDouble("type.value")
+                            )
+                    ));
+                });
+
+        battlePass = new BattlePass(levels, tasks);
     }
 }

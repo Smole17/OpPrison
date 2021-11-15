@@ -11,6 +11,7 @@ import ru.luvas.rmcs.utils.UtilBungee;
 import ru.smole.OpPrison;
 import ru.smole.commands.GangCommand;
 import ru.smole.commands.KitCommand;
+import ru.smole.data.battlepass.BattlePass;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -21,11 +22,13 @@ import ru.smole.data.npc.question.Question;
 import ru.smole.scoreboard.ScoreboardManager;
 import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.smole.utils.server.ServerUtil;
+import ru.xfenilafs.core.util.Base64Util;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.CooldownUtil;
 import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.network.server.BungeeClient;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -62,13 +65,14 @@ public class PlayerDataManager {
                 Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
                 String access = resultSet.getString("access");
                 Map<String, Question> questions = getQuestionsFromString(resultSet.getString("questions"));
+                BattlePass.BattlePassPlayer passPlayer = getPassPlayer(resultSet.getString("battlepass"), player);
 
                 playerDataMap.put(
                         name,
                         new PlayerData(
                                 name, blocks, money, token, multiplier,
                                 group, prestige, fly, getListFromString(access),
-                                questions
+                                questions, passPlayer
                         )
                 );
 
@@ -76,7 +80,7 @@ public class PlayerDataManager {
 
                 pickaxeManager.load(resultSet.getString("pickaxe"));
                 KitCommand.KitsGui.load(name, resultSet.getString("kit"));
-            } catch (SQLException ex) {
+            } catch (SQLException | IOException ex) {
                 ChatUtil.sendMessage(player, "§c§lВаши данные не были загружены, сообщите об этом Smole17#7425 | https://vk.com/smole17");
                 player.sendTitle("§c§lВаши данные не были загружены,", "сообщите об этом Smole17#7425 | https://vk.com/smole17", 20, 20, 20);
 
@@ -145,7 +149,8 @@ public class PlayerDataManager {
 
         PlayerDataSQL.save(
                 name, blocks, money, token, multiplier, group, prestige, fly, pickaxe,
-                KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions)
+                KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions),
+                savePassPlayer(data)
         );
 
         OpPrison.getInstance().getScoreboardManager().unloadScoreboard(player);
@@ -236,5 +241,66 @@ public class PlayerDataManager {
         }
 
         return sb.toString();
+    }
+
+    protected BattlePass.BattlePassPlayer getPassPlayer(String str, Player player) throws IOException {
+        if (str == null || str.equals("null"))
+            return null;
+
+        str = Base64Util.decodeSimple(str);
+
+        BattlePass battlePass = OpPrison.getInstance().getBattlePass();
+        String[] data = str.split("-");
+
+        double exp = Double.parseDouble(data[0]);
+        BattlePass.BattlePassPlayer.BattlePassLevel passLevel = battlePass.getLevel(Integer.parseInt(data[1]));
+        boolean premium = Boolean.parseBoolean(data[2]);
+        String[] tasks = data[3].split(";");
+
+        List<BattlePass.BattlePassTask> taskList = new ArrayList<>();
+        Arrays.stream(tasks)
+                .filter(Objects::nonNull)
+                .forEach(s -> {
+                    String[] taskData = s.split(":");
+
+                    taskList.add(
+                            battlePass.getTask(Integer.parseInt(taskData[0]))
+                                    .setComplete(Boolean.parseBoolean(taskData[1]))
+                    );
+                });
+
+        return new BattlePass.BattlePassPlayer(
+                exp,
+                passLevel,
+                player,
+                premium,
+                taskList
+                );
+    }
+
+    protected String savePassPlayer(PlayerData playerData) {
+        StringBuilder builder = new StringBuilder();
+        String format = "%s-";
+        String format1 = "%s;";
+
+        BattlePass.BattlePassPlayer battlePass = playerData.getBattlePass();
+
+        builder.append(String.format(format, battlePass.getExp()));
+        builder.append(String.format(format, battlePass.getBattlePassLevel().getLevel()));
+        builder.append(String.format(format, battlePass.isPremium()));
+
+        StringBuilder builder1 = new StringBuilder();
+
+        int i = 1;
+        for (BattlePass.BattlePassTask task : battlePass.getTasks()) {
+            if (i == battlePass.getTasks().size())
+                format1 = "%s";
+
+            builder1.append(String.format(format1, task.getI() + ":" + task.isComplete()));
+            i++;
+        }
+
+        builder.append(String.format(format, builder1));
+        return Base64Util.encodeSimple(builder.toString());
     }
 }

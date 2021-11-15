@@ -24,12 +24,12 @@ import java.util.function.BiConsumer;
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
-            0,100, 650000, 40,
+            0,1, 650000, 40,
             Material.DIAMOND, GroupsManager.Group.MANTLE, false),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 20, 75000, 1100,
+            0, 1, 75000, 1100,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
 
     NIGHT_VISION("§5Ночное зрение",

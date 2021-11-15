@@ -25,10 +25,9 @@ import org.bukkit.inventory.ItemStack;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
 import ru.smole.data.cases.Case;
-import ru.smole.data.event.EventManager;
-import ru.smole.data.event.data.Event;
+import ru.smole.data.event.Event;
 import ru.smole.data.gang.GangDataManager;
-import ru.smole.data.event.data.impl.PointEvent;
+import ru.smole.data.event.impl.PointEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.crates.CrateItem;
@@ -248,7 +247,7 @@ public class PlayerListener implements Listener {
                             mine_key = mine_key.clone();
 
                             OpPlayer.add(player, mine_key);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &fx4", mine_key.getItemMeta().getDisplayName());
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &ax4", mine_key.getItemMeta().getDisplayName());
                             break;
 
                         case 1:
@@ -260,7 +259,7 @@ public class PlayerListener implements Listener {
                             epic_key = epic_key.clone();
 
                             OpPlayer.add(player, epic_key);
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &fx1", epic_key.getItemMeta().getDisplayName());
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили новый предмет %s &ax1", epic_key.getItemMeta().getDisplayName());
                             break;
 
                         case 2:

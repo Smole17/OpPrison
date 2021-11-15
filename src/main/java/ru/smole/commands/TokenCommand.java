@@ -25,7 +25,7 @@ public class TokenCommand extends BukkitCommand<Player> {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();
@@ -40,13 +40,13 @@ public class TokenCommand extends BukkitCommand<Player> {
                 double token;
                 try {
                     if (args[1].contains(".")) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Введите целое положительное число");
                         return;
                     }
 
                     token = Double.parseDouble(args[1]);
                 } catch (Exception e) {
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Введите целое положительное число");
                     return;
                 }
 
@@ -64,12 +64,12 @@ public class TokenCommand extends BukkitCommand<Player> {
         double token = playerData.getToken();
 
         if (1D >= count) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите корректное число");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Введите корректное число");
             return;
         }
 
         if (count > token) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Недостаточно токенов");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Недостаточно токенов");
             return;
         }
 

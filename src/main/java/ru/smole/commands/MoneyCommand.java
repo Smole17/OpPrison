@@ -21,7 +21,7 @@ public class MoneyCommand extends BukkitCommand<Player> {
         if (args.length == 1) {
             Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Игрок не найден");
                 return;
             }
             String targetName = target.getName();

@@ -1,12 +1,11 @@
-package ru.smole.data.event.data.impl;
+package ru.smole.data.event.impl;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
-import ru.smole.data.event.EventManager;
-import ru.smole.data.event.data.Event;
+import ru.smole.data.event.Event;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.config.ConfigUtils;

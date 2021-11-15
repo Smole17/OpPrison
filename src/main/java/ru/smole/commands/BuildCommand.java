@@ -22,10 +22,10 @@ public class BuildCommand extends BukkitCommand<Player> {
         boolean contains = BUILD_MODE.contains(player);
         if (contains) {
             BUILD_MODE.remove(player);
-            ChatUtil.sendMessage(player, "&8[&bКоманды&8] &cБольше вы не можете вносить изменения на карте!");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Больше вы не можете вносить изменения на карте!");
         } else {
             BUILD_MODE.add(player);
-            ChatUtil.sendMessage(player, "&8[&bКоманды&8] &aТеперь вы можете вносить изменения на карте!");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Теперь вы можете вносить изменения на карте!");
         }
     }
 }

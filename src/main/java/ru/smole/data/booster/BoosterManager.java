@@ -138,7 +138,7 @@ public class BoosterManager {
 //        String[] event = {null};
 //        OpEvents.getBreakEvents().keySet().stream().findFirst().ifPresent(s -> event[0] = s);
 
-        BAR.setTitle(String.format("§fБустер режима: §a+%s",
+        BAR.setTitle(String.format("§fБустер Режима: §a+%s",
                 StringUtils._fixDouble(1, BOOSTER) + "%"));
     }
 }

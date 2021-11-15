@@ -448,7 +448,7 @@ import static ru.smole.OpPrison.MINES;
                 .findFirst()
                 .orElse(null);
 
-        double bonus = mine == null ? 0.01 : mine.getBonus();
+        double bonus = mine == null ? 0.01 : mine.getBonus() / 100;
 
         return cost + (cost * (bonus == 0 ? 0.01 : bonus));
     }

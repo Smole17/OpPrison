@@ -29,7 +29,7 @@ public class GangChatCommand extends BukkitCommand<Player> {
         boolean playerHasGang = gangDataManager.playerHasGang(playerName);
 
         if (!playerHasGang) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы не состоите в банде");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы не состоите в банде");
             return;
         }
 

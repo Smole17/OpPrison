@@ -30,7 +30,7 @@ public class WarpGui extends BaseSimpleInventory {
     private final ConfigManager configManager;
 
     public WarpGui(ConfigManager configManager) {
-        super(5, "§lЛокации режима");
+        super(5, "§7Локации Режима");
         this.configManager = configManager;
     }
 
@@ -74,7 +74,10 @@ public class WarpGui extends BaseSimpleInventory {
                 addItem(slot,
                         ApiManager.newItemBuilder(Material.valueOf(material.toUpperCase()))
                                 .setName(displayName)
-                                .setLore("§7Нажмите, для телепортации")
+                                .setLore(
+                                        "",
+                                        "§eНажмите, для телепортации!"
+                                )
                                 .build(),
                         (baseInventory, inventoryClickEvent) -> {
                             double needPrestige = item.getDouble("prestige");
@@ -99,13 +102,21 @@ public class WarpGui extends BaseSimpleInventory {
 
         addItem(21,
                 ApiManager.newItemBuilder(Material.DIAMOND)
-                        .setName("§fШахты для групп")
+                        .setName("§7Шахты Групп")
+                        .setLore(
+                                "",
+                                "§eНажмите, для выбора!"
+                        )
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new DonateWarpGui(configManager).openInventory(player));
 
         addItem(25,
                 ApiManager.newItemBuilder(Material.NETHER_STAR)
-                        .setName("§fШахты престижей")
+                        .setName("§7Шахты Престижей")
+                        .setLore(
+                                "",
+                                "§eНажмите, для выбора!"
+                        )
                         .build(), (baseInventory, inventoryClickEvent)
                         -> new PrestigeWarpGui(configManager).openInventory(player));
 
@@ -116,7 +127,7 @@ public class WarpGui extends BaseSimpleInventory {
         private final ConfigManager configManager;
 
         public PrestigeWarpGui(ConfigManager configManager) {
-            super(5, "§lШахты престижей");
+            super(5, "§7Шахты Престижей");
             this.configManager = configManager;
         }
 
@@ -159,9 +170,9 @@ public class WarpGui extends BaseSimpleInventory {
 
                 builder.setLore(
                         s,
-                        mine == null ? null : mine.getBonus() == 0 ? null : ChatUtil.text("&6+%s% к добываемым деньгам", StringUtils.replaceComma(mine.getBonus())),
+                        mine == null ? null : String.format("§6+%,." + (!String.valueOf(mine.getBonus()).split("\\.")[1].equals("0") ? 1 : 0) + "f%% к добываемым деньгам", mine.getBonus()),
                         "",
-                        is ? "§eНажмите, для телепортации" : null
+                        is ? "§eНажмите, для телепортации!" : null
                 );
 
                 addItem(slot,
@@ -176,13 +187,21 @@ public class WarpGui extends BaseSimpleInventory {
 
             addItem(42,
                     ApiManager.newItemBuilder(Material.DIAMOND)
-                            .setName("§aШахты для групп")
+                            .setName("§7Шахты Групп")
+                            .setLore(
+                                    "",
+                                    "§eНажмите, для выбора!"
+                            )
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new DonateWarpGui(configManager).openInventory(player));
 
             addItem(40,
                     ApiManager.newItemBuilder(Material.BOOK)
-                            .setName("§aОсновные локации")
+                            .setName("§7Локации Режима")
+                            .setLore(
+                                    "",
+                                    "§eНажмите, для выбора!"
+                            )
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new WarpGui(configManager).openInventory(player));
 
@@ -195,7 +214,7 @@ public class WarpGui extends BaseSimpleInventory {
         private final ConfigManager configManager;
 
         public DonateWarpGui(ConfigManager configManager) {
-            super(5, "§lШахты для групп");
+            super(5, "§7Шахты Групп");
             this.configManager = configManager;
         }
 
@@ -225,9 +244,6 @@ public class WarpGui extends BaseSimpleInventory {
                         .setName(name + " §fшахта");
 
                 String s = null;
-                if (is && slot == 15) {
-                    s = "§8На шахте не работает Взрыв и Разрушитель";
-                }
 
                 Mine mine = OpPrison.MINES
                         .values()
@@ -239,9 +255,9 @@ public class WarpGui extends BaseSimpleInventory {
 
                 builder.setLore(
                         s,
-                        mine == null ? null : mine.getBonus() == 0 ? null : ChatUtil.text("&6+%s% к добываемым деньгам", StringUtils.replaceComma(mine.getBonus())),
+                        mine == null ? null : String.format("§6+%,." + (!String.valueOf(mine.getBonus()).split("\\.")[1].equals("0") ? 1 : 0) + "f%% к добываемым деньгам", mine.getBonus()),
                         "",
-                        is ? "§eНажмите, для телепортации" : null
+                        is ? "§eНажмите, для телепортации!" : null
                 );
 
                 addItem(slot,
@@ -256,13 +272,21 @@ public class WarpGui extends BaseSimpleInventory {
 
             addItem(40,
                     ApiManager.newItemBuilder(Material.BOOK)
-                            .setName("§fОсновные локации")
+                            .setName("§7Локации Режима")
+                            .setLore(
+                                    "",
+                                    "§eНажмите, для выбора!"
+                            )
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new WarpGui(configManager).openInventory(player));
 
             addItem(42,
                     ApiManager.newItemBuilder(Material.NETHER_STAR)
-                            .setName("§fШахты престижей")
+                            .setName("§7Шахты Престижей")
+                            .setLore(
+                                    "",
+                                    "§eНажмите, для выбора!"
+                            )
                             .build(), (baseInventory, inventoryClickEvent)
                             -> new PrestigeWarpGui(configManager).openInventory(player));
 

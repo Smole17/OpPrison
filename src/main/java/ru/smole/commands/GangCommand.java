@@ -11,6 +11,7 @@ import ru.smole.OpPrison;
 import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.mysql.GangDataSQL;
+import ru.smole.guis.GangGui;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.command.BukkitCommand;
 import ru.xfenilafs.core.command.annotation.CommandPermission;
@@ -55,26 +56,7 @@ public class GangCommand extends BukkitCommand<Player> {
                 case 1:
                     switch (args[0]) {
                         case "info":
-                            ChatUtil.sendMessage(player, PREFIX + "&fБанда %s &8&o(%s/%s)&r&f:", gangName, gangPlayersMap.size(), 10);
-                            ChatUtil.sendMessage(player, "   &fКоличество очков: &b%s", StringUtils.replaceComma(gangData.getScore()));
-
-                            val gangPlayers = gangData.findGangPlayers(GangPlayerType.LEADER, GangPlayerType.MANAGER, GangPlayerType.OLDEST, GangPlayerType.DEFAULT);
-                            StringBuilder builder = new StringBuilder();
-
-                            gangPlayers.forEach(tempGangPlayer -> {
-                                GangPlayerType tempType = tempGangPlayer.getType();
-                                String format = "%s &7%s &8&o(%s)&7, ";
-
-                                if (gangPlayers.get(gangPlayers.size() - 1).equals(tempGangPlayer))
-                                    format = format.replace(",", "");
-
-                                builder.append(String.format(format,
-                                        tempType.getName(), tempGangPlayer.getPlayerName(), StringUtils.replaceComma(tempGangPlayer.getScore())));
-                            });
-
-                            ChatUtil.sendMessage(player, "   &fУчастники:");
-                            ChatUtil.sendMessage(player, builder.toString());
-
+                            new GangGui(gangData).openInventory(player);
                             return;
                         case "disband":
                             if (gangPlayerType != GangPlayerType.LEADER) {
@@ -350,17 +332,17 @@ public class GangCommand extends BukkitCommand<Player> {
                 switch (args[0]) {
                     case "create":
                         if (args[1].length() > 5) {
-                            ChatUtil.sendMessage(player, PREFIX + "Название банды не может превышать 5 символов");
+                            ChatUtil.sendMessage(player, PREFIX_N + "Название банды не может превышать 5 символов");
                             return;
                         }
 
                         if (args[1].contains("&")) {
-                            ChatUtil.sendMessage(player, PREFIX + "Цветовые символы временно запрещены");
+                            ChatUtil.sendMessage(player, PREFIX_N + "Цветовые символы временно запрещены");
                             return;
                         }
 
                         if (gangDataMap.keySet().stream().parallel().anyMatch(s -> s.equalsIgnoreCase(args[1]))) {
-                            ChatUtil.sendMessage(player, PREFIX + "Придумайте уникальное название");
+                            ChatUtil.sendMessage(player, PREFIX_N + "Придумайте уникальное название");
                             return;
                         }
 
@@ -373,7 +355,7 @@ public class GangCommand extends BukkitCommand<Player> {
                         GangData playerGangData = gangDataManager.getGangDataMap().get(args[1]);
 
                         if (playerGangData == null) {
-                            ChatUtil.sendMessage(player, PREFIX + "Банда не найдена");
+                            ChatUtil.sendMessage(player, PREFIX_N + "Банда не найдена");
                             return;
                         }
 
@@ -403,14 +385,14 @@ public class GangCommand extends BukkitCommand<Player> {
                         List<String> invitedGangs = invitedList.get(playerName.toLowerCase());
 
                         if (invitedGangs.isEmpty()) {
-                            ChatUtil.sendMessage(player, PREFIX + "У вас нет активных приглашений");
+                            ChatUtil.sendMessage(player, PREFIX_N + "У вас нет активных приглашений");
                             return;
                         }
 
                         GangData acceptedGang = gangDataMap.get(args[1]);
 
                         if (acceptedGang == null || !invitedGangs.contains(acceptedGang.getName())) {
-                            ChatUtil.sendMessage(player, PREFIX + "Банда не найдена");
+                            ChatUtil.sendMessage(player, PREFIX_N + "Банда не найдена");
                             return;
                         }
 

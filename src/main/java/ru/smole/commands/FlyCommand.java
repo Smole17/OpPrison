@@ -20,7 +20,7 @@ public class FlyCommand extends BukkitCommand<Player> {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
         if (player.getWorld().getName().contains("gangs")) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы не можете включить здесь полёт");
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы не можете включить здесь полёт");
             return;
         }
 
@@ -33,6 +33,6 @@ public class FlyCommand extends BukkitCommand<Player> {
             return;
         }
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к полёту");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "У вас нет доступа к полёту");
     }
 }

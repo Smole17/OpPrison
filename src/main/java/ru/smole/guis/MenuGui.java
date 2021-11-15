@@ -22,35 +22,37 @@ import ru.xfenilafs.core.util.ItemUtil;
 
 public class MenuGui extends BaseSimpleInventory {
     public MenuGui() {
-        super(5, "§lМеню режима");
+        super(4, "§7Меню Режима");
     }
 
     @Override
     public void drawInventory(@NonNull Player player) {
         String playerName = player.getName();
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName);
+        GangDataManager gangDataManager = OpPrison.getInstance().getGangDataManager();
 
         ItemStack item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
                 .setName("§aВаш Профиль")
                 .setLore(
-                        "§e▦  §fБлоки: §e" + StringUtils.replaceComma(playerData.getBlocks()),
-                        "§a❖ §fПрестиж: §a" + StringUtils.replaceComma(playerData.getPrestige()),
-                        "§d❃ §fМножитель: §d" + StringUtils.replaceComma(playerData.getMultiplier()),
-                        "§f➲ §fГруппа: " + playerData.getGroup().getName()
+                        "§e❏ §fБлоки §e" + StringUtils.replaceComma(playerData.getBlocks()),
+                        "§a❖ §fПрестиж §a" + StringUtils.replaceComma(playerData.getPrestige()),
+                        "§d❃ §fМножитель §d" + StringUtils.replaceComma(playerData.getMultiplier()),
+                        "§f➲ §fГруппа " + playerData.getGroup().getName(),
+                        "§6✈ §fБанда " + (gangDataManager.playerHasGang(playerName) ? gangDataManager.getGangFromPlayer(playerName).getName() : "отсутствует")
                 )
                 .setDurability(3)
                 .setPlayerSkull(playerName)
                 .build();
 
         addItem(
-                5,
+                14,
                 item
         );
 
         item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
                 .setName("§bЛокации Режима")
                 .setLore(
-                        "§7Телепортация на локации режима",
+                        "§7Телепортация на локации режима.",
                         "",
                         "§eНажмите для выбора локации!"
                 )
@@ -58,35 +60,47 @@ public class MenuGui extends BaseSimpleInventory {
                 .setPlayerSkull("speu")
                 .build();
 
-        addItem(41,
+        addItem(23,
                 item,
                 (inv, click) -> new WarpGui(OpPrison.getInstance().getConfigManager()).openInventory(player));
 
-        item = ApiManager.newItemBuilder(Material.ENDER_CHEST)
-                .setName("§bЛичное хранилище")
+        item = ApiManager.newItemBuilder(Material.GOLD_SWORD)
+                .setName("§bБанда")
                 .setLore(
+                        "§7Информация по вашей банде.",
                         "",
                         "§eНажмите для открытия!"
                 )
-                .setDurability(0)
                 .build();
 
-       addItem(25,
+        addItem(21,
+                item,
+                (inv, click) -> {
+                    closeInventory(player);
+                    new GangGui(OpPrison.getInstance().getGangDataManager().getGangFromPlayer(playerName)).open(player);
+                });
+
+        item = ApiManager.newItemBuilder(Material.ENDER_CHEST)
+                .setName("§aЛичное Хранилище")
+                .setLore(
+                        "§7Ваше личное хранилище,",
+                        "эндер-сундук.",
+                        "",
+                        "§eНажмите для открытия!"
+                )
+                .build();
+
+        addItem(25,
                 item,
                 (inv, click) -> player.openInventory(player.getEnderChest()));
 
-        item = ApiManager.newItemBuilder(Material.CHEST)
-                .setName("§bХранилище банды")
-                .setLore(
-                        "",
-                        "§eНажмите для открытия!"
-                )
-                .setDurability(0)
-                .build();
+       item = ApiManager.newItemBuilder(Material.BARRIER)
+               .setName("§cЗакрыть")
+               .build();
 
-       addItem(21,
-                item,
-                (inv, click) -> OpPrison.getInstance().getGangDataManager().getGangFromPlayer(playerName).openVault(player));
+       addItem(32,
+               item,
+               (inv, click) -> closeInventory(player));
 
         setGlassPanel();
     }

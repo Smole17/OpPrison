@@ -45,14 +45,14 @@ public class StatsCommand extends BukkitCommand<CommandSender> {
                     try {
                         value = Double.valueOf(args[2]);
                     } catch (Exception e) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Введите целое положительное число");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Введите целое положительное число");
                         return;
                     }
                 } else if (type == Stat.GROUP) {
                     try {
                         value = GroupsManager.Group.getGroupFromString(args[2]);
                     } catch (Exception e) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Группа не найдена. Используйте данный список: %s", Arrays.toString(GroupsManager.Group.values()));
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Группа не найдена. Используйте данный список: %s", Arrays.toString(GroupsManager.Group.values()));
                         return;
                     }
                 } else {

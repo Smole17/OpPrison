@@ -1,33 +1,16 @@
 package ru.smole.data.event;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerEvent;
-import ru.luvas.rmcs.player.RPlayer;
-import ru.smole.OpPrison;
-import ru.smole.data.booster.BoosterManager;
-import ru.smole.data.event.data.Event;
-import ru.smole.data.event.data.impl.BlockEvent;
-import ru.smole.data.event.data.impl.ChatEvent;
-import ru.smole.data.event.data.impl.PointEvent;
-import ru.smole.data.items.pickaxe.PickaxeManager;
-import ru.smole.data.items.pickaxe.Upgrade;
-import ru.smole.data.npc.question.Question;
-import ru.smole.data.player.PlayerData;
-import ru.smole.utils.StringUtils;
+import ru.smole.data.event.impl.BlockEvent;
+import ru.smole.data.event.impl.ChatEvent;
+import ru.smole.data.event.impl.PointEvent;
 import ru.xfenilafs.core.regions.Region;
 import ru.xfenilafs.core.util.ChatUtil;
-import sexy.kostya.mineos.achievements.Achievement;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 
 public class EventManager {
 
@@ -35,7 +18,6 @@ public class EventManager {
     private final @Getter Map<String, ChatEvent> chatEvents;
     private final @Getter Map<String, BlockEvent> blockEvents;
 
-    private final OpPrison main = OpPrison.getInstance();
     private final @Getter Map<String, Double> blocks;
     private final @Getter Map<String, List<Location>> treasureMap;
 

@@ -38,7 +38,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
             Player target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игрок не найден");
+                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Игрок не найден");
                 return;
             }
 
@@ -47,7 +47,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     Upgrade.UpgradeStat jack = PickaxeManager.getPickaxes().get(target.getName()).getUpgrades().get(Upgrade.JACK_HAMMER);
 
                     if (jack.isCompleteQ()) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы уже имеете этот предмет");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы уже имеете этот предмет");
                         return;
                     }
 
@@ -67,7 +67,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     ItemStack itemStack = Items.getItem(args[1], amount);
 
                     if (itemStack == null) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
                         return;
                     }
 
@@ -89,7 +89,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
             Player target = Bukkit.getPlayer(args[0]);
 
             if (target == null) {
-                ChatUtil.sendMessage(sender, OpPrison.PREFIX + "Игрок не найден");
+                ChatUtil.sendMessage(sender, OpPrison.PREFIX_N + "Игрок не найден");
                 return;
             }
 
@@ -98,7 +98,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     Upgrade.UpgradeStat jack = PickaxeManager.getPickaxes().get(target.getName()).getUpgrades().get(Upgrade.JACK_HAMMER);
 
                     if (jack.isCompleteQ()) {
-                        ChatUtil.sendMessage(sender, OpPrison.PREFIX + "Вы уже имеете этот предмет");
+                        ChatUtil.sendMessage(sender, OpPrison.PREFIX_N + "Вы уже имеете этот предмет");
                         return;
                     }
 
@@ -118,7 +118,7 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
                     ItemStack itemStack = Items.getItem(args[1], amount);
 
                     if (itemStack == null) {
-                        ChatUtil.sendMessage(sender, OpPrison.PREFIX + "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
+                        ChatUtil.sendMessage(sender, OpPrison.PREFIX_N + "Предмет не найден. Воспользуйтесь списком: %s", ChatColor.stripColor(Arrays.toString(Items.getCreators().keySet().toArray())));
                         return;
                     }
 

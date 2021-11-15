@@ -7,12 +7,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
-import ru.smole.data.event.EventManager;
-import ru.smole.data.event.data.Event;
-import ru.smole.data.event.data.impl.ChatEvent;
+import ru.smole.data.event.impl.ChatEvent;
 import ru.smole.data.items.Items;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.utils.ItemStackUtils;
@@ -21,9 +18,7 @@ import ru.xfenilafs.core.command.annotation.CommandPermission;
 import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
 
 @CommandPermission(permission = "opprison.admin")
 public class EventCommand extends BukkitCommand<CommandSender> {
@@ -110,7 +105,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 .runnable(event -> () -> {
                     Bukkit.getOnlinePlayers().forEach(player -> {
                         OpPlayer.add(player, itemMain.clone());
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "§fВы получили %s §fx%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &ax%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
                     });
 
                     event.stop();
@@ -190,6 +185,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                 ChatUtil.broadcast("    §fПобедителем события стал: §b%s", target.getName());
                 ChatUtil.broadcast("");
 
+                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы получили новый предмет %s &ax%s", itemMain.getItemMeta().getDisplayName(), itemMain.getAmount());
                 OpPlayer.add(target, itemMain.clone());
 
                 ChatUtil.broadcast("");

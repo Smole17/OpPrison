@@ -1,16 +1,9 @@
-package ru.smole.data.event.data.impl;
+package ru.smole.data.event.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
-import ru.smole.OpPrison;
-import ru.smole.data.event.EventManager;
-import ru.smole.data.event.data.Event;
-import ru.xfenilafs.core.util.Pair;
+import ru.smole.data.event.Event;
 import ru.xfenilafs.core.util.Schedules;
 
 import java.util.function.Consumer;

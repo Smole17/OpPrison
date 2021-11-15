@@ -1,23 +1,15 @@
-package ru.smole.data.event.data.impl;
+package ru.smole.data.event.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
 import ru.smole.OpPrison;
-import ru.smole.data.event.data.Event;
-import ru.smole.scoreboard.ScoreboardManager;
-import ru.xfenilafs.core.scoreboard.BaseScoreboard;
+import ru.smole.data.event.Event;
 import ru.xfenilafs.core.scoreboard.BaseScoreboardBuilder;
-import ru.xfenilafs.core.util.Pair;
 import ru.xfenilafs.core.util.Schedules;
 
 import java.util.Arrays;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

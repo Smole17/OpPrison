@@ -66,10 +66,14 @@ public class GangData {
     }
 
     public void removeGangPlayer(String playerName) {
-        if (!gangPlayerMap.containsKey(playerName.toLowerCase()))
+        if (!hasGangPlayer(playerName))
             return;
 
         gangPlayerMap.remove(playerName.toLowerCase());
+    }
+
+    public boolean hasGangPlayer(String playerName) {
+        return gangPlayerMap.containsKey(playerName.toLowerCase());
     }
 
     public boolean isFull() {

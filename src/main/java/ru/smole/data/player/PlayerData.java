@@ -1,9 +1,11 @@
 package ru.smole.data.player;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
+import ru.smole.data.battlepass.BattlePass;
 import ru.smole.data.gang.GangData;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.npc.question.Question;
@@ -13,7 +15,9 @@ import sexy.kostya.mineos.achievements.Achievements;
 import java.util.List;
 import java.util.Map;
 
-@Data public class PlayerData {
+@AllArgsConstructor
+@Data
+public class PlayerData {
 
     private String name;
     private double blocks;
@@ -25,21 +29,7 @@ import java.util.Map;
     private boolean fly;
     private List<String> access;
     private Map<String, Question> questions;
-
-    public PlayerData(String name, double blocks, double money, double token, double multiplier,
-                      GroupsManager.Group group, double prestige, boolean fly, List<String> access,
-                      Map<String, Question> questions) {
-        this.name = name;
-        this.blocks = blocks;
-        this.money = money;
-        this.token = token;
-        this.multiplier = multiplier;
-        this.group = group;
-        this.prestige = prestige;
-        this.fly = fly;
-        this.access = access;
-        this.questions = questions;
-    }
+    private BattlePass.BattlePassPlayer battlePass;
 
     public Player getPlayer() {
         return Bukkit.getPlayer(name);
