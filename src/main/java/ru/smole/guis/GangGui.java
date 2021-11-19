@@ -46,7 +46,6 @@ public class GangGui extends BaseSimpleInventory {
                     .setDurability(3)
                     .setPlayerSkull(gangPlayer.getPlayerName())
                     .build();
-
             addItem(14,
                     item
             );

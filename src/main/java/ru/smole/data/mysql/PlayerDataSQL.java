@@ -71,11 +71,11 @@ public class PlayerDataSQL {
     public static void save(
             String name, double blocks, double money, double token, double multiplier,
             GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits,
-            String access, String questions, String pass
+            String access, String questions
     ) {
         base.getExecuteHandler().executeUpdate(true,
-                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ? `battlepass` = ?  WHERE `name` = ?",
-                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, pass, name
+                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ? WHERE `name` = ?",
+                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, name
         );
     }
 

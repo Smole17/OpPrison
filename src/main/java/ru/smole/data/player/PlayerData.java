@@ -5,8 +5,6 @@ import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
-import ru.smole.data.battlepass.BattlePass;
-import ru.smole.data.gang.GangData;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.npc.question.Question;
 import sexy.kostya.mineos.achievements.Achievement;
@@ -29,7 +27,6 @@ public class PlayerData {
     private boolean fly;
     private List<String> access;
     private Map<String, Question> questions;
-    private BattlePass.BattlePassPlayer battlePass;
 
     public Player getPlayer() {
         return Bukkit.getPlayer(name);

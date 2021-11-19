@@ -22,13 +22,12 @@ import org.bukkit.scheduler.BukkitTask;
 import org.spigotmc.AsyncCatcher;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.commands.*;
-import ru.smole.data.battlepass.BattlePass;
 import ru.smole.data.booster.BoosterManager;
 import ru.smole.data.cases.Case;
 import ru.smole.data.event.EventManager;
 import ru.smole.data.event.impl.BlockEvent;
-import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.event.impl.PointEvent;
+import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.crates.Crate;
 import ru.smole.data.items.pickaxe.Pickaxe;
@@ -67,7 +66,6 @@ import ru.xfenilafs.core.util.ChatUtil;
 import ru.xfenilafs.core.util.Schedules;
 import ru.xfenilafs.core.util.cuboid.Cuboid;
 import sexy.kostya.mineos.achievements.Achievement;
-import ru.smole.data.battlepass.BattlePass.BattlePassPlayer.BattlePassLevel;
 
 import java.time.ZoneId;
 import java.util.*;
@@ -93,7 +91,6 @@ public class OpPrison extends CorePlugin {
     private @Getter PvPCooldown pvPCooldown;
     private @Getter EventManager eventManager;
     private @Getter ScoreboardManager scoreboardManager;
-    private @Getter BattlePass battlePass;
 
     public static final Map<String, Region> REGIONS = new HashMap<>();
     public static final Map<Integer, Mine> MINES = new HashMap<>();
@@ -684,60 +681,5 @@ public class OpPrison extends CorePlugin {
                 20 * 60,
                 20 * 60 * 5
         );
-
-        Map<Integer, BattlePass.BattlePassPlayer.BattlePassLevel> levels = new HashMap<>();
-        Map<Integer,BattlePass.BattlePassTask> tasks = new HashMap<>();
-
-        FileConfiguration config = getConfigManager().getConfig().getConfiguration();
-        ConfigurationSection pass = config.getConfigurationSection("battlepass");
-
-        pass.getConfigurationSection("levels").getKeys(false)
-                .forEach(s -> {
-                    ConfigurationSection sec = pass.getConfigurationSection("levels." + s);
-                    Set<String> rewSec = sec.getConfigurationSection("rewards").getKeys(false);
-                    BattlePassLevel.Reward[] rewards = new BattlePassLevel.Reward[rewSec.size()];
-
-                    rewSec.forEach(s1 -> {
-                        ConfigurationSection rew = sec.getConfigurationSection("rewards." + s1);
-                        List<String> itemSec = rew.getStringList("items." + s1);
-                        ItemStack[] itemStacks = new ItemStack[itemSec.size()];
-
-                        itemSec.forEach(s2 -> {
-                            String[] item = s2.split(":");
-
-                            itemStacks[Integer.parseInt(s2)] = Items.getItem(item[0], Double.parseDouble(item[1]));
-                        });
-
-                        rewards[Integer.parseInt(s1)] = new BattlePassLevel.Reward(rew.getBoolean("premium"), itemStacks, rew.getInt("slot"));
-                    });
-
-                    levels.put(
-                            Integer.parseInt(s),
-                            new BattlePassLevel(
-                                    Integer.parseInt(s),
-                                    sec.getDouble("exp"),
-                                    rewards
-                            )
-                    );
-                });
-
-        pass.getConfigurationSection("tasks").getKeys(false)
-                .forEach(s -> {
-                    ConfigurationSection sec = pass.getConfigurationSection("tasks." + s);
-
-                    tasks.put(Integer.parseInt(s), new BattlePass.BattlePassTask(
-                            Integer.parseInt(s),
-                            sec.getDouble("exp"),
-                            sec.getBoolean("premium"),
-                            false,
-                            sec.getInt("time"),
-                            new BattlePass.BattlePassTask.TaskType(
-                                    BattlePass.BattlePassTask.TaskType.Type.valueOf(sec.getString("type.name").toUpperCase()),
-                                    sec.getDouble("type.value")
-                            )
-                    ));
-                });
-
-        battlePass = new BattlePass(levels, tasks);
     }
 }
