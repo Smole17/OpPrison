@@ -475,7 +475,8 @@ public class Items {
         EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический §fключ").build()),
         LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§eЛегендарный §fключ").build()),
         MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический §fключ").build()),
-        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build());
+        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build()),
+        GROUP("Групповой", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§dГрупповой §fключ").build());
 
         private final String name;
         private final ItemStack stack;
