@@ -32,7 +32,7 @@ public class PrestigeManager {
         double upped = 1;
         double money = playerData.getMoney();
 
-        double c = 5500D;
+        double c = 1000000D;
         double multip = 1.001F;
         double cost = prestige == 0 ? c : upped * multip * c;
 

@@ -4,6 +4,8 @@ import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import ru.smole.OpPrison;
@@ -12,6 +14,7 @@ import ru.smole.commands.GangCommand;
 import ru.smole.commands.GangSetCommand;
 import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
+import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
 import ru.smole.guis.warps.WarpGui;
 import ru.smole.utils.StringUtils;
@@ -22,7 +25,7 @@ import ru.xfenilafs.core.util.ItemUtil;
 
 public class MenuGui extends BaseSimpleInventory {
     public MenuGui() {
-        super(4, "§7Меню Режима");
+        super(6, "§7Меню Режима");
     }
 
     @Override
@@ -45,8 +48,40 @@ public class MenuGui extends BaseSimpleInventory {
                 .build();
 
         addItem(
-                14,
+                13,
                 item
+        );
+
+        item = ApiManager.newItemBuilder(Material.NETHER_STAR)
+                .setName("§bПрокачать Престиж")
+                .setLore(
+                        "§7Одним нажатием прокачать нужное кол-во престижей.",
+                        "",
+                        "§eНажмите ЛКМ, чтобы прокачать престиж на 1!",
+                        "§eНажмите ПКМ, чтобы прокачать престиж на все деньги!"
+                )
+                .setDurability(3)
+                .setPlayerSkull("speu")
+                .build();
+
+        OpPlayer opPlayer = new OpPlayer(player);
+
+        addItem(
+                15,
+                item,
+                (inv, click) -> {
+                    if (click.isLeftClick()) {
+                        opPlayer.getPrestigeManager().up(1);
+                        return;
+                    }
+
+                    if (click.isRightClick()) {
+                        opPlayer.getPrestigeManager().up(2);
+                        return;
+                    }
+
+                    closeInventory(player);
+                }
         );
 
         item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
@@ -60,7 +95,7 @@ public class MenuGui extends BaseSimpleInventory {
                 .setPlayerSkull("speu")
                 .build();
 
-        addItem(23,
+        addItem(32,
                 item,
                 (inv, click) -> new WarpGui(OpPrison.getInstance().getConfigManager()).openInventory(player));
 
@@ -73,7 +108,7 @@ public class MenuGui extends BaseSimpleInventory {
                 )
                 .build();
 
-        addItem(21,
+        addItem(30,
                 item,
                 (inv, click) -> {
                     closeInventory(player);
@@ -84,13 +119,13 @@ public class MenuGui extends BaseSimpleInventory {
                 .setName("§aЛичное Хранилище")
                 .setLore(
                         "§7Ваше личное хранилище,",
-                        "эндер-сундук.",
+                        "§7эндер-сундук.",
                         "",
                         "§eНажмите для открытия!"
                 )
                 .build();
 
-        addItem(25,
+        addItem(34,
                 item,
                 (inv, click) -> player.openInventory(player.getEnderChest()));
 
@@ -98,7 +133,7 @@ public class MenuGui extends BaseSimpleInventory {
                .setName("§cЗакрыть")
                .build();
 
-       addItem(32,
+       addItem(41,
                item,
                (inv, click) -> closeInventory(player));
 

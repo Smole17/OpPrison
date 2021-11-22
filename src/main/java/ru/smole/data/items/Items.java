@@ -470,13 +470,13 @@ public class Items {
     @Getter
     public enum Key {
 
-        TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен §fключ").build()),
-        MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский §fключ").build()),
-        EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический §fключ").build()),
-        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§eЛегендарный §fключ").build()),
-        MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический §fключ").build()),
-        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный §fключ").build()),
-        GROUP("Групповой", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§dГрупповой §fключ").build());
+        TOKEN("Токен", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§6Токен Ключ").build()),
+        MINE("Шахтёрский", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§aШахтёрский Ключ").build()),
+        EPIC("Эпический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§5Эпический Ключ").build()),
+        LEGENDARY("Легендарный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§eЛегендарный Ключ").build()),
+        MYTHICAL("Мифический", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§cМифический Ключ").build()),
+        SEASON("Сезонный", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§bСезонный Ключ").build()),
+        GROUP("Групповой", ApiManager.newItemBuilder(Material.TRIPWIRE_HOOK).setName("§dГрупповой Ключ").build());
 
         private final String name;
         private final ItemStack stack;

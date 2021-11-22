@@ -35,7 +35,6 @@ import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.mysql.GangDataSQL;
 import ru.smole.data.npc.NpcInitializer;
-import ru.smole.data.npc.question.Question;
 import ru.smole.data.pads.LaunchPad;
 import ru.smole.data.player.PlayerData;
 import ru.smole.data.player.PlayerDataManager;
@@ -215,7 +214,7 @@ public class OpPrison extends CorePlugin {
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getToken()).length() <= 3 ? 0 : 2, playerData.getToken())
                             )
                     );
-                }), 5)
+                }), 1)
                 .build();
     }
 
@@ -394,8 +393,7 @@ public class OpPrison extends CorePlugin {
         info.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
         info.addEmptyLine();
         info.addTextLine("§fВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
-        info.addTextLine("§fНа данном режиме цель является прокачать свою кирку и престиж §8§o(/prestige|pr max)");
-        info.addTextLine("§fА остальную информацию Вы можете узнать через §b/opprison");
+        info.addTextLine("§fА остальную информацию Вы можете узнать через §b/help");
         info.addEmptyLine();
         info.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
         LeaderBoard.holograms.add(info);
@@ -449,8 +447,6 @@ public class OpPrison extends CorePlugin {
 
                     int hasteLevel = (int) upgrades.get(Upgrade.HASTE).getCount() - 1;
                     int speedLevel = (int) upgrades.get(Upgrade.SPEED).getCount() - 1;
-                    int jump_boostLevel = (int) upgrades.get(Upgrade.JUMP_BOOST).getCount() - 1;
-                    int night_visionLevel = (int) upgrades.get(Upgrade.NIGHT_VISION).getCount() - 1;
 
                     if (hasteLevel != 0) {
                         if (upgrades.get(Upgrade.HASTE).isIs()) {
@@ -470,24 +466,6 @@ public class OpPrison extends CorePlugin {
                         }
                     }
 
-                    if (jump_boostLevel != 0) {
-                        if (upgrades.get(Upgrade.JUMP_BOOST).isIs()) {
-                            if (player.hasPotionEffect(PotionEffectType.JUMP))
-                                player.removePotionEffect(PotionEffectType.JUMP);
-
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 80, jump_boostLevel));
-                        }
-                    }
-
-                    if (night_visionLevel != 0) {
-                        if (upgrades.get(Upgrade.NIGHT_VISION).isIs()) {
-                            if (player.hasPotionEffect(PotionEffectType.NIGHT_VISION))
-                                player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 400, night_visionLevel));
-                        }
-                    }
-
                 }), 20, 20);
     }
 
@@ -500,7 +478,7 @@ public class OpPrison extends CorePlugin {
                     if (!blockEMap.isEmpty())
                         return;
 
-                    switch (random0.nextInt(0, 1)) {
+                    switch (random0.nextInt(3)) {
                         case 0: {
                             Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 0;
 
@@ -587,21 +565,6 @@ public class OpPrison extends CorePlugin {
 
                                                 playerData.addToken(added);
                                                 RPlayer.checkAndGet(x.getKey()).getAchievements().addAchievement(Achievement.OP_CONTEST_WINNER);
-
-                                                Question question = playerData.getQuestions().get("SOFOS");
-
-                                                if (question == null)
-                                                    return;
-
-                                                Question.QuestionStep step = question.getStep();
-
-                                                if (step == null)
-                                                    return;
-
-                                                if (step == Question.QuestionStep.COMPLETING) {
-                                                    question.setStep(Question.QuestionStep.ALR_COMPLETED);
-                                                    PickaxeManager.getPickaxes().get(x.getKey()).getUpgrades().get(Upgrade.JACK_HAMMER).setCompleteQ(true);
-                                                }
                                             });
                                         } else
                                             ChatUtil.broadcast("   &fВ событии &aСостязание &fникто не принял участие");
@@ -610,12 +573,6 @@ public class OpPrison extends CorePlugin {
 
                                         blocks.clear();
                                         task.cancel();
-
-                                        scoreboardManager
-                                                .removeLine(2)
-                                                .removeLine(1)
-                                                .reloadScoreboard();
-
                                         blockEvent.stop();
                                     })
                                     .start(20 * 60 * 1);

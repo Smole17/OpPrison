@@ -39,9 +39,9 @@ public class GangGui extends BaseSimpleInventory {
                     .setName("§aВаша Банда")
                     .setLore(
                             "§f✍ §fНазвание " + gangData.getName(),
-                            "§6☀ §fОчки " + StringUtils.replaceComma(gangData.getScore()),
-                            "§e❃ §fГлава " + gangPlayer.getPlayerName(),
-                            String.format("§a✌ §fУчастники %s/10", gangData.getGangPlayerMap().size())
+                            "§6☀ §fОчки §6" + StringUtils.replaceComma(gangData.getScore()),
+                            "§f❃ §f§lГлава §r§7" + gangPlayer.getPlayerName(),
+                            String.format("§a✌ §fУчастники §a%s/10", gangData.getGangPlayerMap().size())
                     )
                     .setDurability(3)
                     .setPlayerSkull(gangPlayer.getPlayerName())
@@ -68,18 +68,21 @@ public class GangGui extends BaseSimpleInventory {
 
         int[] i = {1};
         gangData.findGangPlayers(
-                GangData.GangPlayer.GangPlayerType.values()
+                GangData.GangPlayer.GangPlayerType.LEADER,
+                GangData.GangPlayer.GangPlayerType.MANAGER,
+                GangData.GangPlayer.GangPlayerType.OLDEST,
+                GangData.GangPlayer.GangPlayerType.DEFAULT
         )
                 .forEach(gangPlayer1 -> {
                     lore.add(String.format(
                             "§7%s. %s §7%s §6☀ %s §8(%s§8)",
-                            i[0], gangPlayer1.getType().getName(), gangPlayer1.getPlayerName(),
-                            StringUtils.replaceComma(gangPlayer1.getScore()), gangPlayer1.getPlayer().isOnline() ? "§a+" : "§c-")
+                            i[0], gangPlayer1.getType().getName(), gangPlayer1.getName(),
+                            StringUtils.replaceComma(gangPlayer1.getScore()), gangPlayer1.getPlayer() == null ? "§a-" : "§c+")
                     );
                     i[0]++;
                 });
 
-        item = ApiManager.newItemBuilder(Material.CHEST)
+        item = ApiManager.newItemBuilder(Material.PAPER)
                 .setName("§bУчастники")
                 .setLore(lore)
                 .build();
@@ -88,13 +91,13 @@ public class GangGui extends BaseSimpleInventory {
                 item
         );
 
-        item = ApiManager.newItemBuilder(Material.BARRIER)
-                .setName("§cЗакрыть")
+        item = ApiManager.newItemBuilder(Material.ARROW)
+                .setName("§cНазад")
                 .build();
 
         addItem(32,
                 item,
-                (inv, click) -> closeInventory(player)
+                (inv, click) -> new MenuGui().openInventory(player)
         );
 
         setGlassPanel();

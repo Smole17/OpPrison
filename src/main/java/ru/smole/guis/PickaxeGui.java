@@ -27,7 +27,7 @@ import java.util.*;
 
 public class PickaxeGui extends BaseSimpleInventory {
     public PickaxeGui() {
-        super(6, "§7Прокачка Кирки");
+        super(6, "§7Зачарования Кирки");
     }
 
     @SuppressWarnings("uncheked")
@@ -37,14 +37,18 @@ public class PickaxeGui extends BaseSimpleInventory {
         PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(player.getName());
 
         List<String> lore = new ArrayList<>();
+        int i = 0;
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Upgrade.UpgradeStat> upgrades = pickaxe.getUpgrades();
             double pickaxe_level = pickaxe.getLevel();
 
-            int slot = 28 + upgrade.ordinal();
+            if ((29 + upgrade.ordinal()) % 9 == 0)
+                i = i + 2;
+
+            int slot = 29 + upgrade.ordinal() + i;
 
             if (upgrades.get(upgrade) == null) {
-                upgrades.put(upgrade, new Upgrade.UpgradeStat(0, true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
+                upgrades.put(upgrade, new Upgrade.UpgradeStat(0, true, upgrade.isNeedMessage()));
             }
 
             double count = upgrades.get(upgrade).getCount();
@@ -61,16 +65,15 @@ public class PickaxeGui extends BaseSimpleInventory {
             boolean isCanGroup = group.isCan(playerData.getGroup());
             boolean isIs = upgrades.get(upgrade).isIs();
             boolean isMessage = upgrades.get(upgrade).isMessage();
-            boolean isCompleteQ = upgrades.get(upgrade).isCompleteQ();
 
-            if (pickaxe_level < need_level || !isCanGroup || !isCompleteQ) {
+            if (pickaxe_level < need_level || !isCanGroup) {
                 ItemUtil.ItemBuilder iBuilder = ApiManager.newItemBuilder(Material.COAL_BLOCK)
                         .setName("§cЗАБЛОКИРОВАНО")
                         .setLore(
                                 ""
                         );
 
-                if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN)
+                if (upgrade == Upgrade.BLESSINGS)
                     iBuilder = ApiManager.newItemBuilder(upgrade.getMaterial())
                             .setName(upgrade.getName())
                             .setLore("§7" + upgrade.getDescribe(), "");
@@ -81,10 +84,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                 if (!isCanGroup)
                     iBuilder.addLore(String.format("§c∗ §fДоступно с %s §fгруппы", group.getName()));
 
-                if (!isCompleteQ)
-                    iBuilder.addLore("§c∗ §fНеобходимо прохождение задания");
-
-                if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN) {
+                if (upgrade == Upgrade.BLESSINGS) {
                     iBuilder.addLore("");
                     iBuilder.addLore(String.format("§a∗ §fСообщения: %s §8(( CTRL + Q ))", isMessage ? "§aВКЛЮЧЕНО" : "§cВЫКЛЮЧЕНО"));
                 }
@@ -93,7 +93,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                         slot,
                         iBuilder.build(),
                         (baseInventory, inventoryClickEvent) -> {
-                            if (upgrade == Upgrade.BLESSINGS || upgrade == Upgrade.LEPRECHAUN) {
+                            if (upgrade == Upgrade.BLESSINGS) {
                                 if (inventoryClickEvent.getClick() == ClickType.CONTROL_DROP) {
                                     upgrades.get(upgrade).setMessage(!isMessage);
 

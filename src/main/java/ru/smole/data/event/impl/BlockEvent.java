@@ -97,19 +97,18 @@ public class BlockEvent implements Event {
     public void stop() {
         Event.getEventManager().stop(1, this);
 
-        if (!Bukkit.getOnlinePlayers().isEmpty())
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                OpPrison.getInstance()
-                        .getScoreboardManager()
-                        .removeLine(4)
-                        .removeLine(3)
-                        .reloadScoreboard();
-            });
+        OpPrison.getInstance()
+                .getScoreboardManager()
+                .removeLine(4)
+                .removeLine(3)
+                .removeLine(2)
+                .removeLine(1)
+                .build();
 
         if (tasks.length != 0)
-        Arrays.stream(tasks).forEach(bukkitTask -> {
-            if (bukkitTask.isCancelled())
-                bukkitTask.cancel();
-        });
+            Arrays.stream(tasks).forEach(bukkitTask -> {
+                if (bukkitTask.isCancelled())
+                    bukkitTask.cancel();
+            });
     }
 }

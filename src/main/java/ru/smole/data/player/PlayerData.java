@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.data.group.GroupsManager;
-import ru.smole.data.npc.question.Question;
 import sexy.kostya.mineos.achievements.Achievement;
 import sexy.kostya.mineos.achievements.Achievements;
 
@@ -21,12 +20,12 @@ public class PlayerData {
     private double blocks;
     private double money;
     private double token;
+    private double gems;
     private double multiplier;
     private GroupsManager.Group group;
     private double prestige;
     private boolean fly;
     private List<String> access;
-    private Map<String, Question> questions;
 
     public Player getPlayer() {
         return Bukkit.getPlayer(name);
@@ -105,6 +104,13 @@ public class PlayerData {
         if (prestige >= 1000000000) {
             achievements.addAchievement(Achievement.OP_PRESTIGE_1B);
         }
+
+        return added;
+    }
+
+    public double addGems(double count) {
+        double added = gems + count;
+        setGems(added);
 
         return added;
     }

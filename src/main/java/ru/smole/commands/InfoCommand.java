@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class InfoCommand extends BukkitCommand<Player> {
 
     public InfoCommand() {
-        super("opprison");
+        super("help");
     }
 
     public static String description;
@@ -20,7 +20,7 @@ public class InfoCommand extends BukkitCommand<Player> {
     @Override
     protected void onExecute(Player player, String[] args) {
 
-        description = "§fИспользуйте: §a/opprison " + Arrays.toString(Guide.values());
+        description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
 
         if (args.length >= 1) {
             try {
@@ -31,7 +31,7 @@ public class InfoCommand extends BukkitCommand<Player> {
                                 description = guide.getDesc()
                         );
             } catch (Exception e) {
-                description = "§fИспользуйте: §a/opprison " + Arrays.toString(Guide.values());
+                description = "§fИспользуйте: §a/help " + Arrays.toString(Guide.values());
             }
         }
 

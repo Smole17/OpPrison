@@ -69,13 +69,13 @@ public class PlayerDataSQL {
     }
 
     public static void save(
-            String name, double blocks, double money, double token, double multiplier,
-            GroupsManager.Group group, double prestige, int fly, String pickaxe, String kits,
-            String access, String questions
+            String name, double blocks, double money, double token, double gems,
+            double multiplier, GroupsManager.Group group, double prestige, int fly,
+            String pickaxe, String kits, String access
     ) {
         base.getExecuteHandler().executeUpdate(true,
-                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ?, `questions` = ? WHERE `name` = ?",
-                name, blocks, money, token, multiplier, group.name(), prestige, fly, pickaxe, kits, access, questions, name
+                "UPDATE players SET `name` = ?, `blocks` = ?, `money` = ?, `token` = ?, `gems` = ?, `multiplier` = ?, `rank` = ?, `prestige` = ?, `fly` = ?, `pickaxe` = ?, `kit` = ?, `access` = ? WHERE `name` = ?",
+                name, blocks, money, token, gems, multiplier, group.name(), prestige, fly, pickaxe, kits, access, name
         );
     }
 

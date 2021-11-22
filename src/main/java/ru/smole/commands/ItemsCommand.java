@@ -43,17 +43,6 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
             }
 
             switch (args[1]) {
-                case "jack_hammer":
-                    Upgrade.UpgradeStat jack = PickaxeManager.getPickaxes().get(target.getName()).getUpgrades().get(Upgrade.JACK_HAMMER);
-
-                    if (jack.isCompleteQ()) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы уже имеете этот предмет");
-                        return;
-                    }
-
-                    jack.setCompleteQ(true);
-
-                    break;
                 default:
                     OpPlayer opPlayer = new OpPlayer(target);
 
@@ -94,17 +83,6 @@ public class ItemsCommand extends BukkitCommand<CommandSender> {
             }
 
             switch (args[1]) {
-                case "jack_hammer":
-                    Upgrade.UpgradeStat jack = PickaxeManager.getPickaxes().get(target.getName()).getUpgrades().get(Upgrade.JACK_HAMMER);
-
-                    if (jack.isCompleteQ()) {
-                        ChatUtil.sendMessage(sender, OpPrison.PREFIX_N + "Вы уже имеете этот предмет");
-                        return;
-                    }
-
-                    jack.setCompleteQ(true);
-
-                    break;
                 default:
                     OpPlayer opPlayer = new OpPlayer(target);
 

@@ -13,7 +13,6 @@ import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.mysql.PlayerDataSQL;
-import ru.smole.data.npc.question.Question;
 import ru.smole.utils.leaderboard.LeaderBoard;
 import ru.xfenilafs.core.util.ChatUtil;
 import sexy.kostya.mineos.achievements.Achievement;
@@ -47,20 +46,20 @@ public class PlayerDataManager {
                 double blocks = resultSet.getDouble("blocks");
                 double money = resultSet.getDouble("money");
                 double token = resultSet.getDouble("token");
+                double gems = resultSet.getDouble("gems");
                 double multiplier = resultSet.getDouble("multiplier");
                 GroupsManager.Group group = GroupsManager.Group.valueOf(resultSet.getString("rank"));
                 double prestige = resultSet.getDouble("prestige");
                 boolean fly = resultSet.getInt("fly") == 1;
                 Pickaxe pickaxe = PickaxeManager.getPickaxes().get(name);
                 String access = resultSet.getString("access");
-                Map<String, Question> questions = getQuestionsFromString(resultSet.getString("questions"));
 
                 playerDataMap.put(
                         name,
                         new PlayerData(
-                                name, blocks, money, token, multiplier,
-                                group, prestige, fly, getListFromString(access),
-                                questions
+                                name, blocks, money, token, gems,
+                                multiplier, group, prestige, fly,
+                                getListFromString(access)
                         )
                 );
 
@@ -127,17 +126,18 @@ public class PlayerDataManager {
         double blocks = data.getBlocks();
         double money = data.getMoney();
         double token = data.getToken();
+        double gems = data.getGems();
         double multiplier = data.getMultiplier();
         GroupsManager.Group group = data.getGroup();
         double prestige = data.getPrestige();
         int fly = data.isFly() ? 1 : 0;
         String pickaxe = pickaxeManager.getStats();
         List<String> access = data.getAccess();
-        Map<String, Question> questions = data.getQuestions();
 
         PlayerDataSQL.save(
-                name, blocks, money, token, multiplier, group, prestige, fly, pickaxe,
-                KitCommand.KitsGui.save(name), getStringFromList(access), getStringFromQuestions(questions)
+                name, blocks, money, token, gems,
+                multiplier, group, prestige, fly, pickaxe,
+                KitCommand.KitsGui.save(name), getStringFromList(access)
         );
 
         OpPrison.getInstance().getScoreboardManager().unloadScoreboard(player);
@@ -186,44 +186,6 @@ public class PlayerDataManager {
                 format = format.replace(",", "");
 
             sb.append(String.format(format, s));
-            i++;
-        }
-
-        return sb.toString();
-    }
-
-    protected Map<String, Question> getQuestionsFromString(String str) {
-        Map<String, Question> questions = new HashMap<>();
-
-        if (str == null || str.equals("null"))
-            return questions;
-
-        for (String s : str.split(",")) {
-            if (s == null)
-                break;
-
-            String[] args = s.split("\\.");
-
-            if (args.length <= 1)
-                break;
-
-            questions.put(args[0], new Question(Question.QuestionStep.valueOf(args[1].toUpperCase())));
-        }
-
-        return questions;
-    }
-
-    protected String getStringFromQuestions(Map<String, Question> questions) {
-        StringBuilder sb = new StringBuilder();
-        String format = "%s.%s,";
-
-        int i = 1;
-        for (String s : questions.keySet()) {
-            Question question = questions.get(s);
-            if (i == questions.size())
-                format = format.replace(",", "");
-
-            sb.append(String.format(format, s, question.getStep().name().toUpperCase()));
             i++;
         }
 

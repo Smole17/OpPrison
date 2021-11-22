@@ -31,7 +31,7 @@ public class PickaxeManager {
         upgradeMap = new HashMap<>();
 
         for (Upgrade upgrade : Upgrade.values())
-            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
+            upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage()));
 
 
         Pickaxe pickaxe = new Pickaxe(
@@ -88,17 +88,17 @@ public class PickaxeManager {
                 continue;
 
             double count = Double.parseDouble(arg_1);
-            boolean is = args.length <= 3 || Boolean.parseBoolean(args[3]);
-            boolean isMes = args.length <= 4 ? upgrade.isNeedMessage() : Boolean.parseBoolean(args[4]);
+            boolean is = args.length <= 2 || Boolean.parseBoolean(args[2]);
+            boolean isMes = args.length <= 3 ? upgrade.isNeedMessage() : Boolean.parseBoolean(args[3]);
             upgradeMap.put(upgrade, new Upgrade.UpgradeStat(count,
                     is,
-                    isMes,
-                    Boolean.parseBoolean(args[2])));
+                    isMes
+            ));
         }
 
         for (Upgrade upgrade : Upgrade.values()) {
             if (upgradeMap.get(upgrade) == null) {
-                upgradeMap.put(upgrade, new Upgrade.UpgradeStat(0, true, upgrade.isNeedMessage(), upgrade != Upgrade.JACK_HAMMER));
+                upgradeMap.put(upgrade, new Upgrade.UpgradeStat(upgrade.getStart_level(), true, upgrade.isNeedMessage()));
             }
         }
 
@@ -107,7 +107,7 @@ public class PickaxeManager {
 
         Arrays.stream(player.getInventory().getStorageContents())
                 .parallel()
-                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType() == Material.DIAMOND_PICKAXE)
+                .filter(itemStack1 -> itemStack1 != null && itemStack1.getType().name().equalsIgnoreCase("pickaxe"))
                 .forEach(itemStack1 -> itemStack1.setAmount(0));
 
         OpPlayer.add(player, Items.getItem("pickaxe", name));
@@ -134,14 +134,14 @@ public class PickaxeManager {
         for (Upgrade upgrade : Upgrade.values()) {
             Map<Upgrade, Upgrade.UpgradeStat> upgradesMap = pickaxes.get(name).getUpgrades();
 
-            String format = "%s-%s-%s-%s-%s,";
+            String format = "%s-%s-%s-%s,";
 
             if (upgrade.ordinal() == Upgrade.values().length -1) {
                 format = format.replace(",", "");
             }
 
             Upgrade.UpgradeStat stat = upgradesMap.get(upgrade);
-            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, stat.getCount()), stat.isCompleteQ(), stat.isIs(), stat.isMessage()));
+            builder.append(String.format(format, upgrade.name(), StringUtils._fixDouble(0, stat.getCount()), stat.isIs(), stat.isMessage()));
         }
 
         return builder.toString();

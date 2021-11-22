@@ -360,7 +360,7 @@ public class GangCommand extends BukkitCommand<Player> {
                         }
 
                         ChatUtil.sendMessage(player, PREFIX + "Банда %s&f:", args[1]);
-                        ChatUtil.sendMessage(player, "   &fКоличество очков: &b%s", StringUtils.replaceComma(playerGangData.getScore()));
+                        ChatUtil.sendMessage(player, "   &fКоличество очков: &6%s", StringUtils.replaceComma(playerGangData.getScore()));
 
                         val gangPlayers = playerGangData.findGangPlayers(GangPlayerType.LEADER, GangPlayerType.MANAGER, GangPlayerType.OLDEST, GangPlayerType.DEFAULT);
                         StringBuilder builder = new StringBuilder();
@@ -373,7 +373,7 @@ public class GangCommand extends BukkitCommand<Player> {
                                 format = format.replace(",", "");
 
                             builder.append(String.format(format,
-                                    tempType.getName(), tempGangPlayer.getPlayerName()));
+                                    tempType.getName(), tempGangPlayer.getName()));
                         });
 
                         ChatUtil.sendMessage(player, "   &fУчастники:");

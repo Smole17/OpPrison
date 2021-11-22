@@ -20,97 +20,77 @@ import java.util.function.BiConsumer;
     EFFICIENCY("§7Эффективность",
             "Увеличивает скорость добычи блоков",
             0,10, 300,  35,
-            Material.ANVIL, GroupsManager.Group.MANTLE, false),
+            Material.ANVIL, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
-            0,1, 650000, 40,
-            Material.DIAMOND, GroupsManager.Group.MANTLE, false),
+            0,1, 300000, 120,
+            Material.DIAMOND, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 1, 75000, 1100,
-            Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false),
-
-    NIGHT_VISION("§5Ночное зрение",
-            "Выдаёт эффект ночного зрения",
-            1, 0, 1, 25000,
-            Material.BROWN_MUSHROOM, GroupsManager.Group.MANTLE, false),
+            0, 1, 3000, 2550,
+            Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     HASTE("§eСпешка",
-            "Выдаёт эффект для ускоренного копания",
+            "Выдаёт эффект ускоренного копания",
             2,0, 5, 25000,
-            Material.GLOWSTONE_DUST, GroupsManager.Group.MANTLE, false),
+            Material.GLOWSTONE_DUST, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     SPEED("§fСкорость",
-            "Выдаёт эффект для ускоренного передвижения",
-            3,0, 5, 25000,
-            Material.SUGAR, GroupsManager.Group.MANTLE, false),
+            "Выдаёт эффект ускоренного передвижения",
+            3,0, 5, 10,
+            Material.SUGAR, GroupsManager.Group.MANTLE, false, UpgradeType.GEMS),
 
-    JUMP_BOOST("§aПрыгучесть",
-            "Выдаёт эффект для повышенной прыгучести",
-            4,0, 5, 15000,
-            Material.SLIME_BALL, GroupsManager.Group.MANTLE, false),
-
-    KEY_FINDER("§4Добыча ключей",
+    KEY_FINDER("§4Добыча Ключей",
             "Увеличивает количество добываемых ключей",
             2, 0, 50, 225000,
-            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, true),
+            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
 
     EXPLOSIVE("§4Взрыв",
             "Увеличивает шанс на взрыв по площади 5x5x5 блоков",
-            5, 0, 500, 100000,
-            Material.TNT, GroupsManager.Group.MANTLE, false),
+            3, 0, 500, 100000,
+            Material.TNT, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     LUCKY("§9Удача",
-            "Выдаёт случайно токены, монеты. С 25 уровня - становится полезнее  ",
+            "Выдаёт случайное количество токенов, денег, ключей",
             10, 0, 50, 17500000D,
-            Material.LAPIS_ORE, GroupsManager.Group.MANTLE, true),
+            Material.LAPIS_ORE, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
 
     BLESSINGS("§bБлагославление",
-            "Выдаёт токены всем на сервере. Количество зависит от Добычи токенов",
-            15, 0, 1000, 125000,
-            Material.MAGMA_CREAM, GroupsManager.Group.MANTLE, true),
+            "Выдаёт токены всем на сервере. Количество зависит от Добычи Токенов",
+            50, 0, 1000, 1,
+            Material.MAGMA_CREAM, GroupsManager.Group.MANTLE, true, UpgradeType.GEMS),
 
-    TOKEN_MERCHANT("§eМножитель токенов",
-            "Выдаёт умноженное количество токенов",
-            20, 0, 10000, 1000,
-            Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true),
-
-    MULTI_FINDER("§dНахождение множителя",
-            "Выдаёт от 1-го до 3-ёх множителей",
-            25, 0, 2500, 25000,
-            Material.BOOK, GroupsManager.Group.MANTLE, true),
-
-    JACK_HAMMER("§cРазрушитель",
-            "Увеличивает шанс на ломание целого слоя в шахте",
-            25, 0, 750, 550000D,
-            Material.DIAMOND_PICKAXE, GroupsManager.Group.MANTLE, false),
-
-    LEPRECHAUN("§aЛепрекон",
-            "Выдаёт деньги всем на сервере",
-            35, 0, 2500, 5000,
-            Material.EMERALD, GroupsManager.Group.MANTLE, true),
+    PRESTIGE_FINDER("§5Добыча Престижей",
+            "Увеличивает шанс при копание найти престижи",
+            75, 0, 2500, 75000,
+            Material.BEACON, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     JACKPOT("§3Джекпот",
-            "Выдаёт случайно токены, деньги. С 3 уровня - ключи",
-            40, 0, 5, 10000000000D,
-            Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true),
+            "Работает как \"Удача\", но лучше!",
+            75, 0, 10, 2500,
+            Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true, UpgradeType.GEMS),
 
-    PRESTIGE_FINDER("§5Добыча престижей",
-            "Увеличивает шанс при копание найти престижи",
-            50, 0, 2500, 75000,
-            Material.BEACON, GroupsManager.Group.MANTLE, false),
+    ZEUS("§bУдар Зевса",
+            "Вызывает молнию, которая приносит гемы",
+            85, 0, 10, 2500,
+            Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true, UpgradeType.GEMS),
 
-    PRESTIGE_MERCHANT("§2Множитель престижей",
-            "Умножает добываемые престижи от прокачки \"Добыча престижей\"",
-            60, 0, 10000, 12500,
-            Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false),
+    PRESTIGE_MERCHANT("§2Множитель Престижей",
+            "Умножает добываемые престижи от прокачки \"Добыча Престижей\"",
+            100, 0, 10000, 12500,
+            Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
+
+    TOKEN_MERCHANT("§eМножитель Токенов",
+            "Умножает добываемые токены",
+            100, 0, 10000, 1000,
+            Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
 
     IG_MONEY("§4Мистер Крабс",
-            "С ОЧЕНЬ маленьким шансом выдаст Вам чек на 50 рублей",
-            85, 0, 10, 10000000000D,
-            Material.PAPER, GroupsManager.Group.COSMOS, true);
+            "С маленьким шансом \n\nвыдаст Вам чек на 50 рублей",
+            150, 0, 10, 10000000000D,
+            Material.PAPER, GroupsManager.Group.COSMOS, true, UpgradeType.TOKEN);
 
     private @Getter @Setter String name;
     private final @Getter String describe;
@@ -121,6 +101,7 @@ import java.util.function.BiConsumer;
     private final @Getter Material material;
     private final @Getter GroupsManager.Group group;
     private final @Getter boolean needMessage;
+    private final @Getter UpgradeType type;
 
     public Object[] getMaxUpgrades(PlayerData playerData, double level) {
         Object[] obj = {null, null};
@@ -208,6 +189,11 @@ import java.util.function.BiConsumer;
         private double count;
         private boolean is;
         private boolean isMessage;
-        private boolean isCompleteQ;
+    }
+
+    public enum UpgradeType {
+
+        TOKEN,
+        GEMS
     }
 }
