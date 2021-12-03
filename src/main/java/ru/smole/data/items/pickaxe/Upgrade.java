@@ -24,13 +24,18 @@ import java.util.function.BiConsumer;
 
     FORTUNE("§7Шахтёр",
             "Увеличивает количество добываемых денег",
-            0,1, 300000, 120,
+            0,1, 300000, 10,
             Material.DIAMOND, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     TOKEN_MINER("§eДобыча токенов",
             "Увеличивает количество добываемых токенов",
-            0, 1, 3000, 2550,
+            0, 1, 3000, 750,
             Material.DOUBLE_PLANT, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
+
+    EXPLOSIVE("§4Взрыв",
+            "Увеличивает шанс на взрыв по площади 5x5x5 блоков",
+            1, 0, 500, 20000,
+            Material.TNT, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     HASTE("§eСпешка",
             "Выдаёт эффект ускоренного копания",
@@ -45,51 +50,51 @@ import java.util.function.BiConsumer;
     KEY_FINDER("§4Добыча Ключей",
             "Увеличивает количество добываемых ключей",
             2, 0, 50, 225000,
-            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
-
-    EXPLOSIVE("§4Взрыв",
-            "Увеличивает шанс на взрыв по площади 5x5x5 блоков",
-            3, 0, 500, 100000,
-            Material.TNT, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
+            Material.TRIPWIRE_HOOK, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
     LUCKY("§9Удача",
             "Выдаёт случайное количество токенов, денег, ключей",
-            10, 0, 50, 17500000D,
+            25, 0, 50, 17500000D,
             Material.LAPIS_ORE, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
 
     BLESSINGS("§bБлагославление",
-            "Выдаёт токены всем на сервере. Количество зависит от Добычи Токенов",
-            50, 0, 1000, 1,
+            "Выдаёт токены всем на сервере",
+            50, 0, 1000, 0.15,
             Material.MAGMA_CREAM, GroupsManager.Group.MANTLE, true, UpgradeType.GEMS),
 
     PRESTIGE_FINDER("§5Добыча Престижей",
             "Увеличивает шанс при копание найти престижи",
-            75, 0, 2500, 75000,
+            75, 0, 1000, 1750000,
             Material.BEACON, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
 
-    JACKPOT("§3Джекпот",
-            "Работает как \"Удача\", но лучше!",
-            75, 0, 10, 2500,
-            Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true, UpgradeType.GEMS),
-
-    ZEUS("§bУдар Зевса",
+    ZEUS("§9Удар Зевса",
             "Вызывает молнию, которая приносит гемы",
-            85, 0, 10, 2500,
+            75, 0, 10, 75,
+            Material.NETHER_STAR, GroupsManager.Group.MANTLE, true, UpgradeType.GEMS),
+
+    CRATE_FINDER("§9Нахождение Ящиков",
+            "Может выдать ящик с бронёй, зельями, лутбокс",
+            100, 0, 100, 12.5,
+            Material.ENDER_CHEST, GroupsManager.Group.SUN, true, UpgradeType.GEMS),
+
+    JACKPOT("§3Джекпот",
+            "Работает как Удача, но лучше!",
+            125, 0, 10, 2500,
             Material.DIAMOND_BLOCK, GroupsManager.Group.AQUA, true, UpgradeType.GEMS),
 
     PRESTIGE_MERCHANT("§2Множитель Престижей",
-            "Умножает добываемые престижи от прокачки \"Добыча Престижей\"",
-            100, 0, 10000, 12500,
-            Material.EYE_OF_ENDER, GroupsManager.Group.MANTLE, false, UpgradeType.TOKEN),
+            "Умножает добываемые престижи",
+            100, 0, 100, 32500000,
+            Material.EYE_OF_ENDER, GroupsManager.Group.AIR, false, UpgradeType.TOKEN),
 
     TOKEN_MERCHANT("§eМножитель Токенов",
             "Умножает добываемые токены",
-            100, 0, 10000, 1000,
+            100, 0, 1000, 25000,
             Material.ENDER_PEARL, GroupsManager.Group.MANTLE, true, UpgradeType.TOKEN),
 
     IG_MONEY("§4Мистер Крабс",
-            "С маленьким шансом \n\nвыдаст Вам чек на 50 рублей",
-            150, 0, 10, 10000000000D,
+            "С маленьким шансом выдаст чек на 50 рублей",
+            150, 0, 10, 6000000000D,
             Material.PAPER, GroupsManager.Group.COSMOS, true, UpgradeType.TOKEN);
 
     private @Getter @Setter String name;
@@ -103,13 +108,11 @@ import java.util.function.BiConsumer;
     private final @Getter boolean needMessage;
     private final @Getter UpgradeType type;
 
-    public Object[] getMaxUpgrades(PlayerData playerData, double level) {
+    public Object[] getMaxUpgrades(double level, double token) {
         Object[] obj = {null, null};
         double upgrades = 0;
         double tokens = 0;
         double need = 0;
-
-        double token = playerData.getToken();
 
         while (token >= need) {
             if (level >= max_level + 1)
@@ -172,14 +175,20 @@ import java.util.function.BiConsumer;
 
     public void sendProcMessage(Player player, String reward) {
         if (needMessage)
-            if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
-                ChatUtil.sendMessage(player, "&8[%s&8] &fПринесло вам %s", name, reward);
+            if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage()) {
+                if (reward != null) {
+                    ChatUtil.sendMessage(player, "%s &8> &aСработало и принесло вам %s§a!", name, reward);
+                    return;
+                }
+
+                ChatUtil.sendMessage(player, "%s &8> &aСработало и принесло вам хорошую награду!", name);
+            }
     }
 
     public void sendProcMessagePlayer(Player player, String reward) {
         if (needMessage)
             if (PickaxeManager.getPickaxes().get(player.getName()).getUpgrades().get(this).isMessage())
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatUtil.text("§f+%s", reward)));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatUtil.text("§a+%s", reward)));
     }
 
     @Data

@@ -118,6 +118,7 @@ public class OpPrison extends CorePlugin {
                 .queryRow(new TypedQueryRow(DOUBLE, "blocks"))
                 .queryRow(new TypedQueryRow(DOUBLE, "money"))
                 .queryRow(new TypedQueryRow(DOUBLE, "token"))
+                .queryRow(new TypedQueryRow(DOUBLE, "gems"))
                 .queryRow(new TypedQueryRow(DOUBLE, "multiplier"))
                 .queryRow(new TypedQueryRow(DOUBLE, "prestige"))
                 .queryRow(new TypedQueryRow(TEXT, "rank"))
@@ -126,7 +127,6 @@ public class OpPrison extends CorePlugin {
                 .queryRow(new TypedQueryRow(TEXT, "kit"))
                 .queryRow(new TypedQueryRow(TEXT, "access"))
                 .queryRow(new TypedQueryRow(TEXT, "questions"))
-                .queryRow(new TypedQueryRow(TEXT, "battlepass"))
                 .executeAsync(base);
 
         base.newDatabaseQuery("gangs").createTableQuery().setCanCheckExists(true)
@@ -183,9 +183,10 @@ public class OpPrison extends CorePlugin {
     }
 
     public void loadScoreboard() {
-        scoreboardManager.line(10, "")
-                .line(9, "§7Загрузка...")
-                .line(8, "")
+        scoreboardManager.line(11, "")
+                .line(10, "§7Загрузка...")
+                .line(9, "")
+                .line(8, "§7Загрузка...")
                 .line(7, "§7Загрузка...")
                 .line(6, "§7Загрузка...")
                 .line(5, "")
@@ -194,24 +195,31 @@ public class OpPrison extends CorePlugin {
 
                     PlayerData playerData = OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName);
 
-                    baseScoreboard.updateScoreboardLine(9, boardPlayer,
+                    baseScoreboard.updateScoreboardLine(10, boardPlayer,
                             ChatUtil.text(
                                     "§a❖ §fПрестиж: §a%s",
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getPrestige()).length() <= 3 ? 0 : 2, playerData.getPrestige())
                             )
                     );
 
-                    baseScoreboard.updateScoreboardLine(7, boardPlayer,
+                    baseScoreboard.updateScoreboardLine(8, boardPlayer,
                             ChatUtil.text(
                                     "§fДеньги: §6$%s",
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getMoney()).length() <= 3 ? 0 : 2, playerData.getMoney())
                             )
                     );
 
-                    baseScoreboard.updateScoreboardLine(6, boardPlayer,
+                    baseScoreboard.updateScoreboardLine(7, boardPlayer,
                             ChatUtil.text(
                                     "§fТокены: §e⛃%s",
                                     StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getToken()).length() <= 3 ? 0 : 2, playerData.getToken())
+                            )
+                    );
+
+                    baseScoreboard.updateScoreboardLine(6, boardPlayer,
+                            ChatUtil.text(
+                                    "§fГемы: §3❅%s",
+                                    StringUtils.formatDouble(StringUtils._fixDouble(0, playerData.getGems()).length() <= 3 ? 0 : 2, playerData.getGems())
                             )
                     );
                 }), 1)
@@ -368,21 +376,21 @@ public class OpPrison extends CorePlugin {
     private void loadLeaderBoard() {
         FileConfiguration miscConfig = configManager.getMiscConfig().getConfiguration();
         LeaderBoard blocks = new LeaderBoard(
-                "&bТоп по блокам",
+                "&aТоп по блокам",
                 ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-block")),
                 "blocks",
                 "players"
         );
 
         LeaderBoard prestige = new LeaderBoard(
-                "&bТоп по престижам",
+                "&aТоп по престижам",
                 ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-prestige")),
                 "prestige",
                 "players"
         );
 
         LeaderBoard gang = new LeaderBoard(
-                "&bТоп по бандам",
+                "&aТоп по бандам",
                 ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("tops-gang")),
                 "score",
                 "gangs"
@@ -393,9 +401,9 @@ public class OpPrison extends CorePlugin {
         info.addTextLine("§fДобро пожаловать на §bOpPrison§f!");
         info.addEmptyLine();
         info.addTextLine("§fВаша первая шахта §7> §f/warp §7> §fШахты для групп §7> §7MANTLE §fшахта");
-        info.addTextLine("§fА остальную информацию Вы можете узнать через §b/help");
+        info.addTextLine("§fА остальную информацию Вы можете узнать через §a/help");
         info.addEmptyLine();
-        info.addTextLine("§fЖелаем удачи Вам в ваших начинаниях!");
+        info.addTextLine("§aЖелаем удачи Вам в ваших начинаниях!");
         LeaderBoard.holograms.add(info);
 
         SimpleHolographic caseHere = new SimpleHolographic(ConfigUtils.loadLocationFromConfigurationSection(miscConfig.getConfigurationSection("caseHere")));
@@ -470,7 +478,6 @@ public class OpPrison extends CorePlugin {
     }
 
     private void loadEvents() {
-        ThreadLocalRandom random0 = ThreadLocalRandom.current();
 
         Schedules.runAsync(
                 () -> {
@@ -478,7 +485,8 @@ public class OpPrison extends CorePlugin {
                     if (!blockEMap.isEmpty())
                         return;
 
-                    switch (random0.nextInt(3)) {
+                    int n = ThreadLocalRandom.current().nextInt(3);
+                    switch (n) {
                         case 0: {
                             Predicate<Player> predicate = player -> getPlayerDataManager().getPlayerDataMap().get(player.getName()).getPrestige() >= 0;
 
@@ -550,7 +558,7 @@ public class OpPrison extends CorePlugin {
 
                                         if (!blockz.allMatch(stringDoubleEntry -> stringDoubleEntry.getValue() == 0)) {
                                             blockz.forEachOrdered(x -> {
-                                                ChatUtil.broadcast("   &7%s. &b%s &f- &b%s &8&o(+%s%)", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()), 15 / i[0]);
+                                                ChatUtil.broadcast("   &7%s. &b%s &f- &b%s &8&o(+%s% к балансу токенов)", i[0], x.getKey(), StringUtils.replaceComma(x.getValue()), 15 / i[0]);
                                                 i[0]++;
 
                                                 if (Bukkit.getPlayer(x.getKey()) == null || !Bukkit.getPlayer(x.getKey()).isOnline())
@@ -592,7 +600,7 @@ public class OpPrison extends CorePlugin {
                                         if (!treasureMap.containsKey(playerName))
                                             treasureMap.put(playerName, new ArrayList<>());
 
-                                        float random = random0.nextFloat();
+                                        float random = ThreadLocalRandom.current().nextFloat();
 
                                         if (random <= 0.01) {
                                             event.setCancelled(true);

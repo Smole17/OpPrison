@@ -255,8 +255,10 @@ public class Items {
         registerItem("sponge",
                 objects -> ApiManager
                         .newItemBuilder(Material.SPONGE)
-                        .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0]) + " §fочков")
-                        .setLore("§7Нажмите ШИФТ+ПКМ, чтобы добавить " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
+                        .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0]) + " §fОчков")
+                        .setLore(
+                                "Нажмите §8(ШИФТ+ПКМ в руке) для использования!",
+                                "Добавляет " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
                         .build(),
                 (event, itemStack) -> {
                     Player player = event.getPlayer();
@@ -276,14 +278,14 @@ public class Items {
                         return;
                     }
 
-                    double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" очков")[0]);
+                    double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" очков в банду")[0]);
 
                     GangData gangData = gangDataManager.getGangFromPlayer(playerName);
 
                     gangData.getGangPlayerMap().get(playerName.toLowerCase()).addScore(count);
                     gangData.addScore(count);
                     itemStack.setAmount(itemStack.getAmount() - 1);
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "+§e" + StringUtils._fixDouble(0, count) + " §fочков");
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + StringUtils._fixDouble(0, count) + " очков");
                 });
 
         Arrays.stream(Material.values())
@@ -342,13 +344,13 @@ public class Items {
         registerItem("location_gui",
                 objects -> ApiManager
                         .newItemBuilder(Material.NETHER_STAR)
-                        .setName("§fМеню режима")
+                        .setName("§fМеню Режима")
                         .addItemFlags(
                                 ItemFlag.HIDE_ATTRIBUTES,
                                 ItemFlag.HIDE_DESTROYS,
                                 ItemFlag.HIDE_UNBREAKABLE
                         )
-                        .setLore("§7Нажмите для активации")
+                        .setLore("§7Нажмите для использования!")
                         .build(),
                 (event, itemStack) -> new MenuGui().openInventory(event.getPlayer()));
 

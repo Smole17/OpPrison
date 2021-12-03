@@ -77,6 +77,11 @@ public class StatsCommand extends BukkitCommand<CommandSender> {
                         piece = "было установлено токенов";
                         break;
 
+                    case GEMS:
+                        targetData.setGems((double) value);
+                        piece = "было установлено гемов";
+                        break;
+
                     case MULTIPLIER:
                         targetData.setMultiplier((double) value);
                         piece = "был установлен множитель";
@@ -99,7 +104,7 @@ public class StatsCommand extends BukkitCommand<CommandSender> {
                 }
 
                 if (value != null) {
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку &b%s &f%s: §b%s", targetName, piece,
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Игроку %s %s: §b%s", targetName, piece,
                             value.getClass() == Double.class ? StringUtils._fixDouble(0, (double) value) : value);
                     return;
                 }
@@ -158,6 +163,11 @@ public class StatsCommand extends BukkitCommand<CommandSender> {
                         piece = "было установлено токенов";
                         break;
 
+                    case GEMS:
+                        targetData.setGems((double) value);
+                        piece = "было установлено гемов";
+                        break;
+
                     case MULTIPLIER:
                         targetData.setMultiplier((double) value);
                         piece = "был установлен множитель";
@@ -195,6 +205,7 @@ public class StatsCommand extends BukkitCommand<CommandSender> {
         BLOCKS(),
         MONEY(),
         TOKEN(),
+        GEMS(),
         MULTIPLIER(),
         PRESTIGE(),
         GROUP(),

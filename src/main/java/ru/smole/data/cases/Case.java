@@ -117,7 +117,7 @@ public class Case {
             CaseItem.CaseItemType caseItemType = caseItem.getType();
 
             if (caseItem.getChance() <= 0.005) {
-                ChatUtil.broadcast(OpPrison.PREFIX + "Игрок &b%s &fвыбил с %sа: %s",
+                ChatUtil.broadcast(OpPrison.PREFIX + "Игрок %s выбил с §r%sа: %s",
                         playerName, name, caseItemType == CaseItem.CaseItemType.ITEM ? caseItem.getItemStack().getItemMeta().getDisplayName() == null ? caseItem.getItemStack().getType().name().replaceAll("_", " ") : caseItem.getItemStack().getItemMeta().getDisplayName() : "не установлено");
             }
 

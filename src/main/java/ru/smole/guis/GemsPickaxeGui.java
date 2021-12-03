@@ -1,7 +1,6 @@
 package ru.smole.guis;
 
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -9,15 +8,16 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import ru.luvas.rmcs.player.RPlayer;
 import ru.smole.OpPrison;
-import ru.smole.data.player.PlayerData;
 import ru.smole.data.group.GroupsManager;
 import ru.smole.data.items.Items;
 import ru.smole.data.items.pickaxe.Pickaxe;
 import ru.smole.data.items.pickaxe.PickaxeManager;
 import ru.smole.data.items.pickaxe.Upgrade;
 import ru.smole.data.player.OpPlayer;
+import ru.smole.data.player.PlayerData;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
+import ru.xfenilafs.core.inventory.BaseInventory;
 import ru.xfenilafs.core.inventory.BaseInventoryItem;
 import ru.xfenilafs.core.inventory.impl.BaseSimpleInventory;
 import ru.xfenilafs.core.util.ItemUtil;
@@ -26,12 +26,11 @@ import sexy.kostya.mineos.achievements.Achievements;
 
 import java.util.*;
 
-public class PickaxeGui extends BaseSimpleInventory {
-    public PickaxeGui() {
-        super(6, "§7Зачарования Кирки");
+public class GemsPickaxeGui extends BaseSimpleInventory {
+    public GemsPickaxeGui() {
+        super(6, "§7Престижные Зачарования Кирки");
     }
 
-    @SuppressWarnings("uncheked")
     @Override
     public void drawInventory(@NonNull Player player) {
         Pickaxe pickaxe = PickaxeManager.getPickaxes().get(player.getName());
@@ -40,7 +39,7 @@ public class PickaxeGui extends BaseSimpleInventory {
         List<String> lore = new ArrayList<>();
         int i = 0;
         for (Upgrade upgrade : Upgrade.values()) {
-            if (upgrade.getType() == Upgrade.UpgradeType.GEMS)
+            if (upgrade.getType() == Upgrade.UpgradeType.TOKEN)
                 continue;
 
             Map<Upgrade, Upgrade.UpgradeStat> upgrades = pickaxe.getUpgrades();
@@ -63,8 +62,8 @@ public class PickaxeGui extends BaseSimpleInventory {
             double needToken = upgrade.getNeedTokens(count + 1);
             double tenTokens = (double) upgrade.get10Upgrades(count + 1)[1];
 
-            double maxUpgrades = (double) upgrade.getMaxUpgrades(count + 1, playerData.getToken())[0];
-            double maxTokens = (double) upgrade.getMaxUpgrades(count + 1, playerData.getToken())[1];
+            double maxUpgrades = (double) upgrade.getMaxUpgrades(count + 1, playerData.getGems())[0];
+            double maxTokens = (double) upgrade.getMaxUpgrades(count + 1, playerData.getGems())[1];
 
             GroupsManager.Group group = upgrade.getGroup();
             boolean isCanGroup = group.isCan(playerData.getGroup());
@@ -127,9 +126,9 @@ public class PickaxeGui extends BaseSimpleInventory {
                 lore.add("");
 
                 if (!upgrade.isMaxLevel(count)) {
-                    lore.add(String.format("§a+ §f1 уровень: §e⛃%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
-                    lore.add(String.format("§a+ §f10 уровней: §e⛃%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
-                    lore.add(String.format("§a+ §f%s уровней: §e⛃%s §8(( Q ))",
+                    lore.add(String.format("§a+ §f1 уровень: §3❅%s §8(( ЛКМ ))", StringUtils.formatDouble(2, needToken)));
+                    lore.add(String.format("§a+ §f10 уровней: §3❅%s §8(( ПКМ ))", StringUtils.formatDouble(2, tenTokens)));
+                    lore.add(String.format("§a+ §f%s уровней: §3❅%s §8(( Q ))",
                             StringUtils.replaceComma(maxUpgrades),
                             // maxUpgrades > upgrade.getMax_level() ? upgrade.getMax_level() : maxUpgrades
                             StringUtils.formatDouble(2, maxTokens)));
@@ -197,17 +196,17 @@ public class PickaxeGui extends BaseSimpleInventory {
                             return;
                         }
 
-                        double playerToken = playerData.getToken();
+                        double playerGems = playerData.getGems();
 
                         switch (clickType) {
                             case LEFT:
-                                if (playerToken >= needToken)
+                                if (playerGems >= needToken)
                                     updatePickaxe(playerData, player, needToken, upgrade, upgrades, 1);
 
                                 return;
 
                             case RIGHT:
-                                if (playerToken >= tenTokens) {
+                                if (playerGems >= tenTokens) {
                                     double up = 10;
 
                                     if (count + up > upgrade.getMax_level())
@@ -220,7 +219,7 @@ public class PickaxeGui extends BaseSimpleInventory {
                                 return;
 
                             case DROP:
-                                if (playerToken >= maxTokens)
+                                if (playerGems >= maxTokens)
                                     updatePickaxe(playerData, player, maxTokens, upgrade, upgrades, maxUpgrades);
 
                         }
@@ -231,24 +230,17 @@ public class PickaxeGui extends BaseSimpleInventory {
 
         addItem(14, Objects.requireNonNull(Items.getItem("pickaxe", player.getName())));
 
-        addItem(54,
-                ApiManager.newItemBuilder(Material.ENCHANTED_BOOK)
-                        .setName("§bПрестижные Зачарования")
-                        .setLore(
-                                "§7Уникальные зачарования, которые",
-                                "§7улучшаются засчёт гемов.",
-                                "",
-                                "§eНажмите, чтобы открыть список зачарований!"
-                        )
-                .build(),
-                (baseInventory, inventoryClickEvent) -> new GemsPickaxeGui().openInventory(player)
-                );
+        addItem(50,
+                ApiManager.newItemBuilder(Material.ARROW)
+                        .setName("§cНазад")
+                        .build(),
+                (baseInventory, inventoryClickEvent) -> new PickaxeGui().openInventory(player));
+
         setGlassPanel();
     }
 
-
-    protected void updatePickaxe(PlayerData playerData, Player player, double tokens, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap, double upgrades) {
-        playerData.setToken(playerData.getToken() - tokens);
+    protected void updatePickaxe(PlayerData playerData, Player player, double gems, Upgrade upgrade, Map<Upgrade, Upgrade.UpgradeStat> upgradeMap, double upgrades) {
+        playerData.setGems(playerData.getGems() - gems);
         Upgrade.UpgradeStat up = upgradeMap.get(upgrade);
         up.setCount(up.getCount() + upgrades);
 
@@ -284,11 +276,11 @@ public class PickaxeGui extends BaseSimpleInventory {
     }
 
     private void setGlassPanel() {
-        for (int i = 1; i <= getInventoryRows() * 9; i++) {
-            BaseInventoryItem item = getInventoryInfo().getItem(i - 2);
+        for (int i = 1; i <= this.getInventoryRows() * 9; i++) {
+            BaseInventoryItem item = this.getInventoryInfo().getItem(i - 2);
 
             if (item == null)
-                addItem(
+                this.addItem(
                         i,
                         ApiManager
                                 .newItemBuilder(Material.STAINED_GLASS_PANE)

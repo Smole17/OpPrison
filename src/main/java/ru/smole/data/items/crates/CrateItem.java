@@ -121,7 +121,7 @@ public class CrateItem {
 
     public void sendMessage(Player sender, Player player, String crateName) {
             ChatUtil.sendMessage(sender, OpPrison.PREFIX +
-                    String.format("&b%s &fоткрыл %s &fи получил %s %s &fx%s",
+                    String.format("&a%s открыл &r%s &aи получил &r%s %s &fx%s",
                             player.getName(),
                             crateName,
                             rare.getName(),

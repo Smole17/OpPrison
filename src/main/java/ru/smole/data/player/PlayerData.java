@@ -105,6 +105,7 @@ public class PlayerData {
             achievements.addAchievement(Achievement.OP_PRESTIGE_1B);
         }
 
+        addGems(count);
         return added;
     }
 

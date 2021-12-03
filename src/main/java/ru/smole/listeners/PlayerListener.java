@@ -117,7 +117,7 @@ public class PlayerListener implements Listener {
                 });
 
         if (killer != null) {
-            ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вас убил &a%s", killer.getName());
+            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вас убил &a%s", killer.getName());
             ChatUtil.sendMessage(killer, OpPrison.PREFIX + "Вы убили &a%s", player.getName());
         }
 
@@ -228,7 +228,7 @@ public class PlayerListener implements Listener {
 
                     Location loc = block.getLocation();
                     if (!Event.getEventManager().getTreasureMap().containsKey(player.getName()) || !Event.getEventManager().getTreasureMap().get(player.getName()).contains(loc)) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Это не ваше сокровище!");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Это не ваше сокровище!");
                         event.setCancelled(true);
                         break;
                     }
@@ -368,7 +368,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         event.setCancelled(true);
-        ChatUtil.sendMessage(event.getPlayer(), OpPrison.PREFIX + "§fВы не можете выбрасывать предметы. Используйте §a/trash");
+        ChatUtil.sendMessage(event.getPlayer(), OpPrison.PREFIX_N + "Вы не можете выбрасывать предметы. Используйте /trash");
     }
 
     @EventHandler
@@ -468,7 +468,7 @@ public class PlayerListener implements Listener {
         if (item.getType() == Material.AIR)
             return new TextComponent(msg);
 
-        if (msg.equals("#рука") || msg.equals("#hand") || msg.equals("[item]")) {
+        if (msg.equals("#рука") || msg.equals("#hand") || msg.equals("[item]") || msg.equals("[i]")) {
             int amount = item.getAmount();
             String text_peace = amount == 1 ? "" : " §fx" + amount;
             String text = String.format("§8[§f%s%s§8]",

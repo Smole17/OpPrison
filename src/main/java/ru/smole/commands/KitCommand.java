@@ -95,7 +95,7 @@ public class KitCommand extends BukkitCommand<Player> {
                             }
 
                             if (!group.isCan(playerData.getGroup())) {
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к данному набору");
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "У вас нет доступа к данному набору");
                                 return;
                             }
 
@@ -130,7 +130,7 @@ public class KitCommand extends BukkitCommand<Player> {
                             }
 
                             if (!playerData.getAccess().contains(kit)) {
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к данному набору");
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "У вас нет доступа к данному набору");
                                 return;
                             }
 
@@ -164,7 +164,7 @@ public class KitCommand extends BukkitCommand<Player> {
             if (clickType == ClickType.LEFT) {
                 if (!playerKits.isEmpty())
                     if (playerKits.containsKey(playerName) && playerKits.get(playerName).contains(kit)) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы уже забирали данный набор");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы уже забирали данный набор");
                         return;
                     }
 
@@ -173,7 +173,7 @@ public class KitCommand extends BukkitCommand<Player> {
 
                     if (group != null)
                         if (!group.isCan(OpPrison.getInstance().getPlayerDataManager().getPlayerDataMap().get(playerName).getGroup())) {
-                            ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет доступа к набору");
+                            ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "У вас нет доступа к набору");
                             return;
                         }
                 } catch (Exception ignored) {}
@@ -186,7 +186,7 @@ public class KitCommand extends BukkitCommand<Player> {
 
                 items.forEach(itemStack -> {
                     opPlayer.add(itemStack);
-                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &fс набора %s", itemStack.getItemMeta().getDisplayName(), name);
+                    ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы получили %s &aс набора %s", itemStack.getItemMeta().getDisplayName(), name);
                 });
             }
         }
@@ -256,7 +256,7 @@ public class KitCommand extends BukkitCommand<Player> {
             private BaseSimpleInventory inv;
 
             public KitsContentsGui(List<ItemStack> items, BaseSimpleInventory inv) {
-                super(1, "Содержимое набора");
+                super(1, "§7Содержимое набора");
                 this.items = items;
                 this.inv = inv;
             }

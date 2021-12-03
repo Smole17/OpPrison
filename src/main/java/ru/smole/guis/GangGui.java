@@ -23,7 +23,7 @@ public class GangGui extends BaseSimpleInventory {
     GangData gangData;
 
     public GangGui(GangData gangData) {
-        super(4, "§7Банда");
+        super(5, "§7Банда");
         this.gangData = gangData;
     }
 
@@ -38,15 +38,15 @@ public class GangGui extends BaseSimpleInventory {
             item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
                     .setName("§aВаша Банда")
                     .setLore(
+                            "§f❃ §f§lГлава §r§7" + gangPlayer.getPlayerName(),
                             "§f✍ §fНазвание " + gangData.getName(),
                             "§6☀ §fОчки §6" + StringUtils.replaceComma(gangData.getScore()),
-                            "§f❃ §f§lГлава §r§7" + gangPlayer.getPlayerName(),
                             String.format("§a✌ §fУчастники §a%s/10", gangData.getGangPlayerMap().size())
                     )
                     .setDurability(3)
                     .setPlayerSkull(gangPlayer.getPlayerName())
                     .build();
-            addItem(14,
+            addItem(23,
                     item
             );
         }
@@ -59,7 +59,7 @@ public class GangGui extends BaseSimpleInventory {
                 )
                 .build();
 
-        addItem(22,
+        addItem(21,
                 item,
                 (inv, click) -> gangData.openVault(player)
         );
@@ -77,7 +77,7 @@ public class GangGui extends BaseSimpleInventory {
                     lore.add(String.format(
                             "§7%s. %s §7%s §6☀ %s §8(%s§8)",
                             i[0], gangPlayer1.getType().getName(), gangPlayer1.getName(),
-                            StringUtils.replaceComma(gangPlayer1.getScore()), gangPlayer1.getPlayer() == null ? "§a-" : "§c+")
+                            StringUtils.replaceComma(gangPlayer1.getScore()), gangPlayer1.getPlayer() == null ? "§c-" : "§a+")
                     );
                     i[0]++;
                 });
@@ -87,15 +87,15 @@ public class GangGui extends BaseSimpleInventory {
                 .setLore(lore)
                 .build();
 
-        addItem(24,
+        addItem(25,
                 item
         );
 
-        item = ApiManager.newItemBuilder(Material.ARROW)
-                .setName("§cНазад")
-                .build();
+            item = ApiManager.newItemBuilder(Material.ARROW)
+                    .setName("§cНазад")
+                    .build();
 
-        addItem(32,
+        addItem(41,
                 item,
                 (inv, click) -> new MenuGui().openInventory(player)
         );

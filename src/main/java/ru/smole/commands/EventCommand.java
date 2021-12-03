@@ -148,14 +148,14 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             }
 
             if (msg.contains("-")) {
-                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Число не может быть отрицательным");
+                ChatUtil.sendMessage(target, OpPrison.PREFIX_N + "Число не может быть отрицательным");
 
                 event.setCancelled(true);
                 return;
             }
 
             if (msg.split("\\s").length > 1) {
-                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Во время события можно писать только цифры §8(без пробелов)");
+                ChatUtil.sendMessage(target, OpPrison.PREFIX_N + "Во время события можно писать только цифры §8(без пробелов)");
 
                 event.setCancelled(true);
                 return;
@@ -164,14 +164,14 @@ public class EventCommand extends BukkitCommand<CommandSender> {
             try {
                 num = Integer.parseInt(msg.split("\\s")[0]);
             } catch (Exception e) {
-                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Во время события можно писать только цифры §8(без пробелов)");
+                ChatUtil.sendMessage(target, OpPrison.PREFIX_N + "Во время события можно писать только цифры §8(без пробелов)");
 
                 event.setCancelled(true);
                 return;
             }
 
             if (num > i) {
-                ChatUtil.sendMessage(target, OpPrison.PREFIX + "Вы превысили диапозон события §8(%s)", i);
+                ChatUtil.sendMessage(target, OpPrison.PREFIX_N + "Вы превысили диапозон события §8(%s)", i);
 
                 event.setCancelled(true);
                 return;
@@ -217,7 +217,7 @@ public class EventCommand extends BukkitCommand<CommandSender> {
                                 return;
 
                             if (is) {
-                                ChatUtil.sendMessage(player, OpPrison.PREFIX + "Чат был временно отключён");
+                                ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Чат был временно отключён");
                                 event.setCancelled(true);
                             }
                         });

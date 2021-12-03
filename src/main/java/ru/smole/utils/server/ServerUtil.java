@@ -13,14 +13,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ServerUtil {
 
     public static void load() {
-        Task.schedule(new Runnable() {
-
-            public void run() {
-                Bukkit.getWorlds().forEach(world -> world.setTime(18000L));
-                Bukkit.getOnlinePlayers().forEach(p -> p.setPlayerTime(1200L, false));
-                if (LagMeter.getLastMinuteTPS() < 5.0D) {
-                    Bukkit.getOnlinePlayers().forEach(player -> ChatUtil.sendMessage(player, "&4&lСожалеем, но сервер крайне перегружен. Попробуйте вернуться через несколько минут."));
-                }
+        Task.schedule(() -> {
+            Bukkit.getWorlds().forEach(world -> world.setTime(18000L));
+            Bukkit.getOnlinePlayers().forEach(p -> p.setPlayerTime(1200L, false));
+            if (LagMeter.getLastMinuteTPS() < 5.0D) {
+                Bukkit.getOnlinePlayers().forEach(player -> ChatUtil.sendMessage(player, "&4&lСожалеем, но сервер крайне перегружен. Попробуйте вернуться через несколько минут."));
             }
         }, 0L, 20L);
     }
@@ -31,7 +28,7 @@ public class ServerUtil {
 
             PlayerDataManager playerData = OpPrison.getInstance().getPlayerDataManager();
             playerData.unload(player);
-            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 4));
+            UtilBungee.sendPlayer(player, "hub" + ThreadLocalRandom.current().nextInt(1, 3));
         });
 
         Bukkit.getScheduler().runTaskLater(OpPrison.getInstance(), Bukkit::shutdown, 200L);

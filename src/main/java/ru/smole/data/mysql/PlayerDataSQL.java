@@ -42,6 +42,7 @@ public class PlayerDataSQL {
                                 .queryRow(new ValueQueryRow("blocks", 0.0))
                                 .queryRow(new ValueQueryRow("money", 0.0))
                                 .queryRow(new ValueQueryRow("token", 0.0))
+                                .queryRow(new ValueQueryRow("gems", 0.0))
                                 .queryRow(new ValueQueryRow("multiplier", 0.0))
                                 .queryRow(new ValueQueryRow("rank", GroupsManager.Group.MANTLE.name()))
                                 .queryRow(new ValueQueryRow("prestige", 0.0))
@@ -50,7 +51,6 @@ public class PlayerDataSQL {
                                 .queryRow(new ValueQueryRow("kit", null))
                                 .queryRow(new ValueQueryRow("access", null))
                                 .queryRow(new ValueQueryRow("questions", null))
-                                .queryRow(new ValueQueryRow("battlepass", null))
 
                                 .executeAsync(base);
                     }

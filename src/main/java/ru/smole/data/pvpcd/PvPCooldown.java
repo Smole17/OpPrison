@@ -24,7 +24,7 @@ public class PvPCooldown {
 
         players.add(player);
 
-        ChatUtil.sendMessage(player, OpPrison.PREFIX + "Вы вошли в §cPvP§f. Не выходите из игры 20 секунд");
+        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "Вы вошли в §cPvP§f. Не выходите из игры 20 секунд");
 
         Schedules.runAsync(
                 () -> removePlayer(player, true),

@@ -55,7 +55,7 @@ public class Crate {
         if (type.isMessage())
             Bukkit.getOnlinePlayers().forEach(onPlayer ->
                     ChatUtil.sendMessage(onPlayer, OpPrison.PREFIX +
-                            String.format("&a%s &fоткрывает %s&f...",
+                            String.format("&a%s открывает %s&f...",
                                     player.getName(), type.getName())));
 
         new CrateGui().openInventory(player);
@@ -107,7 +107,7 @@ public class Crate {
         ARMOR("§bЯЩИК С БРОНЁЙ", false),
         RARE_ARMOR("§b§lРЕДКИЙ §r§bЯЩИК С БРОНЁЙ", false),
         POTION("§cЯЩИК С ЗЕЛЬЯМИ", false),
-        LOOT_BOX("§6ЛУТБОКС", true),
+        LOOT_BOX("§6ЛУТБОКС", false),
         MONTHLY("§aЯЩИК МЕСЯЦА", true);
 
         private final @Getter String name;
@@ -255,7 +255,8 @@ public class Crate {
 
                             items.remove(crateItem);
 
-                            Bukkit.getOnlinePlayers().forEach(onPlayer -> crateItem.sendMessage(onPlayer, opPlayer.getPlayer(), name));
+                            if (type.isMessage())
+                                Bukkit.getOnlinePlayers().forEach(onPlayer -> crateItem.sendMessage(onPlayer, opPlayer.getPlayer(), name));
                         });
             }
         }

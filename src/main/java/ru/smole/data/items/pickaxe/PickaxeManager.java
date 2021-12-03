@@ -38,7 +38,7 @@ public class PickaxeManager {
                 player,
                 String.format("§b%s", name),
                 0,
-                0,
+                1,
                 upgradeMap
         );
 

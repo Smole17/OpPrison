@@ -16,6 +16,7 @@ import ru.smole.data.gang.GangData;
 import ru.smole.data.gang.GangDataManager;
 import ru.smole.data.player.OpPlayer;
 import ru.smole.data.player.PlayerData;
+import ru.smole.data.shop.GemsShop;
 import ru.smole.guis.warps.WarpGui;
 import ru.smole.utils.StringUtils;
 import ru.xfenilafs.core.ApiManager;
@@ -48,26 +49,48 @@ public class MenuGui extends BaseSimpleInventory {
                 .build();
 
         addItem(
-                13,
+                23,
                 item
         );
 
-        item = ApiManager.newItemBuilder(Material.NETHER_STAR)
-                .setName("§bПрокачать Престиж")
+        item = ApiManager.newItemBuilder(Material.BARRIER)
+                .setName("§cЗакрыть")
+                .build();
+
+        addItem(50,
+                item,
+                (inv, click) -> closeInventory(player));
+
+        item = ApiManager.newItemBuilder(Material.ENDER_CHEST)
+                .setName("§dЛичное Хранилище")
                 .setLore(
-                        "§7Одним нажатием прокачать нужное кол-во престижей.",
+                        "§7Ваше личное хранилище,",
+                        "§7эндер-сундук.",
                         "",
-                        "§eНажмите ЛКМ, чтобы прокачать престиж на 1!",
-                        "§eНажмите ПКМ, чтобы прокачать престиж на все деньги!"
+                        "§eНажмите для открытия!"
                 )
-                .setDurability(3)
-                .setPlayerSkull("speu")
+                .build();
+
+        addItem(34,
+                item,
+                (inv, click) -> player.openInventory(player.getEnderChest()));
+
+        item = ApiManager.newItemBuilder(Material.BEACON)
+                .setName("§bУвеличить Престиж")
+                .setLore(
+                        "§7Используйте предоставленные",
+                        "§7варианты увеличения,",
+                        "§7Вашего престижа.",
+                        "",
+                        "§eНажмите ЛКМ для увеличения на 1 ед.!",
+                        "§eНажмите ПКМ для увеличения на все деньги!"
+                )
                 .build();
 
         OpPlayer opPlayer = new OpPlayer(player);
 
         addItem(
-                15,
+                33,
                 item,
                 (inv, click) -> {
                     if (click.isLeftClick()) {
@@ -85,24 +108,44 @@ public class MenuGui extends BaseSimpleInventory {
         );
 
         item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
-                .setName("§bЛокации Режима")
+                .setName("§2Локации Режима")
                 .setLore(
                         "§7Телепортация на локации режима.",
                         "",
                         "§eНажмите для выбора локации!"
                 )
                 .setDurability(3)
-                .setPlayerSkull("speu")
+                .setPlayerSkull("__planet")
                 .build();
 
         addItem(32,
                 item,
                 (inv, click) -> new WarpGui(OpPrison.getInstance().getConfigManager()).openInventory(player));
 
-        item = ApiManager.newItemBuilder(Material.GOLD_SWORD)
-                .setName("§bБанда")
+
+        item = ApiManager.newItemBuilder(Material.SKULL_ITEM)
+                .setName("§3Магазин Гемов")
                 .setLore(
-                        "§7Информация по вашей банде.",
+                        "§7Выдаёт список предметом,",
+                        "§7которые можно приобрести",
+                        "§7за гемы.",
+                        "",
+                        "§eНажмите для открытия!"
+                )
+                .setDurability(3)
+                .setPlayerSkull("_Olympia_")
+                .build();
+
+        addItem(31,
+                item,
+                (inv, click) ->
+                        new GemsShop(playerData.getGems()).openShop(player)
+                );
+
+        item = ApiManager.newItemBuilder(Material.GOLD_SWORD)
+                .setName("§6Банда")
+                .setLore(
+                        "§7Информация о вашей банде.",
                         "",
                         "§eНажмите для открытия!"
                 )
@@ -110,32 +153,9 @@ public class MenuGui extends BaseSimpleInventory {
 
         addItem(30,
                 item,
-                (inv, click) -> {
-                    closeInventory(player);
-                    new GangGui(OpPrison.getInstance().getGangDataManager().getGangFromPlayer(playerName)).open(player);
-                });
-
-        item = ApiManager.newItemBuilder(Material.ENDER_CHEST)
-                .setName("§aЛичное Хранилище")
-                .setLore(
-                        "§7Ваше личное хранилище,",
-                        "§7эндер-сундук.",
-                        "",
-                        "§eНажмите для открытия!"
-                )
-                .build();
-
-        addItem(34,
-                item,
-                (inv, click) -> player.openInventory(player.getEnderChest()));
-
-       item = ApiManager.newItemBuilder(Material.BARRIER)
-               .setName("§cЗакрыть")
-               .build();
-
-       addItem(41,
-               item,
-               (inv, click) -> closeInventory(player));
+                (inv, click) ->
+                        new GangGui(OpPrison.getInstance().getGangDataManager().getGangFromPlayer(playerName)).open(player)
+        );
 
         setGlassPanel();
     }
