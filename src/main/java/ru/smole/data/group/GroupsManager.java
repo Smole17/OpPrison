@@ -27,18 +27,19 @@ public class GroupsManager {
     @AllArgsConstructor
     public enum Group {
 
-        MANTLE("§7"),
-        EARTH("§8"),
-        AQUA("§9"),
-        AIR("§f"),
-        SKY("§b"),
-        COSMOS("§5"),
-        SUN("§e"),
-        GALAXY("§d"),
-        UNIVERSE("§0"),
-        ADMIN("§c");
+        MANTLE("§7", 100),
+        EARTH("§8", 115),
+        AQUA("§9", 125),
+        AIR("§f", 135),
+        SKY("§b", 145),
+        COSMOS("§5", 160),
+        SUN("§e", 175),
+        GALAXY("§d", 190),
+        UNIVERSE("§0", 210),
+        ADMIN("§c", 9999);
 
         private final @Getter String color;
+        private final @Getter double multiplier;
 
         public String getName() {
             return color + name();

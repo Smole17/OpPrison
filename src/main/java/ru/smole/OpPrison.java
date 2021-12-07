@@ -298,7 +298,7 @@ public class OpPrison extends CorePlugin {
             Cuboid cuboid = region.getZone();
 
             if (!cuboid.getWorld().getName().contains("gangs"))
-                WorldBorderUtils.spawn(region.getZone().getWorld(), cuboid.getCenter(), cuboid.getSizeX() + cuboid.getSizeZ());
+                WorldBorderUtils.spawn(cuboid.getCenter(), cuboid.getSizeX() + cuboid.getSizeZ());
 
             REGIONS.put(name.toLowerCase(), region);
         });

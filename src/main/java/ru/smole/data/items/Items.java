@@ -257,8 +257,8 @@ public class Items {
                         .newItemBuilder(Material.SPONGE)
                         .setName("§e" + StringUtils._fixDouble(0, (Double) objects[0]) + " §fОчков")
                         .setLore(
-                                "Нажмите §8(ШИФТ+ПКМ в руке) для использования!",
-                                "Добавляет " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
+                                "§7Нажмите §8ШИФТ+ПКМ в руке §7для использования!",
+                                "§7Добавляет " + StringUtils._fixDouble(0, (Double) objects[0]) + " очков в банду")
                         .build(),
                 (event, itemStack) -> {
                     Player player = event.getPlayer();
@@ -274,11 +274,11 @@ public class Items {
                         return;
 
                     if (!gangDataManager.playerHasGang(playerName)) {
-                        ChatUtil.sendMessage(player, OpPrison.PREFIX + "У вас нет банды");
+                        ChatUtil.sendMessage(player, OpPrison.PREFIX_N + "У вас нет банды");
                         return;
                     }
 
-                    double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" очков в банду")[0]);
+                    double count = Double.parseDouble(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).split(" ")[0]);
 
                     GangData gangData = gangDataManager.getGangFromPlayer(playerName);
 

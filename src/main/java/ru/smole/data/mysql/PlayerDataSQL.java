@@ -43,7 +43,7 @@ public class PlayerDataSQL {
                                 .queryRow(new ValueQueryRow("money", 0.0))
                                 .queryRow(new ValueQueryRow("token", 0.0))
                                 .queryRow(new ValueQueryRow("gems", 0.0))
-                                .queryRow(new ValueQueryRow("multiplier", 0.0))
+                                .queryRow(new ValueQueryRow("multiplier", 1.0))
                                 .queryRow(new ValueQueryRow("rank", GroupsManager.Group.MANTLE.name()))
                                 .queryRow(new ValueQueryRow("prestige", 0.0))
                                 .queryRow(new ValueQueryRow("fly", 0))

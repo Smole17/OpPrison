@@ -37,7 +37,7 @@ public class PlayerData {
 
         Achievements achievements = RPlayer.checkAndGet(name).getAchievements();
 
-        if (blocks >= 10000)
+        if (blocks >= 10000)    
             achievements.addAchievement(Achievement.OP_NEW_MINER);
 
         if (blocks >= 100000)
@@ -71,12 +71,12 @@ public class PlayerData {
     public double addMultiplier(double count) {
         double added = multiplier + count;
 
-        if (added > 8000)
+        if (added > group.getMultiplier())
             return 0.0;
 
         setMultiplier(added);
 
-        if (multiplier >= 5000) {
+        if (multiplier >= 135) {
             RPlayer.checkAndGet(name).getAchievements().addAchievement(Achievement.OP_MORE_MULTI);
         }
 
