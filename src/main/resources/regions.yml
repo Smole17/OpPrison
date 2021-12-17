@@ -1,0 +1,19 @@
+regions:
+  1:
+    name: test
+    pvp: false
+    inventory:
+      slot: 0
+    spawnLoc: world 8 6 -7 0 0
+    maxPoint: world 129 -30 97
+    minPoint: world -134 111 -122
+mines:
+  1:
+    level: 1
+    region: test
+    world: world
+    maxPoint: 38 131 -1217
+    minPoint: 18 111 -1197
+    resetTime: 3m
+    blocks:
+      - STONE 100

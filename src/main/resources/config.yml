@@ -1,0 +1,96 @@
+cases:
+  §aТестовый кейс:
+    world: world
+    x: 31
+    y: 122
+    z: 3
+    yaw: 0.0
+    pitch: 0.0
+    key: mine_key
+    items:
+      '1':
+        name: §eТест
+        material: DIRT
+        amount: 4
+        chance: 0.3
+
+crates:
+  LOOT_BOX:
+    type: LOOT_BOX
+    items:
+      1:
+        rare: COMMON
+        op-item:
+          name: fly
+      2:
+        rare: COMMON
+        op-item:
+          name: token
+          amount: 50000000.0
+      3:
+        rare: COMMON
+        op-item:
+          name: token
+          amount: 100000000.0
+      4:
+        rare: COMMON
+        op-item:
+          name: token_key
+          amount: 10.0
+      5:
+        rare: COMMON
+        op-item:
+          name: mine_key
+          amount: 4.0
+      6:
+        rare: RARE
+        op-item:
+          name: mine_key
+          amount: 8.0
+      7:
+        rare: RARE
+        op-item:
+          name: token
+          amount: 250000000.0
+      8:
+        rare: RARE
+        op-item:
+          name: token
+          amount: 400000000.0
+      9:
+        rare: RARE
+        op-item:
+          name: epic_key
+          amount: 4.0
+      10:
+        rare: EPIC
+        op-item:
+          name: token
+          amount: 600000000.0
+      11:
+        rare: EPIC
+        op-item:
+          name: epic_key
+          amount: 8.0
+      12:
+        rare: EPIC
+        op-item:
+          name: legendary_key
+          amount: 4.0
+      13:
+        rare: LEGENDARY
+        op-item:
+          name: earth_group
+          amount: 1.0
+      14:
+        rare: LEGENDARY
+        op-item:
+          name: aqua_group
+          amount: 1.0
+
+leaderBoard:
+  update: 1200
+  format1: '&c#[top] &7| &f&o[name] &7- &6&o[count]'
+  format2: '&e#[top] &7| &f&o[name] &7- &6&o[count]'
+  format3: '&6#[top] &7| &f&o[name] &7- &6&o[count]'
+  format-default: '&7#[top] &7| &f[name] &7- &6[count]'
